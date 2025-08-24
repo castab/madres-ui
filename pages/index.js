@@ -134,21 +134,10 @@ const MadresLandingPage = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box
               component="img"
-              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8IS0tIFN1biBSYXlzIC0tPgo8cGF0aCBkPSJNNTAgMTBMMTMuNCAyMEw1MCAzMEw4Ni42IDIwTDUwIDEwWiIgZmlsbD0iI0JCOUI0QyIvPgo8cGF0aCBkPSJNMjAgMTMuNEwzMCA1MEwyMCA4Ni42TDEwIDUwTDIwIDEzLjRaIiBmaWxsPSIjQkI5RDRDIi8+CjxwYXRoIGQ9Ik04MCAzMC40TDkwIDUwTDgwIDg2LjZMNzAgNTBMODAgMTMuNFoiIGZpbGw9IiNCQjlENEMiLz4KPHBhdGggZD0iTTUwIDkwTDEzLjQgODBMNTAgNzBMODYuNiA4MEw1MCA5MFoiIGZpbGw9IiNCQjlENEMiLz4KPGV0Yy4uLj4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTUiIGZpbGw9IiM3QTYyNDEiLz4KPC9zdmc+Cg=="
+              src="./madres_color_text_only.png"
               alt="Madres Taco Shop Logo"
-              sx={{ height: 40, width: 40 }}
+              sx={{ height: { xs: 40, md: 60 } }}
             />
-            <Typography 
-              variant="h4" 
-              component="div" 
-              sx={{ 
-                color: 'primary.main',
-                fontWeight: 'bold',
-                fontSize: { xs: '1.2rem', md: '1.5rem' }
-              }}
-            >
-              MADRES TACO SHOP
-            </Typography>
           </Box>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
             {navItems.map((item) => (
@@ -177,35 +166,11 @@ const MadresLandingPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
               <Box
                 component="img"
-                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwhLS0gU3VuIFJheXMgLS0+CjxwYXRoIGQ9Ik0xMDAgMjBMMzAgNDBMMTAwIDYwTDE3MCA0MEwxMDAgMjBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPHA+cGF0aCBkPSJNNDAgMzBMNjAgMTAwTDQwIDE3MEwyMCAxMDBMNDAgMzBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPHA+cGF0aCBkPSJNMTYwIDMwTDE4MCAxMDBMMTYwIDE3MEwxNDAgMTAwTDE2MCAzMFoiIGZpbGw9IiNCQjlENEMiIG9wYWNpdHk9IjAuOSIvPgo8cGF0aCBkPSJNMTAwIDE4MEwzMCAxNjBMMTAwIDE0MEwxNzAgMTYwTDEwMCAxODBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPCEtLSBDZW50cmFsIFN1biAtLT4KPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIzMCIgZmlsbD0iIzdBNjI0MSIgb3BhY2l0eT0iMC45Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjN0E2MjQxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjkiPk1hZHJlczwvdGV4dD4KPC9zdmc+"
+                src="./madres_color.png"
                 alt="Madres Taco Shop Logo"
-                sx={{ height: { xs: 80, md: 120 }, width: { xs: 80, md: 120 } }}
+                sx={{ height: { xs: 160, md: 480 } }}
               />
             </Box>
-            <Typography 
-              variant="h1" 
-              component="h1" 
-              sx={{ 
-                fontSize: { xs: '3rem', md: '5rem', lg: '6rem' },
-                fontWeight: 'bold',
-                mb: 1,
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
-              }}
-            >
-              MADRES
-            </Typography>
-            <Typography 
-              variant="h2" 
-              component="h2" 
-              sx={{ 
-                fontSize: { xs: '1.8rem', md: '3rem' },
-                fontWeight: 'bold',
-                mb: 3,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
-              }}
-            >
-              TACO SHOP
-            </Typography>
             <Typography 
               variant="h5" 
               component="p" 
@@ -348,7 +313,7 @@ const MadresLandingPage = () => {
             Ready to Taste Tradition?
           </Typography>
           <Typography variant="h5" component="p" sx={{ mb: 4, color: 'primary.main', opacity: 0.8 }}>
-            Join thousands of satisfied customers who trust MADRES TACO SHOP for authentic Mexican cuisine.
+            Join thousands of satisfied customers who trust Madres Taco Shop for authentic Mexican cuisine.
           </Typography>
           <Button
             variant="contained"
@@ -376,7 +341,7 @@ const MadresLandingPage = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Typography variant="h4" component="h3" gutterBottom>
-                MADRES TACO SHOP
+                Madres Taco Shop
               </Typography>
               <Typography variant="body1">
                 Serving authentic Mexican flavors with love and tradition since day one.
