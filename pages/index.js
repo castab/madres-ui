@@ -209,7 +209,7 @@ const MadresLandingPage = () => {
                   },
                 }}
               >
-                Order Now
+                Inquire Now
               </Button>
               <Button
                 variant="outlined"
@@ -291,7 +291,7 @@ const MadresLandingPage = () => {
                 <CardMedia
                   component="img"
                   height="200"
-                  image="https://images.unsplash.com/photo-1559847844-d7b33d2e7da0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                  image="./tacos-lined.jpg"
                   alt="Catering service"
                 />
                 <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -337,7 +337,7 @@ const MadresLandingPage = () => {
               },
             }}
           >
-            Order Online Now
+            Inquire Online Now
           </Button>
         </Container>
       </Box>
@@ -347,9 +347,14 @@ const MadresLandingPage = () => {
         <Container maxWidth="lg">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <Typography variant="h4" component="h3" gutterBottom>
-                Madres Taco Shop
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box
+                  component="img"
+                  src="./madres_white_text_only.png"
+                  alt="Madres Taco Shop Logo"
+                  sx={{ height: { xs: 40, md: 60 } }}
+                />
+              </Box>
               <Typography variant="body1">
                 Serving authentic Mexican flavors with love and tradition since day one.
               </Typography>
