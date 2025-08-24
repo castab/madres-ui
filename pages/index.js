@@ -344,15 +344,15 @@ const MadresLandingPage = () => {
 
       {/* Footer */}
       <Box sx={{ py: 4, backgroundColor: 'primary.main', color: 'background.default' }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={3}>
+        <Container>
+          <Grid container spacing={3} sx={{justifyContent: 'space-between', alignItems: 'flex-start'}}>
             <Grid item xs={12} md={6}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Box
                   component="img"
                   src="./madres_white_text_only.png"
                   alt="Madres Taco Shop Logo"
-                  sx={{ height: { xs: 40, md: 60 } }}
+                  sx={{ height: { xs: 60 } }}
                 />
               </Box>
               <Typography variant="body1">
