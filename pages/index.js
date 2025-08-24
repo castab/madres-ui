@@ -17,26 +17,26 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-// Custom theme based on traditional Mexican/taco shop colors
+// Custom theme based on Madres brand colors
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#D32F2F', // Deep red
-      light: '#FF6659',
-      dark: '#9A0007',
+      main: '#7A6241', // Luna Brown
+      light: '#9B7C5A',
+      dark: '#5D4931',
     },
     secondary: {
-      main: '#FF9800', // Orange/amber
-      light: '#FFB74D',
-      dark: '#F57C00',
+      main: '#BB9D4C', // Sol Yellow
+      light: '#D4B865',
+      dark: '#A08439',
     },
     background: {
-      default: '#FFF8E1', // Cream/warm white
-      paper: '#FFFFFF',
+      default: '#FFF8F5', // Talavera White
+      paper: '#DCD6CB', // Barrow Tan
     },
     text: {
-      primary: '#2E2E2E',
-      secondary: '#5D4037', // Brown
+      primary: '#7A6241', // Luna Brown
+      secondary: '#BB9D4C', // Sol Yellow
     },
   },
   typography: {
@@ -106,10 +106,10 @@ const HeroContent = styled(Box)(({ theme }) => ({
 }));
 
 const FloatingNav = styled(AppBar)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.95)',
+  background: 'rgba(255, 248, 245, 0.95)',
   backdropFilter: 'blur(10px)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-  borderBottom: `3px solid ${theme.palette.primary.main}`,
+  boxShadow: '0 8px 32px rgba(122, 98, 65, 0.1)',
+  borderBottom: `3px solid ${theme.palette.secondary.main}`,
 }));
 
 const FeatureCard = styled(Card)(({ theme }) => ({
@@ -117,7 +117,7 @@ const FeatureCard = styled(Card)(({ theme }) => ({
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: '0 12px 24px rgba(211, 47, 47, 0.15)',
+    boxShadow: '0 12px 24px rgba(122, 98, 65, 0.15)',
   },
 }));
 
@@ -131,17 +131,25 @@ const MadresLandingPage = () => {
       {/* Floating Navigation */}
       <FloatingNav position="fixed" elevation={0}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography 
-            variant="h4" 
-            component="div" 
-            sx={{ 
-              color: 'primary.main',
-              fontWeight: 'bold',
-              fontSize: { xs: '1.5rem', md: '2rem' }
-            }}
-          >
-            MADRES
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box
+              component="img"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8IS0tIFN1biBSYXlzIC0tPgo8cGF0aCBkPSJNNTAgMTBMMTMuNCAyMEw1MCAzMEw4Ni42IDIwTDUwIDEwWiIgZmlsbD0iI0JCOUI0QyIvPgo8cGF0aCBkPSJNMjAgMTMuNEwzMCA1MEwyMCA4Ni42TDEwIDUwTDIwIDEzLjRaIiBmaWxsPSIjQkI5RDRDIi8+CjxwYXRoIGQ9Ik04MCAzMC40TDkwIDUwTDgwIDg2LjZMNzAgNTBMODAgMTMuNFoiIGZpbGw9IiNCQjlENEMiLz4KPHBhdGggZD0iTTUwIDkwTDEzLjQgODBMNTAgNzBMODYuNiA4MEw1MCA5MFoiIGZpbGw9IiNCQjlENEMiLz4KPGV0Yy4uLj4KPGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMTUiIGZpbGw9IiM3QTYyNDEiLz4KPC9zdmc+Cg=="
+              alt="Madres Taco Shop Logo"
+              sx={{ height: 40, width: 40 }}
+            />
+            <Typography 
+              variant="h4" 
+              component="div" 
+              sx={{ 
+                color: 'primary.main',
+                fontWeight: 'bold',
+                fontSize: { xs: '1.2rem', md: '1.5rem' }
+              }}
+            >
+              MADRES TACO SHOP
+            </Typography>
+          </Box>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
             {navItems.map((item) => (
               <Button
@@ -166,28 +174,37 @@ const MadresLandingPage = () => {
       <HeroSection>
         <Container maxWidth="lg">
           <HeroContent>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+              <Box
+                component="img"
+                src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwhLS0gU3VuIFJheXMgLS0+CjxwYXRoIGQ9Ik0xMDAgMjBMMzAgNDBMMTAwIDYwTDE3MCA0MEwxMDAgMjBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPHA+cGF0aCBkPSJNNDAgMzBMNjAgMTAwTDQwIDE3MEwyMCAxMDBMNDAgMzBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPHA+cGF0aCBkPSJNMTYwIDMwTDE4MCAxMDBMMTYwIDE3MEwxNDAgMTAwTDE2MCAzMFoiIGZpbGw9IiNCQjlENEMiIG9wYWNpdHk9IjAuOSIvPgo8cGF0aCBkPSJNMTAwIDE4MEwzMCAxNjBMMTAwIDE0MEwxNzAgMTYwTDEwMCAxODBaIiBmaWxsPSIjQkI5RDRDIiBvcGFjaXR5PSIwLjkiLz4KPCEtLSBDZW50cmFsIFN1biAtLT4KPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIzMCIgZmlsbD0iIzdBNjI0MSIgb3BhY2l0eT0iMC45Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjN0E2MjQxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjkiPk1hZHJlczwvdGV4dD4KPC9zdmc+"
+                alt="Madres Taco Shop Logo"
+                sx={{ height: { xs: 80, md: 120 }, width: { xs: 80, md: 120 } }}
+              />
+            </Box>
             <Typography 
               variant="h1" 
               component="h1" 
               sx={{ 
                 fontSize: { xs: '3rem', md: '5rem', lg: '6rem' },
                 fontWeight: 'bold',
-                mb: 2,
+                mb: 1,
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
               }}
             >
               MADRES
             </Typography>
             <Typography 
-              variant="h3" 
+              variant="h2" 
               component="h2" 
               sx={{ 
-                fontSize: { xs: '1.5rem', md: '2.5rem' },
+                fontSize: { xs: '1.8rem', md: '3rem' },
+                fontWeight: 'bold',
                 mb: 3,
                 textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
               }}
             >
-              Authentic Mexican Flavors
+              TACO SHOP
             </Typography>
             <Typography 
               variant="h5" 
@@ -212,9 +229,11 @@ const MadresLandingPage = () => {
                   py: 1.5,
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
-                  background: 'linear-gradient(45deg, #D32F2F, #FF6659)',
+                  background: 'linear-gradient(45deg, #BB9D4C, #DCD6CB)',
+                  color: '#7A6241',
                   '&:hover': {
-                    background: 'linear-gradient(45deg, #9A0007, #D32F2F)',
+                    background: 'linear-gradient(45deg, #A08439, #BB9D4C)',
+                    color: 'white',
                   },
                 }}
               >
@@ -232,8 +251,8 @@ const MadresLandingPage = () => {
                   color: 'white',
                   borderWidth: 2,
                   '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: '#FFF8F5',
+                    backgroundColor: 'rgba(255, 248, 245, 0.2)',
                   },
                 }}
               >
@@ -265,10 +284,10 @@ const MadresLandingPage = () => {
                   alt="Fresh ingredients"
                 />
                 <CardContent>
-                  <Typography variant="h5" component="h3" gutterBottom color="primary">
+                  <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Fresh Daily
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     All our ingredients are sourced fresh daily, ensuring every bite 
                     is packed with authentic flavors and the highest quality.
                   </Typography>
@@ -284,10 +303,10 @@ const MadresLandingPage = () => {
                   alt="Traditional recipes"
                 />
                 <CardContent>
-                  <Typography variant="h5" component="h3" gutterBottom color="primary">
+                  <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Family Recipes
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     Passed down through generations, our traditional recipes bring 
                     you the authentic taste of Mexico in every dish.
                   </Typography>
@@ -303,10 +322,10 @@ const MadresLandingPage = () => {
                   alt="Catering service"
                 />
                 <CardContent>
-                  <Typography variant="h5" component="h3" gutterBottom color="primary">
+                  <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Premium Catering
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" color="text.primary">
                     Elevate your events with our professional catering services, 
                     bringing restaurant-quality Mexican cuisine to your special occasions.
                   </Typography>
@@ -320,16 +339,16 @@ const MadresLandingPage = () => {
       {/* Call to Action Section */}
       <Box sx={{ 
         py: 8, 
-        backgroundColor: 'primary.main',
-        background: 'linear-gradient(135deg, #D32F2F, #FF9800)',
-        color: 'white' 
+        backgroundColor: 'secondary.main',
+        background: 'linear-gradient(135deg, #BB9D4C, #DCD6CB)',
+        color: 'primary.main' 
       }}>
         <Container maxWidth="md" textAlign="center">
-          <Typography variant="h2" component="h2" gutterBottom>
+          <Typography variant="h2" component="h2" gutterBottom color="primary.main">
             Ready to Taste Tradition?
           </Typography>
-          <Typography variant="h5" component="p" sx={{ mb: 4, opacity: 0.9 }}>
-            Join thousands of satisfied customers who trust Madres for authentic Mexican cuisine.
+          <Typography variant="h5" component="p" sx={{ mb: 4, color: 'primary.main', opacity: 0.8 }}>
+            Join thousands of satisfied customers who trust MADRES TACO SHOP for authentic Mexican cuisine.
           </Typography>
           <Button
             variant="contained"
@@ -339,10 +358,10 @@ const MadresLandingPage = () => {
               py: 2,
               fontSize: '1.2rem',
               fontWeight: 'bold',
-              backgroundColor: 'white',
-              color: 'primary.main',
+              backgroundColor: 'primary.main',
+              color: 'background.default',
               '&:hover': {
-                backgroundColor: 'background.default',
+                backgroundColor: 'primary.dark',
               },
             }}
           >
@@ -352,12 +371,12 @@ const MadresLandingPage = () => {
       </Box>
 
       {/* Footer */}
-      <Box sx={{ py: 4, backgroundColor: 'text.primary', color: 'white' }}>
+      <Box sx={{ py: 4, backgroundColor: 'primary.main', color: 'background.default' }}>
         <Container maxWidth="lg">
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <Typography variant="h4" component="h3" gutterBottom>
-                MADRES
+                MADRES TACO SHOP
               </Typography>
               <Typography variant="body1">
                 Serving authentic Mexican flavors with love and tradition since day one.
