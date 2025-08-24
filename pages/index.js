@@ -40,7 +40,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Futura PT", "Futura", "Century Gothic", "Arial", sans-serif',
+    fontFamily: '"Futura PT Book", "Futura", "Century Gothic", "Arial", sans-serif',
     h1: {
       fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
       fontWeight: 600,
@@ -73,6 +73,10 @@ const theme = createTheme({
       fontFamily: '"Futura PT Book", "Futura", "Century Gothic", "Arial", sans-serif',
       fontWeight: 400,
     },
+    button: {
+      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
+      fontWeight: 600,
+    },
   },
 });
 
@@ -93,7 +97,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'linear-gradient(45deg, rgba(211, 47, 47, 0.7), rgba(255, 152, 0, 0.3))',
+    background: 'rgba(122, 98, 65, 0.7)',
     zIndex: 1,
   },
 }));
@@ -114,6 +118,9 @@ const FloatingNav = styled(AppBar)(({ theme }) => ({
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.paper,
   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
   '&:hover': {
     transform: 'translateY(-8px)',
@@ -168,7 +175,7 @@ const MadresLandingPage = () => {
                 component="img"
                 src="./madres_color.png"
                 alt="Madres Taco Shop Logo"
-                sx={{ height: { xs: 160, md: 480 } }}
+                sx={{ height: { xs: 240, md: 540 } }}
               />
             </Box>
             <Typography 
@@ -194,11 +201,11 @@ const MadresLandingPage = () => {
                   py: 1.5,
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
-                  background: 'linear-gradient(45deg, #BB9D4C, #DCD6CB)',
-                  color: '#7A6241',
+                  backgroundColor: 'secondary.main',
+                  color: 'primary.main',
                   '&:hover': {
-                    background: 'linear-gradient(45deg, #A08439, #BB9D4C)',
-                    color: 'white',
+                    backgroundColor: 'secondary.dark',
+                    color: 'background.default',
                   },
                 }}
               >
@@ -212,12 +219,13 @@ const MadresLandingPage = () => {
                   py: 1.5,
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
-                  borderColor: 'white',
-                  color: 'white',
+                  borderColor: 'background.paper',
+                  color: 'background.paper',
                   borderWidth: 2,
                   '&:hover': {
-                    borderColor: '#FFF8F5',
-                    backgroundColor: 'rgba(255, 248, 245, 0.2)',
+                    borderColor: 'background.default',
+                    backgroundColor: 'background.paper',
+                    color: 'primary.main',
                   },
                 }}
               >
@@ -230,36 +238,36 @@ const MadresLandingPage = () => {
 
       {/* Features Section */}
       <Box sx={{ py: 8, backgroundColor: 'background.default' }}>
-        <Container maxWidth="lg">
+        <Container>
           <Typography 
             variant="h2" 
             component="h2" 
             textAlign="center" 
             sx={{ mb: 6, color: 'text.primary' }}
           >
-            Why Choose Madres?
+            Why choose Madres?
           </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={4} >
+            <Grid item size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
-                  height="200"
+                  sx={{ height: 200, objectFit: 'cover' }}
                   image="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                   alt="Fresh ingredients"
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Fresh Daily
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
+                  <Typography variant="body1" color="text.primary" sx={{ flexGrow: 1 }}>
                     All our ingredients are sourced fresh daily, ensuring every bite 
                     is packed with authentic flavors and the highest quality.
                   </Typography>
                 </CardContent>
               </FeatureCard>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
@@ -267,18 +275,18 @@ const MadresLandingPage = () => {
                   image="https://images.unsplash.com/photo-1613514785940-daed07799d9b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                   alt="Traditional recipes"
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Family Recipes
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
+                  <Typography variant="body1" color="text.primary" sx={{ flexGrow: 1 }}>
                     Passed down through generations, our traditional recipes bring 
                     you the authentic taste of Mexico in every dish.
                   </Typography>
                 </CardContent>
               </FeatureCard>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
@@ -286,11 +294,11 @@ const MadresLandingPage = () => {
                   image="https://images.unsplash.com/photo-1559847844-d7b33d2e7da0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                   alt="Catering service"
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="h5" component="h3" gutterBottom color="secondary">
                     Premium Catering
                   </Typography>
-                  <Typography variant="body1" color="text.primary">
+                  <Typography variant="body1" color="text.primary" sx={{ flexGrow: 1 }}>
                     Elevate your events with our professional catering services, 
                     bringing restaurant-quality Mexican cuisine to your special occasions.
                   </Typography>
@@ -305,14 +313,13 @@ const MadresLandingPage = () => {
       <Box sx={{ 
         py: 8, 
         backgroundColor: 'secondary.main',
-        background: 'linear-gradient(135deg, #BB9D4C, #DCD6CB)',
         color: 'primary.main' 
       }}>
         <Container maxWidth="md" textAlign="center">
           <Typography variant="h2" component="h2" gutterBottom color="primary.main">
             Ready to Taste Tradition?
           </Typography>
-          <Typography variant="h5" component="p" sx={{ mb: 4, color: 'primary.main', opacity: 0.8 }}>
+          <Typography variant="h5" component="p" sx={{ mb: 4, color: 'primary.main', opacity: 0.9 }}>
             Join thousands of satisfied customers who trust Madres Taco Shop for authentic Mexican cuisine.
           </Typography>
           <Button
