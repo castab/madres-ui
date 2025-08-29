@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -10,12 +10,18 @@ import {
   Card,
   CardContent,
   CardMedia,
-  useTheme,
   createTheme,
   ThemeProvider,
   CssBaseline,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+  IconButton,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  useMediaQuery,
+} from '@mui/material'
+import { styled, useTheme } from '@mui/material/styles'
+import MenuIcon from '@mui/icons-material/Menu'
 
 // Custom theme based on Madres brand colors
 const theme = createTheme({
@@ -78,7 +84,7 @@ const theme = createTheme({
       fontWeight: 600,
     },
   },
-});
+})
 
 // Styled components
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -100,21 +106,21 @@ const HeroSection = styled(Box)(({ theme }) => ({
     background: 'rgba(122, 98, 65, 0.7)',
     zIndex: 1,
   },
-}));
+}))
 
 const HeroContent = styled(Box)(({ theme }) => ({
   position: 'relative',
   zIndex: 2,
   color: 'white',
   textAlign: 'center',
-}));
+}))
 
 const FloatingNav = styled(AppBar)(({ theme }) => ({
   background: 'rgba(255, 248, 245, 0.95)',
   backdropFilter: 'blur(10px)',
   boxShadow: '0 8px 32px rgba(122, 98, 65, 0.1)',
   borderBottom: `3px solid ${theme.palette.secondary.main}`,
-}));
+}))
 
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -126,16 +132,23 @@ const FeatureCard = styled(Card)(({ theme }) => ({
     transform: 'translateY(-8px)',
     boxShadow: '0 12px 24px rgba(122, 98, 65, 0.15)',
   },
-}));
+}))
 
 const MadresLandingPage = () => {
-  const navItems = ['Menu', 'Catering', 'About', 'Locations', 'Contact'];
+  const navItems = ['Menu', 'Catering', 'Gallery', 'About', 'Contact']
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+
+  useEffect(() => {
+    if (!isMobile) {
+      setDrawerOpen(false)
+    }
+  }, [isMobile])
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      
-      {/* Floating Navigation */}
       <FloatingNav position="fixed" elevation={0}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -163,6 +176,41 @@ const MadresLandingPage = () => {
               </Button>
             ))}
           </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              aria-label="open menu"
+              onClick={() => setDrawerOpen(true)}
+              sx={{ color: 'primary.main' }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
+          <Drawer
+            anchor="right"
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+          >
+            <Box
+              sx={{ width: 260, p: 2 }}
+              role="presentation"
+              onClick={() => setDrawerOpen(false)}
+              onKeyDown={() => setDrawerOpen(false)}
+            >
+              <List>
+                {navItems.map((text) => (
+                  <ListItemButton key={text}>
+                    <Typography
+                      variant="button"
+                      sx={{ color: 'text.primary', textTransform: 'uppercase' }}
+                    >
+                      {text}
+                    </Typography>
+                  </ListItemButton>
+                ))}
+              </List>
+            </Box>
+          </Drawer>
+
         </Toolbar>
       </FloatingNav>
 
@@ -186,7 +234,7 @@ const MadresLandingPage = () => {
                 mb: 4,
                 maxWidth: '600px',
                 margin: '0 auto 2rem auto',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
               }}
             >
               Experience the taste of tradition with our handcrafted tacos, 
@@ -212,7 +260,7 @@ const MadresLandingPage = () => {
                 Inquire Now
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 size="large"
                 sx={{
                   px: 4,
@@ -248,7 +296,7 @@ const MadresLandingPage = () => {
             Why choose Madres?
           </Typography>
           <Grid container spacing={4} >
-            <Grid item size={12}>
+            <Grid size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
@@ -267,7 +315,7 @@ const MadresLandingPage = () => {
                 </CardContent>
               </FeatureCard>
             </Grid>
-            <Grid item size={12}>
+            <Grid size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
@@ -286,7 +334,7 @@ const MadresLandingPage = () => {
                 </CardContent>
               </FeatureCard>
             </Grid>
-            <Grid item size={12}>
+            <Grid size={12}>
               <FeatureCard>
                 <CardMedia
                   component="img"
@@ -313,7 +361,7 @@ const MadresLandingPage = () => {
       <Box sx={{ 
         py: 8, 
         backgroundColor: 'secondary.main',
-        color: 'primary.main' 
+        color: 'primary.main', 
       }}>
         <Container maxWidth="md" textAlign="center">
           <Typography variant="h2" component="h2" gutterBottom color="primary.main">
@@ -345,34 +393,53 @@ const MadresLandingPage = () => {
       {/* Footer */}
       <Box sx={{ py: 4, backgroundColor: 'primary.main', color: 'background.default' }}>
         <Container>
-          <Grid container spacing={3} sx={{justifyContent: 'space-between', alignItems: 'flex-start'}}>
+          <Grid
+            container
+            spacing={3}
+            sx={{
+              justifyContent: { xs: 'center', md: 'space-between' },
+              alignItems: { xs: 'center', md: 'flex-start' },
+              textAlign: { xs: 'center', md: 'left' },
+            }}
+          >
+            <Grid item xs={12} md="auto">
+              <Typography variant="h6" gutterBottom>
+          Contact Us
+              </Typography>
+              <Typography variant="body2">
+          Phone: (555) 123-TACO<br />
+          Email: hello@madrestacoshop.com
+              </Typography>
+            </Grid>
+
             <Grid item xs={12} md={6}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: 'center',
+                  justifyContent: { xs: 'center', md: 'flex-end' },
+                  gap: 2,
+                  mb: { xs: 2, md: 0 },
+                }}
+              >
                 <Box
                   component="img"
                   src="./madres_white_text_only.png"
                   alt="Madres Taco Shop Logo"
-                  sx={{ height: { xs: 60 } }}
+                  sx={{ height: { xs: 80, md: 60 } }}
                 />
               </Box>
               <Typography variant="body1">
-                Serving authentic Mexican flavors with love and tradition since day one.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-              <Typography variant="h6" gutterBottom>
-                Contact Us
-              </Typography>
-              <Typography variant="body2">
-                Phone: (555) 123-TACO<br />
-                Email: hello@madrestacoshop.com
+          Serving authentic Mexican flavors with love and tradition since day one.
               </Typography>
             </Grid>
           </Grid>
         </Container>
       </Box>
-    </ThemeProvider>
-  );
-};
 
-export default MadresLandingPage;
+    </ThemeProvider>
+  )
+}
+
+export default MadresLandingPage
