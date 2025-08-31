@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -19,6 +19,8 @@ import {
   ListItemButton,
   ListItemText,
   useMediaQuery,
+  Snackbar, 
+  Alert,
 } from '@mui/material'
 import { styled, useTheme } from '@mui/material/styles'
 import MenuIcon from '@mui/icons-material/Menu'
@@ -137,6 +139,8 @@ const FeatureCard = styled(Card)(({ theme }) => ({
 const MadresLandingPage = () => {
   const navItems = ['Menu', 'Catering', 'Gallery', 'About', 'Contact']
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [snackbarKey, setSnackbarKey] = useState(Date.now())
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -145,6 +149,31 @@ const MadresLandingPage = () => {
       setDrawerOpen(false)
     }
   }, [isMobile])
+
+  const handleClick = useCallback(() => {
+    if (open) {
+      setSnackbarKey(Date.now()) // refresh timer
+    } else {
+      setOpen(true)
+    }
+  }, [open])
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') return
+    setOpen(false)
+  }
+
+  useEffect(() => {
+    const elements = document.querySelectorAll('a, button')
+    const handleEvent = (e) => {
+      e.preventDefault()
+      handleClick()
+    }
+    elements.forEach((el) => el.addEventListener('click', handleEvent))
+    return () => {
+      elements.forEach((el) => el.removeEventListener('click', handleEvent))
+    }
+  }, [handleClick])
 
   return (
     <ThemeProvider theme={theme}>
@@ -402,17 +431,17 @@ const MadresLandingPage = () => {
               textAlign: { xs: 'center', md: 'left' },
             }}
           >
-            <Grid item xs={12} md="auto">
+            <Grid sx={{xs: 12}}>
               <Typography variant="h6" gutterBottom>
           Contact Us
               </Typography>
               <Typography variant="body2">
-          Phone: (555) 123-TACO<br />
-          Email: hello@madrestacoshop.com
+          Text: (555) 123-TACO<br />
+          Email: inquire@madrestacoshop.com
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid sx={{xs: 12, md: 6}}>
               <Box
                 sx={{
                   display: 'flex',
@@ -437,7 +466,23 @@ const MadresLandingPage = () => {
           </Grid>
         </Container>
       </Box>
-
+      {/* Snackbar Notification */}
+      <Snackbar
+        key={snackbarKey}
+        open={open}
+        autoHideDuration={4000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="info"
+          sx={{ width: '100%', backgroundColor: '#BB9D4C', color: '#fff', fontSize: '1rem', fontWeight: 'bold' }}
+          icon={false}
+        >
+          🛠️ Pardon our dust! Buttons and links on this page are still under construction.
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   )
 }
