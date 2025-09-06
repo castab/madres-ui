@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Box,
@@ -10,83 +8,15 @@ import {
   Card,
   CardContent,
   CardMedia,
-  createTheme,
   ThemeProvider,
   CssBaseline,
-  IconButton,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  useMediaQuery,
   Snackbar, 
   Alert,
 } from '@mui/material'
-import { styled, useTheme } from '@mui/material/styles'
-import MenuIcon from '@mui/icons-material/Menu'
-
-// Custom theme based on Madres brand colors
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#7A6241', // Luna Brown
-      light: '#9B7C5A',
-      dark: '#5D4931',
-    },
-    secondary: {
-      main: '#BB9D4C', // Sol Yellow
-      light: '#D4B865',
-      dark: '#A08439',
-    },
-    background: {
-      default: '#FFF8F5', // Talavera White
-      paper: '#DCD6CB', // Barrow Tan
-    },
-    text: {
-      primary: '#7A6241', // Luna Brown
-      secondary: '#BB9D4C', // Sol Yellow
-    },
-  },
-  typography: {
-    fontFamily: '"Futura PT Book", "Futura", "Century Gothic", "Arial", sans-serif',
-    h1: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    h2: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    h3: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    h4: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    h5: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    h6: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-    body1: {
-      fontFamily: '"Futura PT Book", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 400,
-    },
-    body2: {
-      fontFamily: '"Futura PT Book", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 400,
-    },
-    button: {
-      fontFamily: '"Futura PT Demi", "Futura", "Century Gothic", "Arial", sans-serif',
-      fontWeight: 600,
-    },
-  },
-})
+import { styled } from '@mui/material/styles'
+import theme from '@/theme'
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
 
 // Styled components
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -116,13 +46,6 @@ const HeroContent = styled(Box)(({ theme }) => ({
   textAlign: 'center',
 }))
 
-const FloatingNav = styled(AppBar)(({ theme }) => ({
-  background: 'rgba(255, 248, 245, 0.95)',
-  backdropFilter: 'blur(10px)',
-  boxShadow: '0 8px 32px rgba(122, 98, 65, 0.1)',
-  borderBottom: `3px solid ${theme.palette.secondary.main}`,
-}))
-
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
@@ -136,18 +59,9 @@ const FeatureCard = styled(Card)(({ theme }) => ({
 }))
 
 const MadresLandingPage = () => {
-  const navItems = ['Menu', 'Catering', 'Gallery', 'About', 'Contact']
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [open, setOpen] = useState(false)
   const [snackbarKey, setSnackbarKey] = useState(Date.now())
 
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
-  useEffect(() => {
-    if (!isMobile) {
-      setDrawerOpen(false)
-    }
-  }, [isMobile])
 
   const handleClick = useCallback(() => {
     if (open) {
@@ -177,70 +91,7 @@ const MadresLandingPage = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <FloatingNav position="fixed" elevation={0}>
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              component="img"
-              src="./madres_color_text_only.png"
-              alt="Madres Taco Shop Logo"
-              sx={{ height: { xs: 40, md: 60 } }}
-            />
-          </Box>
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
-            {navItems.map((item) => (
-              <Button
-                key={item}
-                sx={{
-                  color: 'text.primary',
-                  fontWeight: 'bold',
-                  '&:hover': {
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                  },
-                }}
-              >
-                {item}
-              </Button>
-            ))}
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              aria-label="open menu"
-              onClick={() => setDrawerOpen(true)}
-              sx={{ color: 'primary.main' }}
-            >
-              <MenuIcon />
-            </IconButton>
-          </Box>
-          <Drawer
-            anchor="right"
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-          >
-            <Box
-              sx={{ width: 260, p: 2 }}
-              role="presentation"
-              onClick={() => setDrawerOpen(false)}
-              onKeyDown={() => setDrawerOpen(false)}
-            >
-              <List>
-                {navItems.map((text) => (
-                  <ListItemButton key={text}>
-                    <Typography
-                      variant="button"
-                      sx={{ color: 'text.primary', textTransform: 'uppercase' }}
-                    >
-                      {text}
-                    </Typography>
-                  </ListItemButton>
-                ))}
-              </List>
-            </Box>
-          </Drawer>
-
-        </Toolbar>
-      </FloatingNav>
+      <Header />
 
       {/* Hero Section */}
       <HeroSection>
@@ -418,53 +269,8 @@ const MadresLandingPage = () => {
         </Container>
       </Box>
 
-      {/* Footer */}
-      <Box sx={{ py: 4, backgroundColor: 'primary.main', color: 'background.default' }}>
-        <Container>
-          <Grid
-            container
-            spacing={3}
-            sx={{
-              justifyContent: { xs: 'center', md: 'space-between' },
-              alignItems: { xs: 'center', md: 'flex-start' },
-              textAlign: { xs: 'center', md: 'left' },
-            }}
-          >
-            <Grid sx={{xs: 12}}>
-              <Typography variant="h6" gutterBottom>
-          Contact Us
-              </Typography>
-              <Typography variant="body2">
-          Text: (555) 123-TACO<br />
-          Email: inquire@madrestacoshop.com
-              </Typography>
-            </Grid>
+      <Footer />
 
-            <Grid sx={{xs: 12, md: 6}}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: { xs: 'column', md: 'row' },
-                  alignItems: 'center',
-                  justifyContent: { xs: 'center', md: 'flex-end' },
-                  gap: 2,
-                  mb: { xs: 2, md: 0 },
-                }}
-              >
-                <Box
-                  component="img"
-                  src="./madres_white_text_only.png"
-                  alt="Madres Taco Shop Logo"
-                  sx={{ height: { xs: 80, md: 60 } }}
-                />
-              </Box>
-              <Typography variant="body1">
-          Serving authentic Mexican flavors with love and tradition since day one.
-              </Typography>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
       {/* Snackbar Notification */}
       <Snackbar
         key={snackbarKey}
