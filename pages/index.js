@@ -90,7 +90,6 @@ const theme = createTheme({
 
 // Styled components
 const HeroSection = styled(Box)(({ theme }) => ({
-  backgroundImage: 'url("https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80")',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
@@ -252,7 +251,7 @@ const MadresLandingPage = () => {
                 component="img"
                 src="./madres_color.png"
                 alt="Madres Taco Shop Logo"
-                sx={{ height: { xs: 240, md: 540 } }}
+                sx={{ height: { xs: 260, sm: 300 } }}
               />
             </Box>
             <Typography 
