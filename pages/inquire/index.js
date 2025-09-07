@@ -22,13 +22,13 @@ export default function InquiryForm() {
     chorizo: false,
     lengua: false,
     tripas: false,
-    veggie: false
+    veggie: false,
   })
   const [drinkOptions, setDrinkOptions] = useState({
     horchata: false,
     infusedWater: false,
     bottledSoda: false,
-    cannedSoda: false
+    cannedSoda: false,
   })
   
   const handleSubmit = async (e) => {
@@ -45,7 +45,7 @@ export default function InquiryForm() {
       const data = await res.json()
       
       if (res.ok) {
-        setStatus(`Thanks! We'll get back to you soon! 😊`)
+        setStatus('Thanks! We\'ll get back to you soon! 😊')
         setSnackbarSeverity('success')
         setSnackbarOpen(true)
         // Clear form on success
@@ -75,14 +75,14 @@ export default function InquiryForm() {
   const handleEntreeChange = (option) => {
     setEntreeOptions(prev => ({
       ...prev,
-      [option]: !prev[option]
+      [option]: !prev[option],
     }))
   }
 
   const handleDrinkChange = (option) => {
     setDrinkOptions(prev => ({
       ...prev,
-      [option]: !prev[option]
+      [option]: !prev[option],
     }))
   }
 
@@ -90,124 +90,140 @@ export default function InquiryForm() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Header />
-      <HeroSection>
+      <HeroSection sx={{ minHeight: '12vh', background: '#5D4931' }}>
         <Container maxWidth="lg">
           <HeroContent>
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <TextField
-                value={name}
-                onChange={e => setName(e.target.value)}
-                label="Name"
-                variant="outlined"
-                required
-                fullWidth
-              />
-              <TextField
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                label="Email"
-                type="email"
-                variant="outlined"
-                required
-                fullWidth
-              />
-              <TextField
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                label="Message"
-                multiline
-                rows={4}
-                variant="outlined"
-                required
-                fullWidth
-              />
-              
-              <TextField
-                value={guestCount}
-                onChange={e => {
-                  const value = e.target.value.replace(/\D/g, '') // Only allow digits
-                  setGuestCount(value)
-                }}
-                label="Guest Count (20-300)"
-                variant="outlined"
-                required
-                fullWidth
-                inputProps={{ min: 20, max: 300 }}
-                helperText="Please enter number of guests (minimum 20, maximum 300)"
-              />
-
-              <FormControl component="fieldset" required>
-                <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
-                  Entree Options (select at least 2)
-                </FormLabel>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.asada} onChange={() => handleEntreeChange('asada')} />}
-                    label="Asada"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.adobada} onChange={() => handleEntreeChange('adobada')} />}
-                    label="Adobada"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.pollo} onChange={() => handleEntreeChange('pollo')} />}
-                    label="Pollo (Chicken)"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.chorizo} onChange={() => handleEntreeChange('chorizo')} />}
-                    label="Chorizo"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.lengua} onChange={() => handleEntreeChange('lengua')} />}
-                    label="Lengua"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.tripas} onChange={() => handleEntreeChange('tripas')} />}
-                    label="Tripas"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={entreeOptions.veggie} onChange={() => handleEntreeChange('veggie')} />}
-                    label="Veggie"
-                  />
-                </FormGroup>
-              </FormControl>
-
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
-                  Drink Options (optional)
-                </FormLabel>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox checked={drinkOptions.horchata} onChange={() => handleDrinkChange('horchata')} />}
-                    label="Horchata"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={drinkOptions.infusedWater} onChange={() => handleDrinkChange('infusedWater')} />}
-                    label="Infused Water"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={drinkOptions.bottledSoda} onChange={() => handleDrinkChange('bottledSoda')} />}
-                    label="Bottled Soda"
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={drinkOptions.cannedSoda} onChange={() => handleDrinkChange('cannedSoda')} />}
-                    label="Canned Soda"
-                  />
-                </FormGroup>
-              </FormControl>
-              <Button 
-                type="submit" 
-                variant="contained" 
-                size="large"
-                sx={{ mt: 2 }}
-                disabled={status === 'Submitting...'}
-              >
-                Submit
-              </Button>
-            </Box>
+            <Typography 
+              variant="h5" 
+              component="p" 
+              sx={{ 
+                fontSize: { xs: '1.75rem', md: '2rem' },
+                mt: 4,
+                maxWidth: '600px',
+                margin: '5.5rem auto 2rem auto',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+              }}
+            >
+                          Send an inquiry!
+            </Typography>
           </HeroContent>
         </Container>
       </HeroSection>
+      <Container maxWidth='lg'>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3, py: 3, backgroundColor: 'background.default' }}>
+          <TextField
+            value={name}
+            onChange={e => setName(e.target.value)}
+            label="Name"
+            variant="outlined"
+            required
+            fullWidth
+          />
+          <TextField
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            label="Email"
+            type="email"
+            variant="outlined"
+            required
+            fullWidth
+          />
+          <TextField
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            label="Message"
+            multiline
+            rows={4}
+            variant="outlined"
+            required
+            fullWidth
+          />
+              
+          <TextField
+            value={guestCount}
+            onChange={e => {
+              const value = e.target.value.replace(/\D/g, '') // Only allow digits
+              setGuestCount(value)
+            }}
+            label="Guest Count (20-300)"
+            variant="outlined"
+            required
+            fullWidth
+            inputProps={{ min: 20, max: 300 }}
+            helperText="Please enter number of guests (minimum 20, maximum 300)"
+          />
+
+          <FormControl component="fieldset" required>
+            <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
+                  Entree Options (select at least 2)
+            </FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.asada} onChange={() => handleEntreeChange('asada')} />}
+                label="Asada"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.adobada} onChange={() => handleEntreeChange('adobada')} />}
+                label="Adobada"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.pollo} onChange={() => handleEntreeChange('pollo')} />}
+                label="Pollo (Chicken)"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.chorizo} onChange={() => handleEntreeChange('chorizo')} />}
+                label="Chorizo"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.lengua} onChange={() => handleEntreeChange('lengua')} />}
+                label="Lengua"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.tripas} onChange={() => handleEntreeChange('tripas')} />}
+                label="Tripas"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={entreeOptions.veggie} onChange={() => handleEntreeChange('veggie')} />}
+                label="Veggie"
+              />
+            </FormGroup>
+          </FormControl>
+
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
+                  Drink Options (optional)
+            </FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox checked={drinkOptions.horchata} onChange={() => handleDrinkChange('horchata')} />}
+                label="Horchata"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={drinkOptions.infusedWater} onChange={() => handleDrinkChange('infusedWater')} />}
+                label="Infused Water"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={drinkOptions.bottledSoda} onChange={() => handleDrinkChange('bottledSoda')} />}
+                label="Bottled Soda"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={drinkOptions.cannedSoda} onChange={() => handleDrinkChange('cannedSoda')} />}
+                label="Canned Soda"
+              />
+            </FormGroup>
+          </FormControl>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            size="large"
+            sx={{ mt: 2 }}
+            disabled={status === 'Submitting...'}
+          >
+                Submit
+          </Button>
+        </Box>
+      </Container>
+      
       <Footer />
       <Snackbar 
         open={snackbarOpen} 

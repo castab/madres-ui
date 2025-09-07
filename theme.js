@@ -42,7 +42,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            backgroundColor: '#FFFFFF', // Using white for better contrast
+            backgroundColor: '#FFF8F5', // Using white for better contrast
+            color: '#000000',
             '& fieldset': {
               borderColor: '#7A6241', // primary.main
             },
@@ -52,6 +53,18 @@ const theme = createTheme({
             '&.Mui-focused fieldset': {
               borderColor: '#7A6241', // primary.main
             },
+          },
+          // Label color (when not focused)
+          '& .MuiInputLabel-root': {
+            color: '#5D4931',
+          },
+          // Label color when focused
+          '& .MuiInputLabel-root.Mui-focused': {
+            color: '#5D4931', // or keep your primary color if you prefer: '#7A6241'
+          },
+          // Helper text color
+          '& .MuiFormHelperText-root': {
+            color: '#FFF8F5',
           },
         },
       },
