@@ -13,17 +13,16 @@ const Footer = () => (
           textAlign: { xs: 'center', md: 'left' },
         }}
       >
-        <Grid sx={{xs: 12}}>
+        <Grid item xs={12} md={6}>
           <Typography variant="h6" gutterBottom>
-          Contact Us
+            Contact Us
           </Typography>
           <Typography variant="body2">
-          Text: (555) 123-TACO<br />
-          Email: inquire@madrestacoshop.com
+            Text: (555) 123-TACO<br />
+            Email: inquire@madrestacoshop.com
           </Typography>
         </Grid>
-
-        <Grid sx={{xs: 12, md: 6}}>
+        <Grid item xs={12} md={6}>
           <Box
             sx={{
               display: 'flex',
@@ -42,7 +41,7 @@ const Footer = () => (
             />
           </Box>
           <Typography variant="body1">
-          Serving authentic Mexican flavors with love and tradition since day one.
+            Serving authentic Mexican flavors with love and tradition since day one.
           </Typography>
         </Grid>
       </Grid>

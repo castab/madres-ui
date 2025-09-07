@@ -37,6 +37,26 @@ const theme = createTheme({
       textTransform: 'uppercase',
     },
   },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: '#FFFFFF', // Using white for better contrast
+            '& fieldset': {
+              borderColor: '#7A6241', // primary.main
+            },
+            '&:hover fieldset': {
+              borderColor: '#5D4931', // primary.dark
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#7A6241', // primary.main
+            },
+          },
+        },
+      },
+    },
+  },
 })
 
 export default theme

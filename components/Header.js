@@ -11,7 +11,7 @@ const FloatingNav = styled(AppBar)(({ theme }) => ({
 }))
 
 const Header = () => {
-  const navItems = ['Menu', 'Catering', 'Gallery', 'About', 'Contact']
+  const navItems = ['Menu', 'Catering', 'Gallery', 'About', 'Inquire']
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const theme = useTheme()

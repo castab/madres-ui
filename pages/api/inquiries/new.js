@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: 'Too many requests' })
   }
 
-  const { name, email, message, recaptchaToken } = req.body
-  if (!name || !email || !message || !recaptchaToken) {
+  const { name, email, message, token } = req.body
+  if (!name || !email || !message || !token) {
     return res.status(400).json({ error: 'Invalid input' })
   }
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       method: 'POST',
       body: JSON.stringify({
         event: {
-          token: recaptchaToken,
+          token: token,
           expectedAction: 'USER_ACTION',
           siteKey: process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
         },
@@ -37,12 +37,12 @@ export default async function handler(req, res) {
 
   // Forward to backend
   try {
-    const backendRes = await fetch(`${process.env.BACKEND_URL}/save`, {
+    const backendRes = await fetch(`${process.env.BACKEND_URL}/actuator/health`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${process.env.BACKEND_API_KEY}`,
-      }
+      },
     })
     return res.status(backendRes.status).json(null)
   } catch (error) {

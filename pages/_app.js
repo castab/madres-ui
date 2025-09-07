@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import Script from 'next/script'
 
 export default function App({ Component, pageProps }) {
   return (
@@ -7,7 +8,7 @@ export default function App({ Component, pageProps }) {
       <Component {...pageProps} />
       <Analytics />
       <SpeedInsights />
-      <script src={`https://www.google.com/recaptcha/enterprise.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}></script>
+      <Script src={`https://www.google.com/recaptcha/enterprise.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`} />
     </>
   )
 }

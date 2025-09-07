@@ -5,7 +5,6 @@ import {
   Box,
   Container,
   Grid,
-  Card,
   CardContent,
   CardMedia,
   ThemeProvider,
@@ -13,55 +12,16 @@ import {
   Snackbar, 
   Alert,
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
 import theme from '@/theme'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
-
-// Styled components
-const HeroSection = styled(Box)(({ theme }) => ({
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  minHeight: '100vh',
-  display: 'flex',
-  alignItems: 'center',
-  position: 'relative',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(122, 98, 65, 0.7)',
-    zIndex: 1,
-  },
-}))
-
-const HeroContent = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  zIndex: 2,
-  color: 'white',
-  textAlign: 'center',
-}))
-
-const FeatureCard = styled(Card)(({ theme }) => ({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  backgroundColor: theme.palette.background.paper,
-  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: '0 12px 24px rgba(122, 98, 65, 0.15)',
-  },
-}))
+import HeroSection from '@/components/HeroSection'
+import HeroContent from '@/components/HeroContent'
+import FeatureCard from '@/components/FeatureCard'
 
 const MadresLandingPage = () => {
   const [open, setOpen] = useState(false)
   const [snackbarKey, setSnackbarKey] = useState(Date.now())
-
 
   const handleClick = useCallback(() => {
     if (open) {
