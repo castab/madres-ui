@@ -29,7 +29,7 @@ export default function InquiryForm() {
       const data = await res.json()
       
       if (res.ok) {
-        setStatus('Submitted successfully!')
+        setStatus(`Thanks! We'll get back to you soon! 😊`)
         setSnackbarSeverity('success')
         setSnackbarOpen(true)
         // Clear form on success
@@ -114,7 +114,7 @@ export default function InquiryForm() {
           onClose={handleSnackbarClose} 
           severity={snackbarSeverity}
           variant="filled"
-          sx={{ width: '100%' }}
+          sx={{ width: '100%', backgroundColor: '#BB9D4C', color: '#fff', fontSize: '1rem', fontWeight: 'bold' }}
         >
           {status}
         </Alert>
