@@ -4,10 +4,25 @@ import parseToFloatOrThrow from '@/lib/parse-float-or-throw'
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { name, email, otherDetails, token, elapsedMs } = req.body
-  if (!name || !email || !token || !elapsedMs) {
+  const { 
+    name, 
+    email, 
+    otherDetails, 
+    guestCount,
+    entreeOptions,
+    drinkOptions,
+    token, 
+    elapsedMs,
+    honeypot
+  } = req.body
+  if (!name || !email || !guestCount || !entreeOptions || !drinkOptions || !token || !elapsedMs) {
     console.debug('Invalid input on inquiry')
     return res.status(400).json({ error: 'Invalid input' })
+  }
+
+  if (honeypot) {
+    console.info('Honeypot field filled - likely spam submission')
+    return res.status(202).json(null)
   }
 
   const minimumElapsedMs = parseToFloatOrThrow(process.env.FORM_MINIMUM_ELAPSED_MS)

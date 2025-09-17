@@ -6,25 +6,8 @@ import theme from '@/theme'
 import { ThemeProvider } from '@mui/material/styles' // Changed from @emotion/react
 import { Alert, Box, Button, Checkbox, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Slide, Snackbar, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import capitalizeFirstLetter from '@/lib/capitalize-first-letter'
-
-const initialEntreeOptions = {
-  asada: false,
-  adobada: false,
-  pollo: false,
-  chorizo: false,
-  lengua: false,
-  veggie: false,
-}
-
-const initialDrinkOptions = {
-  horchata: false,
-  infusedWater: false,
-  bottledSoda: false,
-}
-
-Object.freeze(initialEntreeOptions)
-Object.freeze(initialDrinkOptions)
+import clamp from '@/lib/clamp'
+import { DRINK_LABELS, ENTREE_LABELS, initialDrinkOptions, initialEntreeOptions } from '@/constants/formOptions'
 
 export default function InquiryForm() {
   const [formStartTime, setFormStartTime] = useState(null)
@@ -38,6 +21,7 @@ export default function InquiryForm() {
   const [entreeOptions, setEntreeOptions] = useState(initialEntreeOptions)
   const [entreeError, setEntreeError] = useState(undefined)
   const [drinkOptions, setDrinkOptions] = useState(initialDrinkOptions)
+  const [honeypot, setHoneypot] = useState('')
 
   const handleOnFocus = () => {
     if (!formStartTime) {
@@ -47,6 +31,7 @@ export default function InquiryForm() {
   
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
     if (entreeError) {
       setStatus(`Select at least 2 entree options!`)
       setSnackbarSeverity('error')
@@ -60,7 +45,17 @@ export default function InquiryForm() {
       const res = await fetch('/api/inquiries/new', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, otherDetails, token, elapsedMs }),
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          otherDetails, 
+          guestCount,
+          entreeOptions,
+          drinkOptions,
+          token, 
+          elapsedMs,
+          honeypot
+        }),
       })
       const data = await res.json()
       
@@ -75,6 +70,7 @@ export default function InquiryForm() {
         setGuestCount('')
         setEntreeOptions(initialEntreeOptions)
         setDrinkOptions(initialDrinkOptions)
+        setHoneypot('') // Clear honeypot
         setFormStartTime(undefined)
         // Reset the entree error state and first render flag
         setEntreeError(undefined)
@@ -122,11 +118,11 @@ export default function InquiryForm() {
     }
   }, [entreeOptions])
 
-  const handleDrinkChange = (option) => {
-    setDrinkOptions(prev => ({
-      ...prev,
-      [option]: !prev[option],
-    }))
+  const handleDrinkChange = (e) => {
+    setDrinkOptions({
+      ...drinkOptions,
+      [e.target.name]: e.target.checked,
+    })
   }
 
   return (
@@ -159,9 +155,31 @@ export default function InquiryForm() {
           onFocus={handleOnFocus}
         >
           Give us a few details about your event and we'll handle the rest!
+          
+          {/* Honeypot field - hidden from users */}
+          <TextField
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
+            label="Company Name"
+            name="company"
+            variant="outlined"
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              left: '-9999px',
+              visibility: 'hidden',
+              opacity: 0,
+              height: 0,
+              width: 0,
+              overflow: 'hidden',
+              tabIndex: -1,
+            }}
+            tabIndex={-1}
+            autoComplete="off"
+          />
           <TextField
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={e => setName(e.target.value.trim().slice(0, 100))}
             label="Name"
             variant="outlined"
             required
@@ -169,7 +187,7 @@ export default function InquiryForm() {
           />
           <TextField
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value.trim().slice(0, 100))}
             label="Email"
             type="email"
             variant="outlined"
@@ -179,8 +197,13 @@ export default function InquiryForm() {
           <TextField
             value={guestCount}
             onChange={e => {
+              if (e.target.value == '') {
+                setGuestCount('')
+                return
+              }
               const value = e.target.value.replace(/\D/g, '') // Only allow digits
-              setGuestCount(value)
+              const clampedValue = clamp(value, 1, 500)
+              setGuestCount(clampedValue)
             }}
             label="Guest Count"
             variant="outlined"
@@ -194,11 +217,11 @@ export default function InquiryForm() {
                   Entree Options (select at least 2)
             </FormLabel>
             <FormGroup>
-              {Object.keys(entreeOptions).map(optionKey => (
+              {Object.keys(entreeOptions).map(entreeOption => (
                 <FormControlLabel
-                  key={optionKey}
-                  control={<Checkbox name={optionKey} checked={entreeOptions[optionKey]} onChange={handleEntreeChange} />}
-                  label={capitalizeFirstLetter(optionKey)}
+                  key={entreeOption}
+                  control={<Checkbox name={entreeOption} checked={entreeOptions[entreeOption]} onChange={handleEntreeChange} />}
+                  label={ENTREE_LABELS[entreeOption]}
                 />
               ))}
               {entreeError && <FormHelperText>Gotta pick at least 2!</FormHelperText>}
@@ -210,23 +233,18 @@ export default function InquiryForm() {
                   Drink Options (optional)
             </FormLabel>
             <FormGroup>
-              <FormControlLabel
-                control={<Checkbox checked={drinkOptions.horchata} onChange={() => handleDrinkChange('horchata')} />}
-                label="Horchata"
-              />
-              <FormControlLabel
-                control={<Checkbox checked={drinkOptions.infusedWater} onChange={() => handleDrinkChange('infusedWater')} />}
-                label="Infused Water"
-              />
-              <FormControlLabel
-                control={<Checkbox checked={drinkOptions.bottledSoda} onChange={() => handleDrinkChange('bottledSoda')} />}
-                label="Bottled Soda"
-              />
+              {Object.keys(drinkOptions).map(drinkOption => (
+                <FormControlLabel
+                  key={drinkOption}
+                  control={<Checkbox name={drinkOption} checked={drinkOptions[drinkOption]} onChange={handleDrinkChange} />}
+                  label={DRINK_LABELS[drinkOption]}
+                />
+              ))}
             </FormGroup>
           </FormControl>
           <TextField
             value={otherDetails}
-            onChange={e => setMessage(e.target.value)}
+            onChange={e => setOtherDetails(e.target.value)}
             label="Other Details"
             multiline
             rows={4}
