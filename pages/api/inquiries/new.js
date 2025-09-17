@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     drinkOptions,
     token, 
     elapsedMs,
-    honeypot
+    honeypot,
   } = req.body
   if (!name || !email || !guestCount || !entreeOptions || !drinkOptions || !token || !elapsedMs) {
     console.debug('Invalid input on inquiry')

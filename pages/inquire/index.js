@@ -33,7 +33,7 @@ export default function InquiryForm() {
     e.preventDefault()
     
     if (entreeError) {
-      setStatus(`Select at least 2 entree options!`)
+      setStatus('Select at least 2 entree options!')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
       return
@@ -54,7 +54,7 @@ export default function InquiryForm() {
           drinkOptions,
           token, 
           elapsedMs,
-          honeypot
+          honeypot,
         }),
       })
       const data = await res.json()
