@@ -13,7 +13,7 @@ const Footer = () => (
           textAlign: { xs: 'center', md: 'left' },
         }}
       >
-        <Grid item xs={12} md={6}>
+        <Grid sx={{xs: 12, md: 6}}>
           <Typography variant="h6" gutterBottom>
             Contact Us
           </Typography>
@@ -22,7 +22,7 @@ const Footer = () => (
             Email: inquire@madrestacoshop.com
           </Typography>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid sx={{xs: 12, md: 6}}>
           <Box
             sx={{
               display: 'flex',

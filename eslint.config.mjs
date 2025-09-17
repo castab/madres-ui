@@ -28,6 +28,7 @@ const eslintConfig = [
       'quotes': ['error', 'single'],
       'semi': ['error', 'never'],
       'comma-dangle': ['error', 'always-multiline'],
+      'react/no-unescaped-entities': 'off',
     },
   },
 ]

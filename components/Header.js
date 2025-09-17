@@ -2,6 +2,7 @@ import { React, useState, useEffect } from 'react'
 import { AppBar, Toolbar, Box, Button, Drawer, Typography, IconButton, List, ListItemButton, useMediaQuery } from '@mui/material'
 import { styled, useTheme } from '@mui/material/styles'
 import MenuIcon from '@mui/icons-material/Menu'
+import Link from 'next/link'
 
 const FloatingNav = styled(AppBar)(({ theme }) => ({
   background: 'rgba(255, 248, 245, 0.95)',
@@ -26,16 +27,19 @@ const Header = () => {
   return <FloatingNav position="fixed" elevation={0}>
     <Toolbar sx={{ justifyContent: 'space-between' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Box
-          component="img"
-          src="./madres_color_text_only.png"
-          alt="Madres Taco Shop Logo"
-          sx={{ height: { xs: 40, md: 60 } }}
-        />
+        <Link href="/" passHref>
+          <Box
+            component="img"
+            src="./madres_color_text_only.png"
+            alt="Madres Taco Shop Logo"
+            sx={{ height: { xs: 40, md: 60 } }}
+          />
+        </Link>
       </Box>
       <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
         {navItems.map((item) => (
           <Button
+            data-wip="true"
             key={item}
             sx={{
               color: 'text.primary',

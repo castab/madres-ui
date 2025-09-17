@@ -1,19 +1,29 @@
-// pages/api/save.js
-import consume from '@/lib/rate-limit' // optional, see below
+import consume from '@/lib/rate-limit'
+import parseToFloatOrThrow from '@/lib/parse-float-or-throw'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  // Optional: simple rate limiting per IP
-  try {
-    await consume(req.headers['x-forwarded-for'] || req.socket.remoteAddress)
-  } catch {
-    return res.status(429).json({ error: 'Too many requests' })
+  const { name, email, otherDetails, token, elapsedMs } = req.body
+  if (!name || !email || !token || !elapsedMs) {
+    console.debug('Invalid input on inquiry')
+    return res.status(400).json({ error: 'Invalid input' })
   }
 
-  const { name, email, message, token } = req.body
-  if (!name || !email || !message || !token) {
-    return res.status(400).json({ error: 'Invalid input' })
+  const minimumElapsedMs = parseToFloatOrThrow(process.env.FORM_MINIMUM_ELAPSED_MS)
+  const maximumElapsedMs = parseToFloatOrThrow(process.env.FORM_MAXIMUM_ELAPSED_MS)
+  if (elapsedMs < minimumElapsedMs || elapsedMs > maximumElapsedMs) {
+    console.info('Invalid elapsed time on inquiry - likely a bot or otherwise some unecessary submission')
+    return res.status(202).json(null)
+  }
+
+  // Simple rate limiting per IP
+  const remoteHost = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+  try {
+    await consume(remoteHost)
+  } catch {
+    console.info(`Rate limit reached for ${remoteHost}`)
+    return res.status(202).json(null)
   }
 
   // Verify reCAPTCHA
@@ -31,7 +41,8 @@ export default async function handler(req, res) {
     },
   )
   const captchaData = await captchaRes.json()
-  if (!captchaData.tokenProperties.valid || captchaData.riskAnalysis.score < 0.75) {
+  const minimumRequiredScore = parseToFloatOrThrow(process.env.RECAPTCHA_MINIMUM_REQUIRED_SCORE)
+  if (!captchaData.tokenProperties.valid || captchaData.riskAnalysis.score < minimumRequiredScore) {
     return res.status(403).json({ error: 'Failed CAPTCHA check' })
   }
 

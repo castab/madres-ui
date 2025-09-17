@@ -11,6 +11,7 @@ import {
   CssBaseline,
   Snackbar, 
   Alert,
+  Slide,
 } from '@mui/material'
 import theme from '@/theme'
 import Footer from '@/components/Footer'
@@ -18,6 +19,7 @@ import Header from '@/components/Header'
 import HeroSection from '@/components/HeroSection'
 import HeroContent from '@/components/HeroContent'
 import FeatureCard from '@/components/FeatureCard'
+import Link from 'next/link'
 
 const MadresLandingPage = () => {
   const [open, setOpen] = useState(false)
@@ -39,8 +41,11 @@ const MadresLandingPage = () => {
   useEffect(() => {
     const elements = document.querySelectorAll('a, button')
     const handleEvent = (e) => {
-      e.preventDefault()
-      handleClick()
+      const target = e.currentTarget
+      if (target.dataset.wip === 'true') {
+        e.preventDefault()
+        handleClick()
+      }
     }
     elements.forEach((el) => el.addEventListener('click', handleEvent))
     return () => {
@@ -80,25 +85,28 @@ const MadresLandingPage = () => {
               made fresh daily with love and the finest ingredients.
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Button
-                variant="contained"
-                size="large"
-                sx={{
-                  px: 4,
-                  py: 1.5,
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  backgroundColor: 'secondary.main',
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: 'secondary.dark',
-                    color: 'background.default',
-                  },
-                }}
-              >
+              <Link href="/inquire" passHref>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    px: 4,
+                    py: 1.5,
+                    fontSize: '1.1rem',
+                    fontWeight: 'bold',
+                    backgroundColor: 'secondary.main',
+                    color: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'secondary.dark',
+                      color: 'background.default',
+                    },
+                  }}
+                >
                 Inquire Now
-              </Button>
+                </Button>
+              </Link>
               <Button
+                data-wip="true"
                 variant="contained"
                 size="large"
                 sx={{
@@ -209,23 +217,25 @@ const MadresLandingPage = () => {
           <Typography variant="h5" component="p" sx={{ mb: 4, color: 'primary.main', opacity: 0.9 }}>
             Join thousands of satisfied customers who trust Madres Taco Shop for authentic Mexican cuisine.
           </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            sx={{
-              px: 6,
-              py: 2,
-              fontSize: '1.2rem',
-              fontWeight: 'bold',
-              backgroundColor: 'primary.main',
-              color: 'background.default',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-              },
-            }}
-          >
+          <Link href="/inquire">
+            <Button
+              variant="contained"
+              size="large"
+              sx={{
+                px: 6,
+                py: 2,
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                backgroundColor: 'primary.main',
+                color: 'background.default',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+              }}
+            >
             Inquire Online Now
-          </Button>
+            </Button>
+          </Link>
         </Container>
       </Box>
 
@@ -235,9 +245,10 @@ const MadresLandingPage = () => {
       <Snackbar
         key={snackbarKey}
         open={open}
-        autoHideDuration={4000}
+        autoHideDuration={5000}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        slots={{ transition: Slide }}
       >
         <Alert
           onClose={handleClose}
