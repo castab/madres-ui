@@ -1,7 +1,7 @@
-import { TextField } from "@mui/material";
+import { TextField } from '@mui/material'
 
 export default function Honeypot({honeypotValue, onHoneypotChange}) {
-    return <TextField
+  return <TextField
     value={honeypotValue}
     onChange={e => onHoneypotChange(e.target.value)}
     label="Company Name"

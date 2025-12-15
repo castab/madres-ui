@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         error: `Rate limit exceeded, try again in ${error.rateLimitInfo.retryAfter} seconds.`,
         message: `Too many requests. Try again in ${error.rateLimitInfo.retryAfter} seconds.`,
         retryAfter: error.rateLimitInfo.retryAfter,
-        resetTime: error.rateLimitInfo.resetDate.toISOString()
+        resetTime: error.rateLimitInfo.resetDate.toISOString(),
       })
     }
 
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     const backendRes = await fetch(`${process.env.BACKEND_URL}/health`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
 

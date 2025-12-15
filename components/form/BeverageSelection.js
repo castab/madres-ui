@@ -8,16 +8,16 @@ export default function BeverageSelection({selectedBeverages, onSelectionChange}
     fetch('/api/options/beverage')
       .then(res => res.json())
       .then(data => setBeverageOptions(data))
-      .catch(error => console.error('Failed to fetch beverage options:', error));
+      .catch(error => console.error('Failed to fetch beverage options:', error))
   }, [])
   
   const handleCheckboxChange = (beverageName) => {
     const newSelected = selectedBeverages.includes(beverageName)
       ? selectedBeverages.filter(name => name !== beverageName)
-      : [...selectedBeverages, beverageName];
+      : [...selectedBeverages, beverageName]
     
-    onSelectionChange(newSelected);
-  };
+    onSelectionChange(newSelected)
+  }
     
   return (
     <FormControl>

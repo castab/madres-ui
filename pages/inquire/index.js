@@ -21,9 +21,9 @@ export default function InquiryForm() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarSeverity, setSnackbarSeverity] = useState('')
   const [guestCount, setGuestCount] = useState('')
-  const [selectedEntrees, setSelectedEntrees] = useState([]);
-  const [selectedBeverages, setSelectedBeverages] = useState([]);
-  const [selectedAppetizers, setSelectedAppetizers] = useState([]);
+  const [selectedEntrees, setSelectedEntrees] = useState([])
+  const [selectedBeverages, setSelectedBeverages] = useState([])
+  const [selectedAppetizers, setSelectedAppetizers] = useState([])
   const [honeypotValue, setHoneypotValue] = useState('')
 
   const handleOnFocus = () => {

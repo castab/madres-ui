@@ -8,15 +8,15 @@ export default function AppetizerSelection({selectedAppetizers, onSelectionChang
     fetch('/api/options/appetizer')
       .then(res => res.json())
       .then(data => setAppetizerOptions(data))
-      .catch(error => console.error('Failed to fetch appetizer options:', error));
+      .catch(error => console.error('Failed to fetch appetizer options:', error))
   }, [])
   
   const handleCheckboxChange = (appetizerName) => {
     const newSelected = selectedAppetizers.includes(appetizerName)
       ? selectedAppetizers.filter(name => name !== appetizerName)
-      : [...selectedAppetizers, appetizerName];
-    onSelectionChange(newSelected);
-  };
+      : [...selectedAppetizers, appetizerName]
+    onSelectionChange(newSelected)
+  }
     
   return (
     <FormControl>

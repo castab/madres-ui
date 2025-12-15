@@ -9,17 +9,17 @@ export default function EntreeSelection({selectedEntrees, onSelectionChange}) {
     fetch('/api/options/entree')
       .then(res => res.json())
       .then(data => setEntreeOptions(data))
-      .catch(error => console.error('Failed to fetch entree options:', error));
+      .catch(error => console.error('Failed to fetch entree options:', error))
   }, [])
   
   const handleCheckboxChange = (entreeName) => {
     const newSelected = selectedEntrees.includes(entreeName)
       ? selectedEntrees.filter(name => name !== entreeName)
-      : [...selectedEntrees, entreeName];
+      : [...selectedEntrees, entreeName]
   
-    onSelectionChange(newSelected);
-    setSelectionCountError(newSelected.length < 2);
-  };
+    onSelectionChange(newSelected)
+    setSelectionCountError(newSelected.length < 2)
+  }
     
   return (
     <FormControl>
