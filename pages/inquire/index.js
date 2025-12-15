@@ -4,10 +4,13 @@ import HeroContent from '@/components/HeroContent'
 import HeroSection from '@/components/HeroSection'
 import theme from '@/theme'
 import { ThemeProvider } from '@mui/material/styles' // Changed from @emotion/react
-import { Alert, Box, Button, Checkbox, Container, CssBaseline, FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel, Slide, Snackbar, TextField, Typography } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { Alert, Box, Button, Container, CssBaseline, Slide, Snackbar, TextField, Typography } from '@mui/material'
+import { useRef, useState } from 'react'
 import clamp from '@/lib/clamp'
-import { DRINK_LABELS, ENTREE_LABELS, initialDrinkOptions, initialEntreeOptions } from '@/constants/formOptions'
+import BeverageSelection from '@/components/form/BeverageSelection'
+import EntreeSelection from '@/components/form/EntreeSelection'
+import AppetizerSelection from '@/components/form/AppetizerSelection'
+import Honeypot from '@/components/form/Honeypot'
 
 export default function InquiryForm() {
   const [formStartTime, setFormStartTime] = useState(null)
@@ -18,10 +21,10 @@ export default function InquiryForm() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarSeverity, setSnackbarSeverity] = useState('')
   const [guestCount, setGuestCount] = useState('')
-  const [entreeOptions, setEntreeOptions] = useState(initialEntreeOptions)
-  const [entreeError, setEntreeError] = useState(undefined)
-  const [drinkOptions, setDrinkOptions] = useState(initialDrinkOptions)
-  const [honeypot, setHoneypot] = useState('')
+  const [selectedEntrees, setSelectedEntrees] = useState([]);
+  const [selectedBeverages, setSelectedBeverages] = useState([]);
+  const [selectedAppetizers, setSelectedAppetizers] = useState([]);
+  const [honeypotValue, setHoneypotValue] = useState('')
 
   const handleOnFocus = () => {
     if (!formStartTime) {
@@ -32,7 +35,7 @@ export default function InquiryForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (entreeError) {
+    if (selectedEntrees.length < 2) {
       setStatus('Select at least 2 entree options!')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
@@ -42,7 +45,7 @@ export default function InquiryForm() {
     const elapsedMs = formStartTime ? Date.now() - formStartTime : null
     try {
       const token = await window.grecaptcha.enterprise.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, { action: 'submit' })
-      const res = await fetch('/api/inquiries/new', {
+      const res = await fetch('/api/inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -50,11 +53,11 @@ export default function InquiryForm() {
           email, 
           otherDetails, 
           guestCount,
-          entreeOptions,
-          drinkOptions,
+          selectedEntrees,
+          selectedBeverages,
           token, 
           elapsedMs,
-          honeypot,
+          honeypotValue,
         }),
       })
       const data = await res.json()
@@ -68,12 +71,11 @@ export default function InquiryForm() {
         setEmail('')
         setOtherDetails('')
         setGuestCount('')
-        setEntreeOptions(initialEntreeOptions)
-        setDrinkOptions(initialDrinkOptions)
-        setHoneypot('') // Clear honeypot
+        setSelectedEntrees([])
+        setSelectedBeverages([])
+        setHoneypotValue('') // Clear honeypot
         setFormStartTime(undefined)
-        // Reset the entree error state and first render flag
-        setEntreeError(undefined)
+        // Reset the first render flag
         isFirstRender.current = true
       } else {
         const error = data?.error || 'Unknown error'
@@ -96,34 +98,7 @@ export default function InquiryForm() {
     setSnackbarOpen(false)
   }
 
-  const handleEntreeChange = (e) => {
-    setEntreeOptions({
-      ...entreeOptions,
-      [e.target.name]: e.target.checked,
-    })
-  }
-
   const isFirstRender = useRef(true)
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-
-    const selectedCount = Object.values(entreeOptions).filter(value => value === true).length
-    if (selectedCount >= 2) {
-      setEntreeError(false)
-    } else {
-      setEntreeError(true)
-    }
-  }, [entreeOptions])
-
-  const handleDrinkChange = (e) => {
-    setDrinkOptions({
-      ...drinkOptions,
-      [e.target.name]: e.target.checked,
-    })
-  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -157,29 +132,11 @@ export default function InquiryForm() {
           Give us a few details about your event and we'll handle the rest!
           
           {/* Honeypot field - hidden from users */}
-          <TextField
-            value={honeypot}
-            onChange={e => setHoneypot(e.target.value)}
-            label="Company Name"
-            name="company"
-            variant="outlined"
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              left: '-9999px',
-              visibility: 'hidden',
-              opacity: 0,
-              height: 0,
-              width: 0,
-              overflow: 'hidden',
-              tabIndex: -1,
-            }}
-            tabIndex={-1}
-            autoComplete="off"
-          />
+          <Honeypot honeypotValue={honeypotValue} onHoneypotChange={setHoneypotValue} />
+
           <TextField
             value={name}
-            onChange={e => setName(e.target.value.trim().slice(0, 100))}
+            onChange={e => setName(e.target.value.slice(0, 100))}
             label="Name"
             variant="outlined"
             required
@@ -212,36 +169,10 @@ export default function InquiryForm() {
             helperText="Please enter number of guests"
           />
 
-          <FormControl component="fieldset" required error={entreeError}>
-            <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
-                  Entree Options (select at least 2)
-            </FormLabel>
-            <FormGroup>
-              {Object.keys(entreeOptions).map(entreeOption => (
-                <FormControlLabel
-                  key={entreeOption}
-                  control={<Checkbox name={entreeOption} checked={entreeOptions[entreeOption]} onChange={handleEntreeChange} />}
-                  label={ENTREE_LABELS[entreeOption]}
-                />
-              ))}
-              {entreeError && <FormHelperText>Gotta pick at least 2!</FormHelperText>}
-            </FormGroup>
-          </FormControl>
+          <AppetizerSelection selectedAppetizers={selectedAppetizers} onSelectionChange={setSelectedAppetizers} />
+          <EntreeSelection selectedEntrees={selectedEntrees} onSelectionChange={setSelectedEntrees} />
+          <BeverageSelection selectedBeverages={selectedBeverages} onSelectionChange={setSelectedBeverages} />
 
-          <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ color: 'text.primary', mb: 1 }}>
-                  Drink Options (optional)
-            </FormLabel>
-            <FormGroup>
-              {Object.keys(drinkOptions).map(drinkOption => (
-                <FormControlLabel
-                  key={drinkOption}
-                  control={<Checkbox name={drinkOption} checked={drinkOptions[drinkOption]} onChange={handleDrinkChange} />}
-                  label={DRINK_LABELS[drinkOption]}
-                />
-              ))}
-            </FormGroup>
-          </FormControl>
           <TextField
             value={otherDetails}
             onChange={e => setOtherDetails(e.target.value)}
