@@ -30,6 +30,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: >
           npx @railway/cli@5.59.0 up
+          --project ${{ vars.RAILWAY_PROJECT_ID }}
           --service madres-ui-prod
           --environment production
 
