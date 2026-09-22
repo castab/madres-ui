@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('the Madres landing page loads and Book stays disabled with a coming-soon toast', async ({
+test('the Madres landing page loads and Inquire stays disabled with a coming-soon toast until the offering is configured', async ({
 	page
 }) => {
 	await page.goto('/');
@@ -9,9 +9,12 @@ test('the Madres landing page loads and Book stays disabled with a coming-soon t
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('Fine dining,');
 	await expect(page.getByRole('heading', { level: 1 })).toContainText('catered to you.');
 
-	const bookButton = page.getByRole('button', { name: 'Book an Event' });
-	await expect(bookButton).toHaveAttribute('aria-disabled', 'true');
-	await bookButton.click({ force: true });
+	// PRIVATE_EVENT_OFFERING_JSON isn't set in CI, so /inquire is treated as unconfigured and
+	// every inquiry CTA — including this hero button — falls back to the disabled toast state.
+	// The hero and the page-bottom CTA share the "Inquire" label, so take the first (hero) one.
+	const inquireButton = page.getByRole('button', { name: 'Inquire' }).first();
+	await expect(inquireButton).toHaveAttribute('aria-disabled', 'true');
+	await inquireButton.click({ force: true });
 	await expect(page.getByText('Online booking is coming soon')).toBeVisible();
 	await expect(page).toHaveURL('/');
 });
