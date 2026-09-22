@@ -1,0 +1,112 @@
+import { fail } from '@sveltejs/kit';
+import { z } from 'zod';
+import { getOffering } from '$lib/server/offering/offering.server.js';
+import { computeEstimate } from '$lib/offering/estimator.js';
+import type { Estimate, Offering, Selections } from '$lib/offering/types.js';
+import type { Actions, PageServerLoad } from './$types.js';
+
+/** One shape across every action outcome (success and every `fail()`) so `+page.svelte` can
+ * read `form?.field` without a discriminated-union dance in the template. */
+type InquireActionResult = {
+	success: boolean;
+	estimate?: Estimate;
+	formError?: string;
+	fieldErrors?: Partial<Record<'name' | 'email' | 'zip', string[]>>;
+	selectionIssues?: string[];
+	values?: { name: string; email: string; zip: string };
+};
+
+export const load: PageServerLoad = async () => {
+	return { offering: getOffering() };
+};
+
+const customerInfoSchema = z.object({
+	name: z.string().trim().min(1, 'Name is required'),
+	email: z.string().trim().min(1, 'Email is required').email('Enter a valid email address'),
+	zip: z.string().trim().min(1, 'ZIP code is required')
+});
+
+function describeSelectionLimit(minSelections: number, maxSelections: number): string {
+	if (minSelections === maxSelections) return `choose exactly ${minSelections}`;
+	if (minSelections === 0) return `choose up to ${maxSelections}`;
+	return `choose between ${minSelections} and ${maxSelections}`;
+}
+
+/** Re-validates the submitted option ids against the server's own loaded offering — the
+ * client-side min/max enforcement in `category-section.svelte` is UX only. */
+function validateSelections(offering: Offering, selections: Selections): string[] {
+	const issues: string[] = [];
+	for (const [categoryKey, category] of Object.entries(offering.categories)) {
+		const picked = [...new Set(selections[categoryKey] ?? [])];
+		const validOptionIds = new Set(category.options.map((option) => option.id));
+		if (picked.some((id) => !validOptionIds.has(id))) {
+			issues.push(`${category.label}: contains an unrecognized selection`);
+			continue;
+		}
+		if (picked.length < category.minSelections || picked.length > category.maxSelections) {
+			issues.push(
+				`${category.label}: ${describeSelectionLimit(category.minSelections, category.maxSelections)}`
+			);
+		}
+	}
+	return issues;
+}
+
+export const actions: Actions = {
+	default: async ({ request }) => {
+		const offering = getOffering();
+		if (!offering) {
+			return fail(503, {
+				success: false,
+				formError: 'The inquiry form is currently unavailable.'
+			} satisfies InquireActionResult);
+		}
+
+		const formData = await request.formData();
+		const customerResult = customerInfoSchema.safeParse({
+			name: formData.get('name'),
+			email: formData.get('email'),
+			zip: formData.get('zip')
+		});
+
+		const selections: Selections = {};
+		for (const categoryKey of Object.keys(offering.categories)) {
+			selections[categoryKey] = formData.getAll(categoryKey).map(String);
+		}
+		const selectionIssues = validateSelections(offering, selections);
+
+		if (!customerResult.success || selectionIssues.length > 0) {
+			return fail(400, {
+				success: false,
+				fieldErrors: customerResult.success ? {} : z.flattenError(customerResult.error).fieldErrors,
+				selectionIssues,
+				values: {
+					name: String(formData.get('name') ?? ''),
+					email: String(formData.get('email') ?? ''),
+					zip: String(formData.get('zip') ?? '')
+				}
+			} satisfies InquireActionResult);
+		}
+
+		// The browser-side estimate shown while filling out the form is UX only — this is the
+		// authoritative, server-recomputed estimate that gets recorded with the inquiry.
+		const estimate = computeEstimate(offering, selections);
+
+		// No inquiry backend (email/CRM/DB) exists yet in this repo — the only integration
+		// today is the read-only presentation-service gallery client
+		// (`$lib/server/presentation-service`). This log line is the documented hand-off
+		// point: replace it with a real send/persist call once that destination exists.
+		console.info('Private-event inquiry received', {
+			customer: customerResult.data,
+			offeringId: offering.id,
+			offeringVersion: offering.version,
+			selections,
+			estimateGuestsLow: estimate.guestCountLow,
+			estimateGuestsHigh: estimate.guestCountHigh,
+			estimateTotalCentsLow: estimate.totalCentsLow,
+			estimateTotalCentsHigh: estimate.totalCentsHigh
+		});
+
+		return { success: true, estimate } satisfies InquireActionResult;
+	}
+};

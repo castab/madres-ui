@@ -5,12 +5,18 @@
 	import ComingSoonButton from './coming-soon-button.svelte';
 	import { cn } from '$lib/utils.js';
 
-	const navigation = [
+	const baseNavigation = [
 		{ href: '/#experience', label: 'Experience' },
 		{ href: '/#menu', label: 'Menu' },
 		{ href: '/#how', label: 'How to Inquire' },
 		{ href: '/gallery', label: 'Gallery' }
 	] as const;
+
+	const navigation = $derived(
+		page.data.offeringAvailable
+			? [...baseNavigation, { href: '/inquire', label: 'Inquire' } as const]
+			: baseNavigation
+	);
 
 	let isOpen = $state(false);
 	const closeMenu = () => (isOpen = false);

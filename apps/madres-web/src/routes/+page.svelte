@@ -2,7 +2,7 @@
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Card } from '$lib/components/ui/card/index.js';
 	import { Tag } from '$lib/components/ui/tag/index.js';
-	import ComingSoonButton from '$lib/components/coming-soon-button.svelte';
+	import InquireCta from '$lib/components/inquire-cta.svelte';
 	import MarigoldWatermark from '$lib/components/marigold-watermark.svelte';
 	import { eyebrow, headingDisplay, headingSection } from '$lib/styles.js';
 	import { cn } from '$lib/utils.js';
@@ -87,13 +87,13 @@
 				<div
 					class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start"
 				>
-					<ComingSoonButton
+					<InquireCta
 						class={cn(
 							'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-(--brand-cta) px-6 font-sans font-semibold text-(--text-on-accent)'
 						)}
 					>
-						Book an Event
-					</ComingSoonButton>
+						Inquire
+					</InquireCta>
 					<a
 						href="#menu"
 						class="inline-flex min-h-11 items-center justify-center rounded-full border-2 border-(--brand-primary) px-6 font-sans font-semibold text-(--brand-primary) transition-colors hover:bg-(--brand-primary-tint)"
@@ -124,11 +124,11 @@
 					Build-your-own taco buffet — guests top their own, family-style.
 				</span>
 			</div>
-			<ComingSoonButton
+			<InquireCta
 				class="inline-flex min-h-11 items-center justify-center rounded-full bg-(--brand-cta) px-6 font-sans font-semibold text-(--text-on-accent)"
 			>
 				Check Availability
-			</ComingSoonButton>
+			</InquireCta>
 		</div>
 	</section>
 
@@ -247,11 +247,11 @@
 			>
 				Madres appears by reservation only — private events and select pop-ups. Tell us about yours.
 			</p>
-			<ComingSoonButton
+			<InquireCta
 				class="inline-flex min-h-12 items-center justify-center rounded-full bg-(--brand-cta) px-8 font-sans text-lg font-semibold text-(--text-on-accent)"
 			>
-				Start Your Booking Request
-			</ComingSoonButton>
+				Inquire
+			</InquireCta>
 		</div>
 	</section>
 </main>
