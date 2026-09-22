@@ -1,0 +1,16 @@
+**/node_modules
+**/.svelte-kit
+**/build
+**/test-results
+**/playwright-report
+**/blob-report
+.git
+.vscode
+.opencode
+.claude
+.agents
+*.md
+!apps/*/README.md
+.env
+.env.*
+!.env.example
