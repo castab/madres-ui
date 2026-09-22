@@ -218,44 +218,52 @@
 	--color-ink-500: var(--ink-500);
 }
 
-* {
-	box-sizing: border-box;
-}
+/* Base element resets live in Tailwind's own `base` layer (not as plain, unlayered rules)
+ * so utility classes — `text-*`, `outline-*`, etc. — can override them as expected. Per the
+ * CSS Cascade Layers spec, an unlayered rule beats *any* layered rule regardless of
+ * specificity, so an unlayered `a { color: inherit }` would silently defeat every `text-*`
+ * color utility applied to a real `<a>` (e.g. a light `text-(--text-on-accent)` CTA on a dark
+ * background rendering as invisible dark-on-dark text) — this bit us once already. */
+@layer base {
+	* {
+		box-sizing: border-box;
+	}
 
-html {
-	scroll-behavior: smooth;
-}
+	html {
+		scroll-behavior: smooth;
+	}
 
-body {
-	margin: 0;
-	background: var(--surface-page);
-	color: var(--text-primary);
-}
+	body {
+		margin: 0;
+		background: var(--surface-page);
+		color: var(--text-primary);
+	}
 
-a {
-	color: inherit;
-}
+	a {
+		color: inherit;
+	}
 
-img {
-	max-width: 100%;
-	display: block;
-}
+	img {
+		max-width: 100%;
+		display: block;
+	}
 
-:focus-visible {
-	outline: 3px solid var(--focus-ring);
-	outline-offset: 2px;
-}
+	:focus-visible {
+		outline: 3px solid var(--focus-ring);
+		outline-offset: 2px;
+	}
 
-.sr-only {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
