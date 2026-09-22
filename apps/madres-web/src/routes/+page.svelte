@@ -34,8 +34,8 @@
 			desc: 'Marinated steak, seared on the plancha, salsa verde, lime — the one everyone asks for.'
 		},
 		{
-			name: 'Al Pastor',
-			desc: 'Marinated pork, seared on the plancha, charred pineapple, cilantro, white onion.'
+			name: 'Adobada',
+			desc: 'Marinated pork, seared on the plancha, cilantro, white onion.'
 		},
 		{
 			name: 'Chorizo',
@@ -43,7 +43,7 @@
 		}
 	];
 
-	const sideTags = ['Elote', 'Frijoles Charros', 'Chips & Salsa Roja', 'Horchata', 'Agua Fresca'];
+	const sideTags = ['Elote en Vaso', 'Chips & Salsa Roja', 'Horchata', 'Infused Water'];
 
 	const steps = [
 		{

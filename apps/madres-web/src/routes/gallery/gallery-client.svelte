@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { GalleryTile } from '$lib/server/presentation-service/gallery.server.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { PlayIcon, StackedLayersIcon } from '$lib/components/icons/index.js';
@@ -16,8 +17,10 @@
 		instagramHandle: string;
 	} = $props();
 
-	let tiles = $state(initialTiles);
-	let hasNextPage = $state(initialHasNextPage);
+	// Seeded once from the server-rendered first page, then diverges as loadMore() appends
+	// pages — untrack() tells Svelte this one-time read is deliberate, not a missed binding.
+	let tiles = $state(untrack(() => initialTiles));
+	let hasNextPage = $state(untrack(() => initialHasNextPage));
 	let isLoadingMore = $state(false);
 	let nextPage = 2;
 	let endOfGalleryRef: HTMLParagraphElement | undefined = $state();
