@@ -26,8 +26,12 @@
 	let endOfGalleryRef: HTMLParagraphElement | undefined = $state();
 	let activeIndex = $state(-1);
 	let muted = $state(false);
-	let loadedIds = $state(new Set<string>());
-	let loadedThumbnailIds = $state(new Set<string>());
+	// SvelteSet, not `$state(new Set())`: $state only makes reassignment of the variable
+	// reactive, not in-place mutation of a plain Set's internal slots — .add() calls on a
+	// `$state`-wrapped Set silently don't trigger a re-render, leaving every `.has()` read
+	// (e.g. the loading-spinner check below) permanently stuck at its first value.
+	const loadedIds = new SvelteSet<string>();
+	const loadedThumbnailIds = new SvelteSet<string>();
 	const trackedViewIds = new SvelteSet<string>();
 	const warmedMediaUrls = new SvelteSet<string>();
 	let warmedMediaElements: HTMLImageElement[] = [];

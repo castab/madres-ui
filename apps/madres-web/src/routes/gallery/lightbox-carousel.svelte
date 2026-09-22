@@ -239,6 +239,7 @@
 							src={item.largeUrl}
 							alt={slideAlt}
 							onload={() => markLoaded(`${tile.id}:${i}`)}
+							onerror={() => markLoaded(`${tile.id}:${i}`)}
 							class="h-full w-full object-contain"
 						/>
 					{/if}
