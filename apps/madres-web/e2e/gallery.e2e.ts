@@ -28,6 +28,23 @@ test('the gallery grid renders real posts, paginates with Load more, and opens a
 	await expect(page.getByRole('button', { name: 'Close' })).toHaveCount(0);
 });
 
+test('grid and lightbox loading spinners clear once each image settles, even on a failed load', async ({
+	page
+}) => {
+	// Regression test: loadedThumbnailIds/loadedIds must be reactive Sets. A `$state(new
+	// Set())` mutated via `.add()` silently doesn't trigger a re-render — every tile's
+	// spinner (role="status") would stay visible forever, load or no load, error or not.
+	await page.goto('/gallery');
+
+	const spinners = page.locator('section [role="status"]');
+	await expect(spinners).toHaveCount(0, { timeout: 10_000 });
+
+	await page.getByRole('button', { name: /View photo 1 of 2/ }).click();
+	const dialog = page.getByRole('dialog');
+	await expect(dialog).toBeVisible();
+	await expect(dialog.locator('[role="status"]')).toHaveCount(0, { timeout: 10_000 });
+});
+
 test("a carousel post's dots and chevrons move within it before paging to another post, and each slide's own media type drives its badge", async ({
 	page
 }) => {
