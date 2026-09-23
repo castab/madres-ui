@@ -74,6 +74,16 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 
+		// Honeypot: a real user never sees or reaches this field (off-screen, aria-hidden, out
+		// of tab order — see `+page.svelte`), so a non-empty value here means a bot filled every
+		// input on the page blindly. Redirect as if the submission succeeded — same as the real
+		// success path below — so the bot gets no signal to adapt on, and skip Turnstile,
+		// validation, and the email send entirely; this check is free, so it runs first.
+		if (String(formData.get('website') ?? '').trim()) {
+			console.warn('Inquiry blocked by honeypot field — no email was sent');
+			redirect(303, '/inquire/sent');
+		}
+
 		const turnstileToken = String(formData.get('cf-turnstile-response') ?? '');
 		const turnstileResult = await verifyTurnstileToken(turnstileToken, getClientAddress());
 		if (!turnstileResult.ok) {
