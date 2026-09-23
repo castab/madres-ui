@@ -12,6 +12,9 @@ export class InquireFormState {
 	name = $state('');
 	email = $state('');
 	zip = $state('');
+	/** Optional free text ("Anything else?") — no validity getter: unvalidated, never affects
+	 * `isValid`. */
+	additionalNotes = $state('');
 	touched = $state(false);
 
 	private readonly offering: Offering;

@@ -5,6 +5,7 @@
 	import { cn } from '$lib/utils.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import TextField from '$lib/components/inquire/text-field.svelte';
+	import TextareaField from '$lib/components/inquire/textarea-field.svelte';
 	import CategorySection from '$lib/components/inquire/category-section.svelte';
 	import GuestCountNote from '$lib/components/inquire/guest-count-note.svelte';
 	import EstimateSummary from '$lib/components/inquire/estimate-summary.svelte';
@@ -166,6 +167,14 @@
 					estimate={formState.estimate}
 					currency={offering.currency}
 					isComplete={formState.selectionsComplete}
+				/>
+
+				<TextareaField
+					id="additionalNotes"
+					name="additionalNotes"
+					label={offering.additionalNotesField.label}
+					placeholder={offering.additionalNotesField.placeholder}
+					bind:value={formState.additionalNotes}
 				/>
 
 				{#if form?.selectionIssues?.length}

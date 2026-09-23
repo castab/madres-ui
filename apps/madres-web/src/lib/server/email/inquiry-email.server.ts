@@ -12,6 +12,7 @@ export type SendInquiryNotificationInput = {
 	offering: Offering;
 	selections: Selections;
 	estimate: Estimate;
+	additionalNotes: string;
 };
 
 export type SendInquiryNotificationResult =
@@ -58,7 +59,8 @@ export function formatInquiryEmailText(
 	offering: Offering,
 	customer: InquiryCustomer,
 	selections: Selections,
-	estimate: Estimate
+	estimate: Estimate,
+	additionalNotes: string
 ): string {
 	const lines: string[] = [
 		'New private-event catering inquiry',
@@ -78,6 +80,10 @@ export function formatInquiryEmailText(
 		lines.push(
 			`${category.label}: ${selectedLabels.length > 0 ? selectedLabels.join(', ') : 'None selected'}`
 		);
+	}
+
+	if (additionalNotes.trim()) {
+		lines.push('', 'Anything else:', additionalNotes.trim());
 	}
 
 	lines.push(
@@ -103,7 +109,8 @@ export async function sendInquiryNotification({
 	customer,
 	offering,
 	selections,
-	estimate
+	estimate,
+	additionalNotes
 }: SendInquiryNotificationInput): Promise<SendInquiryNotificationResult> {
 	const allowedEmail = devAllowedEmail();
 	if (allowedEmail && customer.email.trim().toLowerCase() !== allowedEmail.toLowerCase()) {
@@ -131,7 +138,7 @@ export async function sendInquiryNotification({
 				to: toEmail,
 				reply_to: customer.email,
 				subject: `New private-event inquiry — ${customer.name}`,
-				text: formatInquiryEmailText(offering, customer, selections, estimate)
+				text: formatInquiryEmailText(offering, customer, selections, estimate, additionalNotes)
 			}),
 			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
 		});

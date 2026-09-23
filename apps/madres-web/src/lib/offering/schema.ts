@@ -107,6 +107,14 @@ const baseChargeSchema = z.object({
 const includedItemSchema = z.object({ id: z.string().min(1), label: z.string().min(1) });
 const staffQuotedExtraSchema = z.object({ id: z.string().min(1), label: z.string().min(1) });
 
+const freeTextInputTypeSchema = z.enum(['TEXTAREA']);
+const additionalNotesFieldSchema = z.object({
+	id: z.string().min(1),
+	label: z.string().min(1),
+	inputType: freeTextInputTypeSchema,
+	placeholder: z.string().min(1).optional()
+});
+
 export const offeringSchema = z.object({
 	id: z.string().min(1),
 	version: z.number().int().positive(),
@@ -116,7 +124,8 @@ export const offeringSchema = z.object({
 	baseCharges: z.array(baseChargeSchema),
 	categories: categoriesSchema,
 	includedItems: z.array(includedItemSchema),
-	staffQuotedExtras: z.array(staffQuotedExtraSchema)
+	staffQuotedExtras: z.array(staffQuotedExtraSchema),
+	additionalNotesField: additionalNotesFieldSchema
 });
 
 export type OfferingParseResult =

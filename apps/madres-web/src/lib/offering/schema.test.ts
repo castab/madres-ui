@@ -171,4 +171,13 @@ describe('parseOffering', () => {
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);
 	});
+
+	test('rejects an unrecognized additionalNotesField.inputType', () => {
+		const broken = {
+			...sampleOffering,
+			additionalNotesField: { ...sampleOffering.additionalNotesField, inputType: 'TEXT' }
+		};
+		const result = parseOffering(broken);
+		expect(result.ok).toBe(false);
+	});
 });

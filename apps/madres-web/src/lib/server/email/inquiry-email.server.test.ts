@@ -15,6 +15,7 @@ const { formatInquiryEmailText, sendInquiryNotification } =
 	await import('./inquiry-email.server.js');
 
 const customer = { name: 'Jane Diaz', email: 'jane@example.com', zip: '90210' };
+const additionalNotes = '';
 const selections: Selections = {
 	guestCount: ['guest_101_175'],
 	serviceDuration: ['duration_120'],
@@ -27,7 +28,13 @@ const estimate = computeEstimate(sampleOffering, selections);
 
 describe('formatInquiryEmailText', () => {
 	test('includes the customer info and every category, selected or not', () => {
-		const text = formatInquiryEmailText(sampleOffering, customer, selections, estimate);
+		const text = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			selections,
+			estimate,
+			additionalNotes
+		);
 
 		expect(text).toContain('Name: Jane Diaz');
 		expect(text).toContain('Email: jane@example.com');
@@ -48,11 +55,39 @@ describe('formatInquiryEmailText', () => {
 			sampleOffering,
 			customer,
 			openEndedSelections,
-			openEndedEstimate
+			openEndedEstimate,
+			additionalNotes
 		);
 
 		expect(text).toContain('Estimated guests: 251+');
 		expect(text).toMatch(/Estimated total: \$[\d,]+\+/);
+	});
+
+	test('includes an "Anything else" section when notes are present', () => {
+		const text = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			selections,
+			estimate,
+			'Please set up near the pavilion, and one guest has a peanut allergy.'
+		);
+
+		expect(text).toContain('Anything else:');
+		expect(text).toContain('Please set up near the pavilion, and one guest has a peanut allergy.');
+	});
+
+	test('omits the "Anything else" section when notes are empty or whitespace-only', () => {
+		const empty = formatInquiryEmailText(sampleOffering, customer, selections, estimate, '');
+		const whitespace = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			selections,
+			estimate,
+			'   '
+		);
+
+		expect(empty).not.toContain('Anything else:');
+		expect(whitespace).not.toContain('Anything else:');
 	});
 });
 
@@ -77,7 +112,13 @@ describe('sendInquiryNotification', () => {
 		vi.stubGlobal('fetch', fetch);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: true });
 
 		expect(fetch).toHaveBeenCalledTimes(1);
@@ -98,6 +139,24 @@ describe('sendInquiryNotification', () => {
 		expect(body.text).toContain('Name: Jane Diaz');
 	});
 
+	test('carries additionalNotes through into the Resend request body', async () => {
+		const fetch = vi.fn().mockResolvedValue(Response.json({ id: 'email-1' }, { status: 200 }));
+		vi.stubGlobal('fetch', fetch);
+
+		await sendInquiryNotification({
+			customer,
+			offering: sampleOffering,
+			selections,
+			estimate,
+			additionalNotes: 'Please set up near the pavilion.'
+		});
+
+		const [, init] = fetch.mock.calls[0] as [string, RequestInit];
+		const body = JSON.parse(init.body as string);
+		expect(body.text).toContain('Anything else:');
+		expect(body.text).toContain('Please set up near the pavilion.');
+	});
+
 	test.each(['RESEND_API_KEY', 'RESEND_FROM_EMAIL', 'RESEND_TO_EMAIL'] as const)(
 		'fails closed without calling fetch when %s is not configured',
 		async (missingVar) => {
@@ -107,7 +166,13 @@ describe('sendInquiryNotification', () => {
 			vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 			await expect(
-				sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+				sendInquiryNotification({
+					customer,
+					offering: sampleOffering,
+					selections,
+					estimate,
+					additionalNotes
+				})
 			).resolves.toEqual({ ok: false, kind: 'misconfigured' });
 			expect(fetch).not.toHaveBeenCalled();
 		}
@@ -119,7 +184,13 @@ describe('sendInquiryNotification', () => {
 		vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: false, kind: 'rejected' });
 	});
 
@@ -129,7 +200,13 @@ describe('sendInquiryNotification', () => {
 		vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: false, kind: 'timeout' });
 		expect(fetch).toHaveBeenCalledTimes(1);
 	});
@@ -140,7 +217,13 @@ describe('sendInquiryNotification', () => {
 		vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: false, kind: 'network' });
 	});
 
@@ -149,7 +232,13 @@ describe('sendInquiryNotification', () => {
 		vi.stubGlobal('fetch', fetch);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: true });
 		expect(fetch).toHaveBeenCalledTimes(1);
 	});
@@ -161,7 +250,13 @@ describe('sendInquiryNotification', () => {
 		vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: false, kind: 'blocked' });
 		expect(fetch).not.toHaveBeenCalled();
 	});
@@ -172,7 +267,13 @@ describe('sendInquiryNotification', () => {
 		vi.stubGlobal('fetch', fetch);
 
 		await expect(
-			sendInquiryNotification({ customer, offering: sampleOffering, selections, estimate })
+			sendInquiryNotification({
+				customer,
+				offering: sampleOffering,
+				selections,
+				estimate,
+				additionalNotes
+			})
 		).resolves.toEqual({ ok: true });
 		expect(fetch).toHaveBeenCalledTimes(1);
 	});

@@ -156,5 +156,11 @@ export const sampleOffering: Offering = {
 		{ id: 'travel_surcharge', label: 'Travel surcharge' },
 		{ id: 'special_protein', label: 'Special-request protein' },
 		{ id: 'special_request', label: 'Other special request' }
-	]
+	],
+	additionalNotesField: {
+		id: 'additional_notes',
+		label: 'Anything else?',
+		inputType: 'TEXTAREA',
+		placeholder: 'Allergies, theme, timing constraints, anything else we should know…'
+	}
 };
