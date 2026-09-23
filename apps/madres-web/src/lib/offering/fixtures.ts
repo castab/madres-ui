@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 4,
+	version: 5,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
@@ -114,6 +114,9 @@ export const sampleOffering: Offering = {
 				{ label: 'Rice', excludedServingStyleIds: ['just_tacos'] },
 				{ label: 'Beans', excludedServingStyleIds: ['just_tacos'] },
 				{ label: 'Chips' },
+				{ label: 'Cutlery' },
+				{ label: 'Napkins' },
+				{ label: 'Plates' },
 				{
 					label:
 						'Taco toppings: chopped white onion, red salsa, green salsa, guacamole salsa, cilantro, sliced limes, sliced cucumbers, and chopped cabbage'

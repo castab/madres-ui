@@ -3,6 +3,14 @@ import { sampleOffering } from './fixtures.js';
 import { includedItemsForServingStyle } from './included-items.js';
 
 describe('includedItemsForServingStyle', () => {
+	test('includes cutlery, napkins, and plates with every serving style', () => {
+		for (const style of sampleOffering.categories.servingStyle.options) {
+			const [tablescape] = includedItemsForServingStyle(sampleOffering.includedItems, style.id);
+			const labels = tablescape.contents?.map((content) => content.label) ?? [];
+			expect(labels).toEqual(expect.arrayContaining(['Cutlery', 'Napkins', 'Plates']));
+		}
+	});
+
 	test('keeps rice and beans for the truck and buffet', () => {
 		for (const style of ['taco_truck', 'buffet']) {
 			const [tablescape] = includedItemsForServingStyle(sampleOffering.includedItems, style);
