@@ -18,7 +18,7 @@
 			eyebrow: 'Service Style',
 			title: 'Build-Your-Own Buffet',
 			subtitle:
-				'Proteins, salsas and garnishes laid out on brass serving ware so guests top their own, family-style. Our most requested setup.'
+				'Fillings, salsas and garnishes laid out on brass serving ware so guests top their own, family-style. Our most requested setup.'
 		},
 		{
 			eyebrow: 'Included',
@@ -31,7 +31,7 @@
 	const featuredTacos = [
 		{
 			name: 'Carne Asada',
-			desc: 'Marinated steak, seared on the plancha, salsa verde, lime — the one everyone asks for.'
+			desc: 'Steak marinated in-house with fresh-squeezed lime and our seasoning blend, seared on the plancha, salsa verde — the one everyone asks for.'
 		},
 		{
 			name: 'Adobada',
@@ -39,17 +39,17 @@
 		},
 		{
 			name: 'Chorizo',
-			desc: 'House chorizo, crisped on the plancha, white onion, cilantro.'
+			desc: 'Chorizo, crisped on the plancha, white onion, cilantro.'
 		}
 	];
 
-	const sideTags = ['Elote en Vaso', 'Chips & Salsa Roja', 'Horchata', 'Infused Water'];
+	const sideTags = ['Elote en Vaso', 'Chips', 'Guacamole Salsa', 'Horchata', 'Infused Water'];
 
 	const steps = [
 		{
 			number: '01',
 			title: 'Send your details',
-			copy: 'Event date, guest count and location — the form below is all we need to start.'
+			copy: "Event date, guest count and location — that's all our inquiry form needs to get started."
 		},
 		{
 			number: '02',
@@ -81,7 +81,7 @@
 				<p
 					class="m-0 max-w-(--measure) text-(length:--text-body-lg) leading-(--leading-relaxed) text-(--text-secondary)"
 				>
-					Tortillas from our local tortillería, proteins seared on the plancha, and a marinade that
+					Tortillas from a local tortillería, fillings seared on the plancha, and a marinade that
 					hasn't changed since day one — brought to your private event by reservation only.
 				</p>
 				<div
