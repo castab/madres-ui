@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { GalleryTile } from '$lib/server/presentation-service/gallery.server.js';
+	import type {
+		GalleryPage,
+		GalleryTile
+	} from '$lib/server/presentation-service/gallery.server.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { PlayIcon, StackedLayersIcon } from '$lib/components/icons/index.js';
 	import LightboxCarousel from './lightbox-carousel.svelte';
@@ -22,6 +25,7 @@
 	let tiles = $state(untrack(() => initialTiles));
 	let hasNextPage = $state(untrack(() => initialHasNextPage));
 	let isLoadingMore = $state(false);
+	let loadMoreError = $state(false);
 	let nextPage = 2;
 	let endOfGalleryRef: HTMLParagraphElement | undefined = $state();
 	let activeIndex = $state(-1);
@@ -59,13 +63,27 @@
 
 	async function loadMore() {
 		isLoadingMore = true;
-		const response = await fetch(`/gallery/load-more?page=${nextPage}`);
-		const page = await response.json();
-		tiles.push(...page.tiles);
-		hasNextPage = page.hasNextPage;
-		nextPage += 1;
-		isLoadingMore = false;
-		if (!page.hasNextPage) endOfGalleryRef?.focus();
+		loadMoreError = false;
+		try {
+			const response = await fetch(`/gallery/load-more?page=${nextPage}`);
+			if (!response.ok) throw new Error('Gallery request failed');
+			const page: GalleryPage = await response.json();
+			if (
+				!Array.isArray(page.tiles) ||
+				typeof page.hasNextPage !== 'boolean' ||
+				page.currentPage !== nextPage
+			) {
+				throw new Error('Invalid gallery response');
+			}
+			tiles.push(...page.tiles);
+			hasNextPage = page.hasNextPage;
+			nextPage += 1;
+			if (!page.hasNextPage) endOfGalleryRef?.focus();
+		} catch {
+			loadMoreError = true;
+		} finally {
+			isLoadingMore = false;
+		}
 	}
 
 	function markLoaded(id: string) {
@@ -193,9 +211,16 @@
 
 <div class="mx-auto flex max-w-(--container-max) justify-center px-(--gutter) pb-(--section-y)">
 	{#if hasNextPage}
-		<Button variant="secondary" onclick={() => void loadMore()} disabled={isLoadingMore}>
-			{isLoadingMore ? 'Loading…' : 'Load more'}
-		</Button>
+		<div class="flex flex-col items-center gap-3">
+			<Button variant="secondary" onclick={() => void loadMore()} disabled={isLoadingMore}>
+				{isLoadingMore ? 'Loading…' : 'Load more'}
+			</Button>
+			{#if loadMoreError}
+				<p role="alert" class="m-0 text-sm text-(--state-danger)">
+					Couldn't load more photos. Please try again.
+				</p>
+			{/if}
+		</div>
 	{:else}
 		<p
 			bind:this={endOfGalleryRef}
