@@ -75,6 +75,9 @@ function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
 }
 
 const categorySchema = makeCategorySchema(optionSchema);
+const servingStyleCategorySchema = makeCategorySchema(
+	optionSchema.extend({ minimumEventCents: z.number().int().positive() })
+);
 const guestCountFieldSchema = z
 	.object({
 		id: z.string().min(1),
@@ -119,7 +122,7 @@ export const offeringSchema = z.object({
 	pricingTypes: z.array(pricingTypeSchema).min(1),
 	baseCharges: z.array(baseChargeSchema),
 	guestCountField: guestCountFieldSchema,
-	categories: z.record(z.string(), categorySchema),
+	categories: z.object({ servingStyle: servingStyleCategorySchema }).catchall(categorySchema),
 	includedItems: z.array(includedItemSchema),
 	staffQuotedExtras: z.array(staffQuotedExtraSchema),
 	additionalNotesField: additionalNotesFieldSchema

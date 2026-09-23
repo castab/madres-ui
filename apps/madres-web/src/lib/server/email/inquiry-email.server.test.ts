@@ -17,7 +17,6 @@ const { formatInquiryEmailText, sendInquiryNotification } =
 const customer = { name: 'Jane Diaz', email: 'jane@example.com', zip: '90210' };
 const additionalNotes = '';
 const selections: Selections = {
-	serviceDuration: ['duration_120'],
 	servingStyle: ['buffet'],
 	proteins: ['asada', 'pollo'],
 	drinks: ['horchata'],
@@ -39,7 +38,6 @@ describe('formatInquiryEmailText', () => {
 		expect(text).toContain('Email: jane@example.com');
 		expect(text).toContain('ZIP: 90210');
 		expect(text).toContain('Guest Count: 175');
-		expect(text).toContain('Service Duration: 2 hours');
 		expect(text).toContain('Serving Style: Buffet Service');
 		expect(text).toContain('Proteins: Asada, Pollo');
 		expect(text).toContain('Drinks: Horchata');
@@ -58,7 +56,14 @@ describe('formatInquiryEmailText', () => {
 		);
 
 		expect(text).toContain('Guest Count: 275');
-		expect(text).toContain('Estimated total: $6,075');
+		expect(text).toContain('Estimated total: $5,800');
+	});
+
+	test('explains an event minimum adjustment in the staff notification', () => {
+		const smallEstimate = computeEstimate(sampleOffering, selections, 15);
+		const text = formatInquiryEmailText(sampleOffering, customer, selections, smallEstimate, '');
+		expect(text).toContain('Serving style minimum adjustment (to $1,000): $400');
+		expect(text).toContain('Estimated total: $1,000');
 	});
 
 	test('includes an "Anything else" section when notes are present', () => {

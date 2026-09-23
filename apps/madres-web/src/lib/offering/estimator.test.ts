@@ -4,7 +4,6 @@ import { sampleOffering } from './fixtures.js';
 import type { Offering, Selections } from './types.js';
 
 const selections: Selections = {
-	serviceDuration: ['duration_180'],
 	servingStyle: ['buffet'],
 	proteins: ['asada', 'pollo'],
 	drinks: ['horchata'],
@@ -15,10 +14,11 @@ describe('computeEstimate', () => {
 	test('calculates one total for the entered guest count', () => {
 		const estimate = computeEstimate(sampleOffering, selections, 175);
 		expect(estimate.guestCount).toBe(175);
-		expect(estimate.perGuestCents).toBe(2600);
-		expect(estimate.perGuestTotalCents).toBe(455000);
+		expect(estimate.perGuestCents).toBe(2300);
+		expect(estimate.perGuestTotalCents).toBe(402500);
 		expect(estimate.perEventCents).toBe(30000);
-		expect(estimate.totalCents).toBe(485000);
+		expect(estimate.minimumAdjustmentCents).toBe(0);
+		expect(estimate.totalCents).toBe(432500);
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:asada')).toMatchObject({
 			included: true,
 			amountCents: 0
@@ -26,17 +26,16 @@ describe('computeEstimate', () => {
 	});
 
 	test('per-guest premiums scale with guest count while per-event charges stay fixed', () => {
-		const at15 = computeEstimate(sampleOffering, selections, 15);
+		const at50 = computeEstimate(sampleOffering, selections, 50);
 		const at150 = computeEstimate(sampleOffering, selections, 150);
-		expect(at150.perEventCents).toBe(at15.perEventCents);
-		expect(at150.totalCents - at15.totalCents).toBe(at15.perGuestCents * 135);
+		expect(at150.perEventCents).toBe(at50.perEventCents);
+		expect(at150.totalCents - at50.totalCents).toBe(at50.perGuestCents * 100);
 	});
 
 	test('charges additional proteins after including the two highest priced choices', () => {
 		const estimate = computeEstimate(
 			sampleOffering,
 			{
-				serviceDuration: ['duration_90'],
 				servingStyle: ['taco_truck'],
 				proteins: ['asada', 'pollo', 'chorizo']
 			},
@@ -46,6 +45,31 @@ describe('computeEstimate', () => {
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:chorizo')).toMatchObject({
 			amountCents: 100
 		});
+	});
+
+	test.each([
+		['taco_truck', 75000, 22500],
+		['buffet', 100000, 43000],
+		['other', 55000, 2500]
+	])('applies the %s serving style minimum to a 15 guest event', (style, minimum, adjustment) => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{ servingStyle: [style], proteins: ['asada', 'pollo'] },
+			15
+		);
+		expect(estimate.minimumEventCents).toBe(minimum);
+		expect(estimate.minimumAdjustmentCents).toBe(adjustment);
+		expect(estimate.totalCents).toBe(minimum);
+	});
+
+	test('does not add an adjustment when the itemized total exceeds the style minimum', () => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{ servingStyle: ['other'], proteins: ['asada', 'pollo'] },
+			20
+		);
+		expect(estimate.minimumAdjustmentCents).toBe(0);
+		expect(estimate.totalCents).toBe(60000);
 	});
 
 	test('uses a changed configured price without calculator changes', () => {

@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 2,
+	version: 3,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
@@ -27,32 +27,6 @@ export const sampleOffering: Offering = {
 		placeholder: 'Enter your estimated guest count'
 	},
 	categories: {
-		serviceDuration: {
-			id: 'service_duration',
-			label: 'Service Duration',
-			minSelections: 1,
-			maxSelections: 1,
-			pricingType: 'PER_GUEST',
-			inputType: 'SELECT',
-			options: [
-				{ id: 'duration_90', label: '1.5 hours', priceCents: 0, facts: { durationMinutes: 90 } },
-				{ id: 'duration_120', label: '2 hours', priceCents: 100, facts: { durationMinutes: 120 } },
-				{
-					id: 'duration_150',
-					label: '2.5 hours',
-					priceCents: 200,
-					facts: { durationMinutes: 150 }
-				},
-				{ id: 'duration_180', label: '3 hours', priceCents: 300, facts: { durationMinutes: 180 } },
-				{
-					id: 'duration_210',
-					label: '3.5 hours',
-					priceCents: 400,
-					facts: { durationMinutes: 210 }
-				},
-				{ id: 'duration_240', label: '4 hours', priceCents: 500, facts: { durationMinutes: 240 } }
-			]
-		},
 		servingStyle: {
 			id: 'serving_style',
 			label: 'Serving Style',
@@ -61,8 +35,15 @@ export const sampleOffering: Offering = {
 			pricingType: 'PER_GUEST',
 			inputType: 'SELECT',
 			options: [
-				{ id: 'taco_truck', label: 'Taco Truck Service', priceCents: 0 },
-				{ id: 'buffet', label: 'Buffet Service', priceCents: 300 }
+				{ id: 'taco_truck', label: 'Taco Truck Service', priceCents: 0, minimumEventCents: 75000 },
+				{ id: 'buffet', label: 'Buffet Service', priceCents: 300, minimumEventCents: 100000 },
+				{
+					id: 'other',
+					label: 'Other',
+					description: 'Tell us what you have in mind in Anything else?',
+					priceCents: 0,
+					minimumEventCents: 55000
+				}
 			]
 		},
 		proteins: {

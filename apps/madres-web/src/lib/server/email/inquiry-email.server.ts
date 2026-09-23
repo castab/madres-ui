@@ -87,6 +87,13 @@ export function formatInquiryEmailText(
 		lines.push('', 'Anything else:', additionalNotes.trim());
 	}
 
+	if (estimate.minimumAdjustmentCents > 0) {
+		lines.push(
+			'',
+			`Serving style minimum adjustment (to ${formatCents(estimate.minimumEventCents, offering.currency)}): ${formatCents(estimate.minimumAdjustmentCents, offering.currency)}`
+		);
+	}
+
 	lines.push(
 		'',
 		`Estimated total: ${formatCents(estimate.totalCents, offering.currency)}`,

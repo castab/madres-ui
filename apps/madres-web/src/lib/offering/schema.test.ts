@@ -68,6 +68,30 @@ describe('parseOffering', () => {
 		expect(result.ok).toBe(false);
 	});
 
+	test('requires a valid minimum event charge on every serving style', () => {
+		for (const minimumEventCents of [undefined, -1, 750.5]) {
+			const broken = {
+				...sampleOffering,
+				categories: {
+					...sampleOffering.categories,
+					servingStyle: {
+						...sampleOffering.categories.servingStyle,
+						options: sampleOffering.categories.servingStyle.options.map((option) =>
+							option.id === 'taco_truck' ? { ...option, minimumEventCents } : option
+						)
+					}
+				}
+			};
+			expect(parseOffering(broken).ok).toBe(false);
+		}
+	});
+
+	test('requires a serving style category', () => {
+		const categories: Record<string, unknown> = { ...sampleOffering.categories };
+		delete categories.servingStyle;
+		expect(parseOffering({ ...sampleOffering, categories }).ok).toBe(false);
+	});
+
 	test('rejects a non-integer priceCents (fractional dollars, not integer cents)', () => {
 		const broken = {
 			...sampleOffering,

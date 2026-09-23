@@ -17,8 +17,11 @@ export type Option<Facts = unknown> = {
 	label: string;
 	description?: string;
 	priceCents: number;
+	minimumEventCents?: number;
 	facts?: Facts;
 };
+
+export type ServingStyleOption = Option & { minimumEventCents: number };
 
 export type Category<Facts = unknown> = {
 	id: string;
@@ -30,6 +33,8 @@ export type Category<Facts = unknown> = {
 	selectionPricing?: SelectionPricing;
 	options: Option<Facts>[];
 };
+
+export type ServingStyleCategory = Category & { options: ServingStyleOption[] };
 
 export type GuestCountField = {
 	id: string;
@@ -79,7 +84,7 @@ export type Offering = {
 	pricingTypes: PricingType[];
 	baseCharges: BaseCharge[];
 	guestCountField: GuestCountField;
-	categories: Record<string, Category>;
+	categories: { servingStyle: ServingStyleCategory; [categoryKey: string]: Category };
 	includedItems: IncludedItem[];
 	staffQuotedExtras: StaffQuotedExtra[];
 	additionalNotesField: AdditionalNotesField;
@@ -100,6 +105,8 @@ export type Estimate = {
 	perEventCents: number;
 	perGuestCents: number;
 	perGuestTotalCents: number;
+	minimumEventCents: number;
+	minimumAdjustmentCents: number;
 	totalCents: number;
 	lineItems: EstimateLineItem[];
 };

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { formatCents } from '$lib/offering/money.js';
-	import type { Category } from '$lib/offering/types.js';
+	import type { Category, Option } from '$lib/offering/types.js';
 	import Chip from './chip.svelte';
 	import ChipGroupShell from './chip-group-shell.svelte';
 
@@ -15,12 +15,18 @@
 
 	let { category, categoryKey, currency, value, error, onChange }: Props = $props();
 
-	function chipLabel(priceCents: number, label: string): string {
-		if (priceCents === 0) return label;
-		const amount = formatCents(priceCents, currency);
-		return category.pricingType === 'PER_GUEST'
-			? `${label} · +${amount}/guest`
-			: `${label} · +${amount}`;
+	function chipLabel(option: Option): string {
+		const priceLabel =
+			option.priceCents === 0
+				? ''
+				: category.pricingType === 'PER_GUEST'
+					? ` · +${formatCents(option.priceCents, currency)}/guest`
+					: ` · +${formatCents(option.priceCents, currency)}`;
+		const minimumLabel =
+			option.minimumEventCents === undefined
+				? ''
+				: ` · ${formatCents(option.minimumEventCents, currency)} event minimum`;
+		return `${option.label}${priceLabel}${minimumLabel}`;
 	}
 </script>
 
@@ -31,7 +37,7 @@
 			name={categoryKey}
 			value={option.id}
 			checked={value === option.id}
-			label={chipLabel(option.priceCents, option.label)}
+			label={chipLabel(option)}
 			description={option.description}
 			onchange={() => onChange(option.id)}
 		/>

@@ -78,6 +78,20 @@
 			</div>
 		</div>
 
+		{#if estimate.minimumAdjustmentCents > 0}
+			<div
+				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
+			>
+				<span
+					>Serving style minimum adjustment (to {formatCents(
+						estimate.minimumEventCents,
+						currency
+					)})</span
+				>
+				<span>{formatCents(estimate.minimumAdjustmentCents, currency)}</span>
+			</div>
+		{/if}
+
 		<div class="flex items-baseline justify-between gap-3 border-t border-(--border-strong) pt-3">
 			<span class="font-sans text-(length:--text-body-lg) font-semibold text-(--text-primary)"
 				>Estimated total</span

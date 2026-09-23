@@ -84,7 +84,7 @@ export function computeEstimate(
 				perGuestCents += amountCents;
 			}
 
-			// A non-included, zero-cost pick (e.g. the free duration tier) adds nothing worth
+			// A non-included, zero-cost pick adds nothing worth
 			// showing. Included picks are always shown so the UI can render "Included".
 			if (!included && amountCents === 0) continue;
 
@@ -102,13 +102,23 @@ export function computeEstimate(
 	}
 
 	const perGuestTotalCents = perGuestCents * guestCount;
+	const selectedServingStyle = offering.categories.servingStyle.options.find(
+		(option) => option.id === selections.servingStyle?.[0]
+	);
+	const minimumEventCents = selectedServingStyle?.minimumEventCents ?? 0;
+	const minimumAdjustmentCents = Math.max(
+		0,
+		minimumEventCents - perEventCents - perGuestTotalCents
+	);
 
 	return {
 		guestCount,
 		perEventCents,
 		perGuestCents,
 		perGuestTotalCents,
-		totalCents: perEventCents + perGuestTotalCents,
+		minimumEventCents,
+		minimumAdjustmentCents,
+		totalCents: perEventCents + perGuestTotalCents + minimumAdjustmentCents,
 		lineItems
 	};
 }
