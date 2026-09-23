@@ -35,11 +35,11 @@
 		},
 		{
 			name: 'Adobada',
-			desc: 'Marinated pork, seared on the plancha, cilantro, white onion.'
+			desc: 'Pork marinated in a smoky guajillo-and-pineapple adobo, caramelized on the plancha.'
 		},
 		{
 			name: 'Chorizo',
-			desc: 'Chorizo, crisped on the plancha, white onion, cilantro.'
+			desc: 'Seasoned chorizo, rendered on the plancha until the edges crackle.'
 		}
 	];
 
