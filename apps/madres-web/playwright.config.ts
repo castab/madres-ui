@@ -28,6 +28,7 @@ export default defineConfig({
 			command: `npm run build && npm run preview -- --port ${port} --host 127.0.0.1`,
 			url: `http://127.0.0.1:${port}`,
 			env: {
+				PRIVATE_EVENT_OFFERING_JSON: '',
 				PRESENTATION_SERVICE_BASE_URL: presentationServiceBaseUrl,
 				PRESENTATION_SERVICE_ACCOUNT_ID: 'e2e-madres-account',
 				PRESENTATION_SERVICE_GALLERY_NAME: 'Madres Taco Shop',

@@ -1,5 +1,6 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { computeEstimate } from '$lib/offering/estimator.js';
+import { parseGuestCount } from '$lib/offering/guest-count.js';
 import type { Offering, Selections } from '$lib/offering/types.js';
 
 /**
@@ -12,6 +13,7 @@ export class InquireFormState {
 	name = $state('');
 	email = $state('');
 	zip = $state('');
+	guestCount = $state<number | undefined>(undefined);
 	/** Optional free text ("Anything else?") — no validity getter: unvalidated, never affects
 	 * `isValid`. */
 	additionalNotes = $state('');
@@ -77,7 +79,17 @@ export class InquireFormState {
 
 	/** UX-only preview — the server recomputes authoritatively from the submitted option ids. */
 	get estimate() {
-		return computeEstimate(this.offering, this.selections);
+		return computeEstimate(
+			this.offering,
+			this.selections,
+			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count ?? 0
+		);
+	}
+
+	get guestCountValid(): boolean {
+		return (
+			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count !== null
+		);
 	}
 
 	get nameValid(): boolean {
@@ -113,7 +125,13 @@ export class InquireFormState {
 	 * tell "you still have fields to fix" apart from "everything else is done, just complete the
 	 * challenge below" and prompt accordingly. */
 	get fieldsValid(): boolean {
-		return this.nameValid && this.emailValid && this.zipValid && this.selectionsComplete;
+		return (
+			this.nameValid &&
+			this.emailValid &&
+			this.zipValid &&
+			this.guestCountValid &&
+			this.selectionsComplete
+		);
 	}
 
 	/** The widget reporting success is a hard requirement — this form never submits without it,
@@ -135,6 +153,12 @@ export class InquireFormState {
 
 	get zipError(): string | undefined {
 		return this.touched && !this.zipValid ? 'ZIP code is required' : undefined;
+	}
+
+	get guestCountError(): string | undefined {
+		return this.touched
+			? parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).error
+			: undefined;
 	}
 
 	/** Shown next to the submit button, not the widget itself — only once every other field is

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { formatCents, formatCentsRange, formatGuestRange } from '$lib/offering/money.js';
+	import { formatCents } from '$lib/offering/money.js';
 	import type { Estimate, EstimateLineItem } from '$lib/offering/types.js';
 
 	type Props = { estimate: Estimate; currency: string; isComplete: boolean };
@@ -68,26 +68,13 @@
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
 			>
 				<span>Estimated guests</span>
-				<span
-					>{formatGuestRange(
-						estimate.guestCountLow,
-						estimate.guestCountHigh,
-						estimate.guestCountOpenEnded
-					)}</span
-				>
+				<span>{estimate.guestCount}</span>
 			</div>
 			<div
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
 			>
 				<span>Guest subtotal</span>
-				<span
-					>{formatCentsRange(
-						estimate.perGuestTotalCentsLow,
-						estimate.perGuestTotalCentsHigh,
-						currency,
-						estimate.guestCountOpenEnded
-					)}</span
-				>
+				<span>{formatCents(estimate.perGuestTotalCents, currency)}</span>
 			</div>
 		</div>
 
@@ -96,12 +83,7 @@
 				>Estimated total</span
 			>
 			<span class="font-sans text-(length:--text-heading-lg) font-semibold text-(--text-primary)">
-				{formatCentsRange(
-					estimate.totalCentsLow,
-					estimate.totalCentsHigh,
-					currency,
-					estimate.guestCountOpenEnded
-				)}
+				{formatCents(estimate.totalCents, currency)}
 			</span>
 		</div>
 

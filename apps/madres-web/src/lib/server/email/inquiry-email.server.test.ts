@@ -17,14 +17,13 @@ const { formatInquiryEmailText, sendInquiryNotification } =
 const customer = { name: 'Jane Diaz', email: 'jane@example.com', zip: '90210' };
 const additionalNotes = '';
 const selections: Selections = {
-	guestCount: ['guest_101_175'],
 	serviceDuration: ['duration_120'],
 	servingStyle: ['buffet'],
 	proteins: ['asada', 'pollo'],
 	drinks: ['horchata'],
 	appetizers: []
 };
-const estimate = computeEstimate(sampleOffering, selections);
+const estimate = computeEstimate(sampleOffering, selections, 175);
 
 describe('formatInquiryEmailText', () => {
 	test('includes the customer info and every category, selected or not', () => {
@@ -39,7 +38,7 @@ describe('formatInquiryEmailText', () => {
 		expect(text).toContain('Name: Jane Diaz');
 		expect(text).toContain('Email: jane@example.com');
 		expect(text).toContain('ZIP: 90210');
-		expect(text).toContain('Guest Count: 100–175');
+		expect(text).toContain('Guest Count: 175');
 		expect(text).toContain('Service Duration: 2 hours');
 		expect(text).toContain('Serving Style: Buffet Service');
 		expect(text).toContain('Proteins: Asada, Pollo');
@@ -47,20 +46,19 @@ describe('formatInquiryEmailText', () => {
 		expect(text).toContain('Appetizers: None selected');
 	});
 
-	test('formats an open-ended guest band as a floor ("251+"), not a bare number', () => {
-		const openEndedSelections: Selections = { ...selections, guestCount: ['guest_251_plus'] };
-		const openEndedEstimate = computeEstimate(sampleOffering, openEndedSelections);
+	test('reports one total for the entered guest count', () => {
+		const largerEstimate = computeEstimate(sampleOffering, selections, 275);
 
 		const text = formatInquiryEmailText(
 			sampleOffering,
 			customer,
-			openEndedSelections,
-			openEndedEstimate,
+			selections,
+			largerEstimate,
 			additionalNotes
 		);
 
-		expect(text).toContain('Estimated guests: 251+');
-		expect(text).toMatch(/Estimated total: \$[\d,]+\+/);
+		expect(text).toContain('Guest Count: 275');
+		expect(text).toContain('Estimated total: $6,075');
 	});
 
 	test('includes an "Anything else" section when notes are present', () => {

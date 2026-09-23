@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { formatCentsRange, formatGuestRange } from '$lib/offering/money.js';
+import { formatCents } from '$lib/offering/money.js';
 import type { Estimate, Offering, Selections } from '$lib/offering/types.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
@@ -68,6 +68,7 @@ export function formatInquiryEmailText(
 		`Name: ${customer.name}`,
 		`Email: ${customer.email}`,
 		`ZIP: ${customer.zip}`,
+		`Guest Count: ${estimate.guestCount}`,
 		''
 	];
 
@@ -88,8 +89,7 @@ export function formatInquiryEmailText(
 
 	lines.push(
 		'',
-		`Estimated guests: ${formatGuestRange(estimate.guestCountLow, estimate.guestCountHigh, estimate.guestCountOpenEnded)}`,
-		`Estimated total: ${formatCentsRange(estimate.totalCentsLow, estimate.totalCentsHigh, offering.currency, estimate.guestCountOpenEnded)}`,
+		`Estimated total: ${formatCents(estimate.totalCents, offering.currency)}`,
 		'',
 		`Offering: ${offering.id} v${offering.version}`
 	);

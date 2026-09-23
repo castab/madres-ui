@@ -25,21 +25,6 @@ function makeOptionSchema<FactsSchema extends z.ZodType>(factsSchema: FactsSchem
 const anyFactsSchema = z.record(z.string(), z.unknown()).optional();
 const optionSchema = makeOptionSchema(anyFactsSchema);
 
-const guestFactsSchema = z
-	.object({
-		minimumGuests: nonNegativeIntSchema,
-		maximumGuests: nonNegativeIntSchema.nullable(),
-		isMinimum: z.boolean()
-	})
-	.refine((facts) => facts.maximumGuests === null || facts.maximumGuests >= facts.minimumGuests, {
-		message: 'maximumGuests must be >= minimumGuests when set'
-	});
-
-const guestOptionSchema = makeOptionSchema(guestFactsSchema);
-
-/** The minimal shape `makeCategorySchema`'s own validation logic (duplicate-id / included-
- * selections checks) needs to see — a structural lower bound satisfied by both
- * `optionSchema`'s and `guestOptionSchema`'s output. */
 type MinimalOptionShape = { id: string; priceCents: number };
 
 function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
@@ -90,12 +75,18 @@ function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
 }
 
 const categorySchema = makeCategorySchema(optionSchema);
-const guestCategorySchema = makeCategorySchema(guestOptionSchema);
-
-/** `guestCount` is required and validated against `guestCategorySchema` (its options must
- * carry `GuestFacts`); every other key is an arbitrary, generically-rendered category
- * validated against the plain `categorySchema` via `.catchall`. */
-const categoriesSchema = z.object({ guestCount: guestCategorySchema }).catchall(categorySchema);
+const guestCountFieldSchema = z
+	.object({
+		id: z.string().min(1),
+		label: z.string().min(1),
+		inputType: z.literal('NUMBER'),
+		minimumGuests: z.number().int().positive(),
+		maximumGuests: z.number().int().positive(),
+		placeholder: z.string().min(1).optional()
+	})
+	.refine((field) => field.maximumGuests >= field.minimumGuests, {
+		message: 'maximumGuests must be >= minimumGuests'
+	});
 
 const baseChargeSchema = z.object({
 	id: z.string().min(1),
@@ -104,7 +95,12 @@ const baseChargeSchema = z.object({
 	priceCents: priceCentsSchema
 });
 
-const includedItemSchema = z.object({ id: z.string().min(1), label: z.string().min(1) });
+const includedItemSchema = z.object({
+	id: z.string().min(1),
+	label: z.string().min(1),
+	description: z.string().min(1).optional(),
+	contents: z.array(z.string().min(1)).min(1).optional()
+});
 const staffQuotedExtraSchema = z.object({ id: z.string().min(1), label: z.string().min(1) });
 
 const freeTextInputTypeSchema = z.enum(['TEXTAREA']);
@@ -122,7 +118,8 @@ export const offeringSchema = z.object({
 	pricingStatus: z.string().min(1),
 	pricingTypes: z.array(pricingTypeSchema).min(1),
 	baseCharges: z.array(baseChargeSchema),
-	categories: categoriesSchema,
+	guestCountField: guestCountFieldSchema,
+	categories: z.record(z.string(), categorySchema),
 	includedItems: z.array(includedItemSchema),
 	staffQuotedExtras: z.array(staffQuotedExtraSchema),
 	additionalNotesField: additionalNotesFieldSchema
@@ -133,7 +130,7 @@ export type OfferingParseResult =
 
 /** Validates an already-`JSON.parse`d offering document. Never throws — malformed or
  * out-of-range data (bad enums, negative prices, `maxSelections < minSelections`, duplicate
- * option ids, missing guest facts, `includedSelections` over the category cap, …) is reported
+ * option ids, invalid guest limits, `includedSelections` over the category cap, …) is reported
  * as a flat list of issues rather than partially accepted. */
 export function parseOffering(raw: unknown): OfferingParseResult {
 	const result = offeringSchema.safeParse(raw);

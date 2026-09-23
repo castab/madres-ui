@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vitest';
 import { parseOffering } from './schema.js';
 import { sampleOffering } from './fixtures.js';
@@ -6,6 +7,16 @@ describe('parseOffering', () => {
 	test('accepts a well-formed offering document', () => {
 		const result = parseOffering(sampleOffering);
 		expect(result.ok).toBe(true);
+	});
+
+	test('keeps the deployable example JSON in sync with the offering fixture', () => {
+		const envExample = readFileSync(new URL('../../../.env.example', import.meta.url), 'utf8');
+		const line = envExample
+			.split(/\r?\n/)
+			.find((entry) => entry.startsWith('PRIVATE_EVENT_OFFERING_JSON='));
+		expect(line).toBeDefined();
+		const result = parseOffering(JSON.parse(line!.slice('PRIVATE_EVENT_OFFERING_JSON='.length)));
+		expect(result).toEqual({ ok: true, offering: sampleOffering });
 	});
 
 	test('rejects a JSON string instead of a parsed object (offering.server is responsible for JSON.parse)', () => {
@@ -19,16 +30,10 @@ describe('parseOffering', () => {
 		if (!result.ok) expect(result.issues.length).toBeGreaterThan(0);
 	});
 
-	test('rejects a category missing required guest facts', () => {
+	test('rejects guest limits in the wrong order', () => {
 		const broken = {
 			...sampleOffering,
-			categories: {
-				...sampleOffering.categories,
-				guestCount: {
-					...sampleOffering.categories.guestCount,
-					options: [{ id: 'guest_25_100', label: '25–100', priceCents: 0 }] // no facts
-				}
-			}
+			guestCountField: { ...sampleOffering.guestCountField, maximumGuests: 14 }
 		};
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);
@@ -152,13 +157,19 @@ describe('parseOffering', () => {
 		expect(result.ok).toBe(false);
 	});
 
-	test('rejects a document missing the required guestCount category', () => {
-		const restCategories = Object.fromEntries(
-			Object.entries(sampleOffering.categories).filter(([key]) => key !== 'guestCount')
-		);
-		const broken = { ...sampleOffering, categories: restCategories };
+	test('rejects a document missing the required guest count field', () => {
+		const broken: Record<string, unknown> = { ...sampleOffering };
+		delete broken.guestCountField;
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);
+	});
+
+	test('rejects an unrecognized guest count input type', () => {
+		const broken = {
+			...sampleOffering,
+			guestCountField: { ...sampleOffering.guestCountField, inputType: 'SELECT' }
+		};
+		expect(parseOffering(broken).ok).toBe(false);
 	});
 
 	test('rejects an unrecognized pricingType', () => {

@@ -5,6 +5,7 @@ import { getOffering } from '$lib/server/offering/offering.server.js';
 import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.js';
 import { verifyTurnstileToken } from '$lib/server/turnstile/turnstile.server.js';
 import { computeEstimate } from '$lib/offering/estimator.js';
+import { parseGuestCount } from '$lib/offering/guest-count.js';
 import type { Offering, Selections } from '$lib/offering/types.js';
 import type { Actions, PageServerLoad } from './$types.js';
 
@@ -14,7 +15,7 @@ import type { Actions, PageServerLoad } from './$types.js';
 type InquireActionResult = {
 	success: boolean;
 	formError?: string;
-	fieldErrors?: Partial<Record<'name' | 'email' | 'zip', string[]>>;
+	fieldErrors?: Partial<Record<'name' | 'email' | 'zip' | 'guestCount', string[]>>;
 	selectionIssues?: string[];
 	values?: { name: string; email: string; zip: string };
 };
@@ -99,6 +100,10 @@ export const actions: Actions = {
 			zip: formData.get('zip')
 		});
 		const additionalNotes = String(formData.get('additionalNotes') ?? '').trim();
+		const guestCountResult = parseGuestCount(
+			String(formData.get('guestCount') ?? ''),
+			offering.guestCountField
+		);
 
 		const selections: Selections = {};
 		for (const categoryKey of Object.keys(offering.categories)) {
@@ -106,10 +111,13 @@ export const actions: Actions = {
 		}
 		const selectionIssues = validateSelections(offering, selections);
 
-		if (!customerResult.success || selectionIssues.length > 0) {
+		if (!customerResult.success || guestCountResult.count === null || selectionIssues.length > 0) {
 			return fail(400, {
 				success: false,
-				fieldErrors: customerResult.success ? {} : z.flattenError(customerResult.error).fieldErrors,
+				fieldErrors: {
+					...(customerResult.success ? {} : z.flattenError(customerResult.error).fieldErrors),
+					...(guestCountResult.error ? { guestCount: [guestCountResult.error] } : {})
+				},
 				selectionIssues,
 				values: {
 					name: String(formData.get('name') ?? ''),
@@ -121,7 +129,7 @@ export const actions: Actions = {
 
 		// The browser-side estimate shown while filling out the form is UX only — this is the
 		// authoritative, server-recomputed estimate that gets recorded with the inquiry.
-		const estimate = computeEstimate(offering, selections);
+		const estimate = computeEstimate(offering, selections, guestCountResult.count);
 
 		const sendResult = await sendInquiryNotification({
 			customer: customerResult.data,

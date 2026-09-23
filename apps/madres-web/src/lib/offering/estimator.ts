@@ -34,20 +34,13 @@ function highestPricedContributions(
  * never floating-point dollars. This function contains no offering-specific knowledge (no
  * option ids, no category names) — every dollar amount and every label comes from `offering`.
  *
- * The guest-count category picks a band, not an exact headcount, so `perGuestCents` (the
- * per-guest rate — duration/serving-style/protein/etc. premiums are all guest-count-
- * independent) is computed once and then applied at both `minimumGuests` and `maximumGuests`
- * to produce a low/high range. An open-ended top band (`maximumGuests: null`) has no high end
- * to range against, so low and high both fall back to `minimumGuests`.
+ * The per-guest rate is computed once and multiplied by the entered guest count.
  */
-export function computeEstimate(offering: Offering, selections: Selections): Estimate {
-	const guestCategory = offering.categories.guestCount;
-	const guestOptionId = selections.guestCount?.[0];
-	const guestOption = guestCategory.options.find((option) => option.id === guestOptionId);
-	const guestCountLow = guestOption?.facts?.minimumGuests ?? 0;
-	const guestCountOpenEnded = guestOption?.facts?.maximumGuests === null;
-	const guestCountHigh = guestOption?.facts?.maximumGuests ?? guestCountLow;
-
+export function computeEstimate(
+	offering: Offering,
+	selections: Selections,
+	guestCount: number
+): Estimate {
 	let perEventCents = 0;
 	let perGuestCents = 0;
 	const lineItems: EstimateLineItem[] = [];
@@ -68,7 +61,7 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 	}
 
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
-		if (categoryKey === 'guestCount' || category.pricingType === 'NONE') continue;
+		if (category.pricingType === 'NONE') continue;
 
 		const selectedIds = selections[categoryKey] ?? [];
 		const selectedOptions = category.options.filter((option) => selectedIds.includes(option.id));
@@ -108,19 +101,14 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 		}
 	}
 
-	const perGuestTotalCentsLow = perGuestCents * guestCountLow;
-	const perGuestTotalCentsHigh = perGuestCents * guestCountHigh;
+	const perGuestTotalCents = perGuestCents * guestCount;
 
 	return {
-		guestCountLow,
-		guestCountHigh,
-		guestCountOpenEnded,
+		guestCount,
 		perEventCents,
 		perGuestCents,
-		perGuestTotalCentsLow,
-		perGuestTotalCentsHigh,
-		totalCentsLow: perEventCents + perGuestTotalCentsLow,
-		totalCentsHigh: perEventCents + perGuestTotalCentsHigh,
+		perGuestTotalCents,
+		totalCents: perEventCents + perGuestTotalCents,
 		lineItems
 	};
 }

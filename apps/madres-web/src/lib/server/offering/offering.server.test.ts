@@ -60,7 +60,7 @@ describe('getOffering', () => {
 		getOffering();
 		getOffering();
 		const first = getOffering();
-		expect(first?.version).toBe(1);
+		expect(first?.version).toBe(2);
 		// Corrupting the env var after the first read must not change subsequent results —
 		// proof the result was memoized rather than re-parsed each call.
 		mockEnv.PRIVATE_EVENT_OFFERING_JSON = 'garbage';

@@ -6,7 +6,7 @@
 	type Props = WithElementRef<Omit<HTMLInputAttributes, 'id' | 'value'>> & {
 		id: string;
 		label: string;
-		value?: string;
+		value?: string | number;
 		helperText?: string;
 		error?: string;
 	};
@@ -18,7 +18,7 @@
 		error,
 		class: className,
 		ref = $bindable(null),
-		value = $bindable(''),
+		value = $bindable(),
 		...restProps
 	}: Props = $props();
 </script>

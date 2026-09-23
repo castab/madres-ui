@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 1,
+	version: 2,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
@@ -18,41 +18,15 @@ export const sampleOffering: Offering = {
 			priceCents: 1500
 		}
 	],
+	guestCountField: {
+		id: 'guest_count',
+		label: 'Guest Count',
+		inputType: 'NUMBER',
+		minimumGuests: 15,
+		maximumGuests: 10000,
+		placeholder: 'Enter your estimated guest count'
+	},
 	categories: {
-		guestCount: {
-			id: 'guest_count',
-			label: 'Guest Count',
-			minSelections: 1,
-			maxSelections: 1,
-			pricingType: 'NONE',
-			inputType: 'SELECT',
-			options: [
-				{
-					id: 'guest_25_100',
-					label: '25–100',
-					priceCents: 0,
-					facts: { minimumGuests: 25, maximumGuests: 100, isMinimum: false }
-				},
-				{
-					id: 'guest_101_175',
-					label: '100–175',
-					priceCents: 0,
-					facts: { minimumGuests: 101, maximumGuests: 175, isMinimum: false }
-				},
-				{
-					id: 'guest_176_250',
-					label: '175–250',
-					priceCents: 0,
-					facts: { minimumGuests: 176, maximumGuests: 250, isMinimum: false }
-				},
-				{
-					id: 'guest_251_plus',
-					label: '250+',
-					priceCents: 0,
-					facts: { minimumGuests: 251, maximumGuests: null, isMinimum: true }
-				}
-			]
-		},
 		serviceDuration: {
 			id: 'service_duration',
 			label: 'Service Duration',
@@ -149,8 +123,18 @@ export const sampleOffering: Offering = {
 		}
 	},
 	includedItems: [
-		{ id: 'rice', label: 'Rice' },
-		{ id: 'peruvian_beans', label: 'Peruvian beans / habichuela' }
+		{
+			id: 'styled_tablescape',
+			label: 'Styled Tablescape',
+			description:
+				'A decorated table themed to match your event, with everything freshly made for the occasion.',
+			contents: [
+				'Rice',
+				'Beans',
+				'Chips',
+				'Taco toppings: chopped white onion, red salsa, green salsa, guacamole salsa, cilantro, sliced limes, sliced cucumbers, and chopped cabbage'
+			]
+		}
 	],
 	staffQuotedExtras: [
 		{ id: 'travel_surcharge', label: 'Travel surcharge' },
