@@ -75,7 +75,9 @@ export function formatInquiryEmailText(
 		const selectedLabels = selectedIds
 			.map((id) => optionsById.get(id)?.label)
 			.filter((label): label is string => Boolean(label));
-		lines.push(`${category.label}: ${selectedLabels.length > 0 ? selectedLabels.join(', ') : 'None selected'}`);
+		lines.push(
+			`${category.label}: ${selectedLabels.length > 0 ? selectedLabels.join(', ') : 'None selected'}`
+		);
 	}
 
 	lines.push(

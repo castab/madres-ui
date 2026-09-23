@@ -11,7 +11,8 @@ import type { Selections } from '$lib/offering/types.js';
 const mockEnv: Record<string, string | undefined> = {};
 vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
 
-const { formatInquiryEmailText, sendInquiryNotification } = await import('./inquiry-email.server.js');
+const { formatInquiryEmailText, sendInquiryNotification } =
+	await import('./inquiry-email.server.js');
 
 const customer = { name: 'Jane Diaz', email: 'jane@example.com', zip: '90210' };
 const selections: Selections = {
@@ -43,7 +44,12 @@ describe('formatInquiryEmailText', () => {
 		const openEndedSelections: Selections = { ...selections, guestCount: ['guest_251_plus'] };
 		const openEndedEstimate = computeEstimate(sampleOffering, openEndedSelections);
 
-		const text = formatInquiryEmailText(sampleOffering, customer, openEndedSelections, openEndedEstimate);
+		const text = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			openEndedSelections,
+			openEndedEstimate
+		);
 
 		expect(text).toContain('Estimated guests: 251+');
 		expect(text).toMatch(/Estimated total: \$[\d,]+\+/);
