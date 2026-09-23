@@ -15,6 +15,7 @@ export class InquireFormState {
 	/** Optional free text ("Anything else?") — no validity getter: unvalidated, never affects
 	 * `isValid`. */
 	additionalNotes = $state('');
+	turnstileToken = $state('');
 	touched = $state(false);
 
 	private readonly offering: Offering;
@@ -91,6 +92,10 @@ export class InquireFormState {
 		return this.zip.trim().length > 0;
 	}
 
+	get turnstileValid(): boolean {
+		return this.turnstileToken.length > 0;
+	}
+
 	categoryValid(categoryKey: string): boolean {
 		const category = this.offering.categories[categoryKey];
 		if (!category) return true;
@@ -104,8 +109,17 @@ export class InquireFormState {
 		return Object.keys(this.offering.categories).every((key) => this.categoryValid(key));
 	}
 
-	get isValid(): boolean {
+	/** Every field except the Turnstile challenge — kept separate from `isValid` so the UI can
+	 * tell "you still have fields to fix" apart from "everything else is done, just complete the
+	 * challenge below" and prompt accordingly. */
+	get fieldsValid(): boolean {
 		return this.nameValid && this.emailValid && this.zipValid && this.selectionsComplete;
+	}
+
+	/** The widget reporting success is a hard requirement — this form never submits without it,
+	 * client-side here and re-verified server-side in the form action. */
+	get isValid(): boolean {
+		return this.fieldsValid && this.turnstileValid;
 	}
 
 	get nameError(): string | undefined {
@@ -121,6 +135,15 @@ export class InquireFormState {
 
 	get zipError(): string | undefined {
 		return this.touched && !this.zipValid ? 'ZIP code is required' : undefined;
+	}
+
+	/** Shown next to the submit button, not the widget itself — only once every other field is
+	 * already satisfied, so it reads as "you're almost done, just this last step below" rather
+	 * than piling on top of the general "fix the highlighted fields" message. */
+	get turnstilePrompt(): string | undefined {
+		return this.touched && this.fieldsValid && !this.turnstileValid
+			? 'Please complete the verification challenge below before sending your inquiry.'
+			: undefined;
 	}
 
 	/** A short, generic prompt for an incomplete category — never mentions the category by

@@ -11,6 +11,7 @@
 	import EstimateSummary from '$lib/components/inquire/estimate-summary.svelte';
 	import IncludedItemsNote from '$lib/components/inquire/included-items-note.svelte';
 	import StaffQuotedNote from '$lib/components/inquire/staff-quoted-note.svelte';
+	import TurnstileWidget from '$lib/components/inquire/turnstile-widget.svelte';
 	import { InquireFormState } from './inquire-form-state.svelte.js';
 	import type { GuestFacts, Option } from '$lib/offering/types.js';
 	import type { PageProps } from './$types.js';
@@ -186,7 +187,7 @@
 				{#if form?.formError}
 					<p class="m-0 text-(length:--text-body-sm) text-(--state-danger)">{form.formError}</p>
 				{/if}
-				{#if formState.touched && !formState.isValid}
+				{#if formState.touched && !formState.fieldsValid}
 					<p class="m-0 text-(length:--text-body-sm) text-(--state-danger)" role="alert">
 						Please complete the highlighted fields above before sending your inquiry.
 					</p>
@@ -195,6 +196,18 @@
 				<Button type="submit" variant="cta" size="lg" disabled={submitting}>
 					{submitting ? 'Sending…' : 'Send Inquiry'}
 				</Button>
+
+				{#if formState.turnstilePrompt}
+					<p class="m-0 text-(length:--text-body-sm) text-(--state-danger)" role="alert">
+						{formState.turnstilePrompt}
+					</p>
+				{/if}
+
+				<TurnstileWidget
+					siteKey={data.turnstileSiteKey}
+					bind:token={formState.turnstileToken}
+					invalid={formState.touched && !formState.turnstileValid}
+				/>
 			</form>
 		</section>
 	{/if}

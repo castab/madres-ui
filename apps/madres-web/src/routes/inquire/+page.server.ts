@@ -1,7 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 import { getOffering } from '$lib/server/offering/offering.server.js';
 import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.js';
+import { verifyTurnstileToken } from '$lib/server/turnstile/turnstile.server.js';
 import { computeEstimate } from '$lib/offering/estimator.js';
 import type { Offering, Selections } from '$lib/offering/types.js';
 import type { Actions, PageServerLoad } from './$types.js';
@@ -18,7 +20,7 @@ type InquireActionResult = {
 };
 
 export const load: PageServerLoad = async () => {
-	return { offering: getOffering() };
+	return { offering: getOffering(), turnstileSiteKey: PUBLIC_TURNSTILE_SITE_KEY };
 };
 
 const customerInfoSchema = z.object({
@@ -54,7 +56,7 @@ function validateSelections(offering: Offering, selections: Selections): string[
 }
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, getClientAddress }) => {
 		const offering = getOffering();
 		if (!offering) {
 			return fail(503, {
@@ -64,6 +66,16 @@ export const actions: Actions = {
 		}
 
 		const formData = await request.formData();
+
+		const turnstileToken = String(formData.get('cf-turnstile-response') ?? '');
+		const turnstileResult = await verifyTurnstileToken(turnstileToken, getClientAddress());
+		if (!turnstileResult.ok) {
+			return fail(400, {
+				success: false,
+				formError: 'Please complete the verification challenge and try again.'
+			} satisfies InquireActionResult);
+		}
+
 		const customerResult = customerInfoSchema.safeParse({
 			name: formData.get('name'),
 			email: formData.get('email'),
