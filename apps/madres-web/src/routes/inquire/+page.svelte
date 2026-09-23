@@ -161,13 +161,6 @@
 				{/each}
 
 				<IncludedItemsNote items={offering.includedItems} />
-				<StaffQuotedNote items={offering.staffQuotedExtras} />
-
-				<EstimateSummary
-					estimate={formState.estimate}
-					currency={offering.currency}
-					isComplete={formState.selectionsComplete}
-				/>
 
 				<TextareaField
 					id="additionalNotes"
@@ -176,6 +169,14 @@
 					placeholder={offering.additionalNotesField.placeholder}
 					bind:value={formState.additionalNotes}
 				/>
+
+				<EstimateSummary
+					estimate={formState.estimate}
+					currency={offering.currency}
+					isComplete={formState.selectionsComplete}
+				/>
+
+				<StaffQuotedNote items={offering.staffQuotedExtras} />
 
 				{#if form?.selectionIssues?.length}
 					<p class="m-0 text-(length:--text-body-sm) text-(--state-danger)">
