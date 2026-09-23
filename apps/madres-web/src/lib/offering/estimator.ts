@@ -45,21 +45,6 @@ export function computeEstimate(
 	let perGuestCents = 0;
 	const lineItems: EstimateLineItem[] = [];
 
-	for (const charge of offering.baseCharges) {
-		if (charge.pricingType === 'NONE') continue;
-		if (charge.pricingType === 'PER_EVENT') {
-			perEventCents += charge.priceCents;
-		} else {
-			perGuestCents += charge.priceCents;
-		}
-		lineItems.push({
-			id: `base:${charge.id}`,
-			label: charge.label,
-			kind: charge.pricingType === 'PER_EVENT' ? 'per-event' : 'per-guest',
-			amountCents: charge.priceCents
-		});
-	}
-
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
 		if (category.pricingType === 'NONE') continue;
 

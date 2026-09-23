@@ -45,18 +45,16 @@ export type GuestCountField = {
 	placeholder?: string;
 };
 
-export type BaseCharge = {
-	id: string;
+export type IncludedContent = {
 	label: string;
-	pricingType: PricingType;
-	priceCents: number;
+	excludedServingStyleIds?: string[];
 };
 
 export type IncludedItem = {
 	id: string;
 	label: string;
 	description?: string;
-	contents?: string[];
+	contents?: IncludedContent[];
 };
 
 export type StaffQuotedExtra = {
@@ -82,7 +80,6 @@ export type Offering = {
 	currency: string;
 	pricingStatus: string;
 	pricingTypes: PricingType[];
-	baseCharges: BaseCharge[];
 	guestCountField: GuestCountField;
 	categories: { servingStyle: ServingStyleCategory; [categoryKey: string]: Category };
 	includedItems: IncludedItem[];

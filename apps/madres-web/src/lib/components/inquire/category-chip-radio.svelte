@@ -19,9 +19,11 @@
 		const priceLabel =
 			option.priceCents === 0
 				? ''
-				: category.pricingType === 'PER_GUEST'
-					? ` · +${formatCents(option.priceCents, currency)}/guest`
-					: ` · +${formatCents(option.priceCents, currency)}`;
+				: option.minimumEventCents !== undefined
+					? ` · ${formatCents(option.priceCents, currency)}/guest`
+					: category.pricingType === 'PER_GUEST'
+						? ` · +${formatCents(option.priceCents, currency)}/guest`
+						: ` · +${formatCents(option.priceCents, currency)}`;
 		const minimumLabel =
 			option.minimumEventCents === undefined
 				? ''

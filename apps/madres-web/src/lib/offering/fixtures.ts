@@ -5,19 +5,10 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 3,
+	version: 4,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
-	baseCharges: [
-		{ id: 'base_event_fee', label: 'Base event fee', pricingType: 'PER_EVENT', priceCents: 30000 },
-		{
-			id: 'base_food_service',
-			label: 'Base food and service',
-			pricingType: 'PER_GUEST',
-			priceCents: 1500
-		}
-	],
 	guestCountField: {
 		id: 'guest_count',
 		label: 'Guest Count',
@@ -35,14 +26,24 @@ export const sampleOffering: Offering = {
 			pricingType: 'PER_GUEST',
 			inputType: 'SELECT',
 			options: [
-				{ id: 'taco_truck', label: 'Taco Truck Service', priceCents: 0, minimumEventCents: 75000 },
-				{ id: 'buffet', label: 'Buffet Service', priceCents: 300, minimumEventCents: 100000 },
 				{
-					id: 'other',
-					label: 'Other',
-					description: 'Tell us what you have in mind in Anything else?',
-					priceCents: 0,
-					minimumEventCents: 55000
+					id: 'taco_truck',
+					label: 'Traditional Taco Truck Style',
+					priceCents: 2300,
+					minimumEventCents: 75000
+				},
+				{
+					id: 'buffet',
+					label: 'Gourmet Taco Buffet',
+					priceCents: 2700,
+					minimumEventCents: 100000
+				},
+				{
+					id: 'just_tacos',
+					label: 'Just the Tacos!',
+					description: 'Rice and beans are not included.',
+					priceCents: 2000,
+					minimumEventCents: 50000
 				}
 			]
 		},
@@ -110,10 +111,13 @@ export const sampleOffering: Offering = {
 			description:
 				'A decorated table themed to match your event, with everything freshly made for the occasion.',
 			contents: [
-				'Rice',
-				'Beans',
-				'Chips',
-				'Taco toppings: chopped white onion, red salsa, green salsa, guacamole salsa, cilantro, sliced limes, sliced cucumbers, and chopped cabbage'
+				{ label: 'Rice', excludedServingStyleIds: ['just_tacos'] },
+				{ label: 'Beans', excludedServingStyleIds: ['just_tacos'] },
+				{ label: 'Chips' },
+				{
+					label:
+						'Taco toppings: chopped white onion, red salsa, green salsa, guacamole salsa, cilantro, sliced limes, sliced cucumbers, and chopped cabbage'
+				}
 			]
 		}
 	],

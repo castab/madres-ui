@@ -173,7 +173,12 @@
 					/>
 				{/each}
 
-				<IncludedItemsNote items={offering.includedItems} />
+				{#if formState.selectedOption('servingStyle')}
+					<IncludedItemsNote
+						items={offering.includedItems}
+						servingStyleId={formState.selectedOption('servingStyle')}
+					/>
+				{/if}
 
 				<TextareaField
 					id="additionalNotes"

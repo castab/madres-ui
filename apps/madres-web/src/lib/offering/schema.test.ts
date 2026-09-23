@@ -95,9 +95,15 @@ describe('parseOffering', () => {
 	test('rejects a non-integer priceCents (fractional dollars, not integer cents)', () => {
 		const broken = {
 			...sampleOffering,
-			baseCharges: sampleOffering.baseCharges.map((charge) =>
-				charge.id === 'base_event_fee' ? { ...charge, priceCents: 300.5 } : charge
-			)
+			categories: {
+				...sampleOffering.categories,
+				servingStyle: {
+					...sampleOffering.categories.servingStyle,
+					options: sampleOffering.categories.servingStyle.options.map((option) =>
+						option.id === 'taco_truck' ? { ...option, priceCents: 2300.5 } : option
+					)
+				}
+			}
 		};
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);
@@ -199,12 +205,28 @@ describe('parseOffering', () => {
 	test('rejects an unrecognized pricingType', () => {
 		const broken = {
 			...sampleOffering,
-			baseCharges: sampleOffering.baseCharges.map((charge) =>
-				charge.id === 'base_event_fee' ? { ...charge, pricingType: 'PER_DURATION' } : charge
-			)
+			categories: {
+				...sampleOffering.categories,
+				servingStyle: { ...sampleOffering.categories.servingStyle, pricingType: 'PER_DURATION' }
+			}
 		};
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);
+	});
+
+	test('rejects the retired base charges', () => {
+		expect(parseOffering({ ...sampleOffering, baseCharges: [] }).ok).toBe(false);
+	});
+
+	test('requires the serving style rate to be per guest', () => {
+		const broken = {
+			...sampleOffering,
+			categories: {
+				...sampleOffering.categories,
+				servingStyle: { ...sampleOffering.categories.servingStyle, pricingType: 'PER_EVENT' }
+			}
+		};
+		expect(parseOffering(broken).ok).toBe(false);
 	});
 
 	test('rejects an unrecognized additionalNotesField.inputType', () => {

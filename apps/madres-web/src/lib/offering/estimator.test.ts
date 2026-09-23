@@ -14,11 +14,11 @@ describe('computeEstimate', () => {
 	test('calculates one total for the entered guest count', () => {
 		const estimate = computeEstimate(sampleOffering, selections, 175);
 		expect(estimate.guestCount).toBe(175);
-		expect(estimate.perGuestCents).toBe(2300);
-		expect(estimate.perGuestTotalCents).toBe(402500);
-		expect(estimate.perEventCents).toBe(30000);
+		expect(estimate.perGuestCents).toBe(3200);
+		expect(estimate.perGuestTotalCents).toBe(560000);
+		expect(estimate.perEventCents).toBe(0);
 		expect(estimate.minimumAdjustmentCents).toBe(0);
-		expect(estimate.totalCents).toBe(432500);
+		expect(estimate.totalCents).toBe(560000);
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:asada')).toMatchObject({
 			included: true,
 			amountCents: 0
@@ -41,16 +41,16 @@ describe('computeEstimate', () => {
 			},
 			50
 		);
-		expect(estimate.perGuestCents).toBe(1600);
+		expect(estimate.perGuestCents).toBe(2400);
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:chorizo')).toMatchObject({
 			amountCents: 100
 		});
 	});
 
 	test.each([
-		['taco_truck', 75000, 22500],
-		['buffet', 100000, 43000],
-		['other', 55000, 2500]
+		['taco_truck', 75000, 40500],
+		['buffet', 100000, 59500],
+		['just_tacos', 50000, 20000]
 	])('applies the %s serving style minimum to a 15 guest event', (style, minimum, adjustment) => {
 		const estimate = computeEstimate(
 			sampleOffering,
@@ -65,8 +65,8 @@ describe('computeEstimate', () => {
 	test('does not add an adjustment when the itemized total exceeds the style minimum', () => {
 		const estimate = computeEstimate(
 			sampleOffering,
-			{ servingStyle: ['other'], proteins: ['asada', 'pollo'] },
-			20
+			{ servingStyle: ['just_tacos'], proteins: ['asada', 'pollo'] },
+			30
 		);
 		expect(estimate.minimumAdjustmentCents).toBe(0);
 		expect(estimate.totalCents).toBe(60000);

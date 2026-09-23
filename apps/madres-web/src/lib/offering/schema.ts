@@ -77,7 +77,9 @@ function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
 const categorySchema = makeCategorySchema(optionSchema);
 const servingStyleCategorySchema = makeCategorySchema(
 	optionSchema.extend({ minimumEventCents: z.number().int().positive() })
-);
+).refine((category) => category.pricingType === 'PER_GUEST' && category.minSelections === 1, {
+	message: 'Serving style must require one selection priced per guest'
+});
 const guestCountFieldSchema = z
 	.object({
 		id: z.string().min(1),
@@ -91,18 +93,19 @@ const guestCountFieldSchema = z
 		message: 'maximumGuests must be >= minimumGuests'
 	});
 
-const baseChargeSchema = z.object({
-	id: z.string().min(1),
-	label: z.string().min(1),
-	pricingType: pricingTypeSchema,
-	priceCents: priceCentsSchema
-});
-
 const includedItemSchema = z.object({
 	id: z.string().min(1),
 	label: z.string().min(1),
 	description: z.string().min(1).optional(),
-	contents: z.array(z.string().min(1)).min(1).optional()
+	contents: z
+		.array(
+			z.object({
+				label: z.string().min(1),
+				excludedServingStyleIds: z.array(z.string().min(1)).min(1).optional()
+			})
+		)
+		.min(1)
+		.optional()
 });
 const staffQuotedExtraSchema = z.object({ id: z.string().min(1), label: z.string().min(1) });
 
@@ -120,7 +123,7 @@ export const offeringSchema = z.object({
 	currency: z.string().min(1),
 	pricingStatus: z.string().min(1),
 	pricingTypes: z.array(pricingTypeSchema).min(1),
-	baseCharges: z.array(baseChargeSchema),
+	baseCharges: z.never().optional(),
 	guestCountField: guestCountFieldSchema,
 	categories: z.object({ servingStyle: servingStyleCategorySchema }).catchall(categorySchema),
 	includedItems: z.array(includedItemSchema),
