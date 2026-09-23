@@ -97,6 +97,15 @@
 				class="flex flex-col gap-(--stack-gap)"
 				use:enhance={handleSubmit}
 			>
+				<!-- Honeypot: invisible to real users (off-screen, aria-hidden, out of tab order, no
+				     autocomplete) but still a real input inside the form, so a bot that blindly fills
+				     every field on the page fills this one too. A non-empty value here makes the
+				     server action silently drop the submission — see `+page.server.ts`. -->
+				<div class="absolute top-0 -left-[9999px]" aria-hidden="true">
+					<label for="website">Website</label>
+					<input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+				</div>
+
 				<div class="flex flex-col gap-4">
 					<div class="flex items-center gap-3">
 						<h2
