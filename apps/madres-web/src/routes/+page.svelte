@@ -49,7 +49,7 @@
 		{
 			number: '01',
 			title: 'Send your details',
-			copy: "Event date, guest count and location — that's all our inquiry form needs to get started."
+			copy: "Tell us about your event — guest count, service style and more — and we'll follow up with a proper quote."
 		},
 		{
 			number: '02',
