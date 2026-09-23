@@ -31,7 +31,7 @@
 	const featuredTacos = [
 		{
 			name: 'Carne Asada',
-			desc: 'Steak marinated in-house with fresh-squeezed lime and our seasoning blend, seared on the plancha, salsa verde — the one everyone asks for.'
+			desc: 'Steak marinated in-house with fresh-squeezed lime and our seasoning blend, seared on the plancha — the one everyone asks for.'
 		},
 		{
 			name: 'Adobada',
