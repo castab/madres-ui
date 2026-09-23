@@ -11,14 +11,24 @@ export function formatCents(cents: number, currency: string): string {
 }
 
 /** Formats a low/high cents pair as a range ("$4,550 – $9,100"), or a single amount when the
- * two ends are equal (an open-ended guest band, or no guest count picked yet). */
-export function formatCentsRange(lowCents: number, highCents: number, currency: string): string {
+ * two ends are equal (no guest count picked yet). `openEnded` (an open-ended top guest band,
+ * e.g. "250+") formats as "$4,550+" instead — a floor, never a bare number that would read as
+ * a hard cap. */
+export function formatCentsRange(
+	lowCents: number,
+	highCents: number,
+	currency: string,
+	openEnded = false
+): string {
+	if (openEnded) return `${formatCents(lowCents, currency)}+`;
 	if (lowCents === highCents) return formatCents(lowCents, currency);
 	return `${formatCents(lowCents, currency)} – ${formatCents(highCents, currency)}`;
 }
 
-/** Formats a low/high guest-count pair as a range ("25–100"), or a single number when equal. */
-export function formatGuestRange(low: number, high: number): string {
+/** Formats a low/high guest-count pair as a range ("25–100"), a single number when equal, or
+ * "251+" when `openEnded` (an open-ended top guest band with no real ceiling to range against). */
+export function formatGuestRange(low: number, high: number, openEnded = false): string {
+	if (openEnded) return `${low}+`;
 	if (low === high) return String(low);
 	return `${low}–${high}`;
 }

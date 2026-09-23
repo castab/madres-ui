@@ -1,15 +1,16 @@
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { getOffering } from '$lib/server/offering/offering.server.js';
+import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.js';
 import { computeEstimate } from '$lib/offering/estimator.js';
-import type { Estimate, Offering, Selections } from '$lib/offering/types.js';
+import type { Offering, Selections } from '$lib/offering/types.js';
 import type { Actions, PageServerLoad } from './$types.js';
 
-/** One shape across every action outcome (success and every `fail()`) so `+page.svelte` can
- * read `form?.field` without a discriminated-union dance in the template. */
+/** One shape across every `fail()` outcome so `+page.svelte` can read `form?.field` without a
+ * discriminated-union dance in the template. A successful submission never reaches the page —
+ * it redirects to `/inquire/sent` instead. */
 type InquireActionResult = {
 	success: boolean;
-	estimate?: Estimate;
 	formError?: string;
 	fieldErrors?: Partial<Record<'name' | 'email' | 'zip', string[]>>;
 	selectionIssues?: string[];
@@ -92,21 +93,19 @@ export const actions: Actions = {
 		// authoritative, server-recomputed estimate that gets recorded with the inquiry.
 		const estimate = computeEstimate(offering, selections);
 
-		// No inquiry backend (email/CRM/DB) exists yet in this repo — the only integration
-		// today is the read-only presentation-service gallery client
-		// (`$lib/server/presentation-service`). This log line is the documented hand-off
-		// point: replace it with a real send/persist call once that destination exists.
-		console.info('Private-event inquiry received', {
+		const sendResult = await sendInquiryNotification({
 			customer: customerResult.data,
-			offeringId: offering.id,
-			offeringVersion: offering.version,
+			offering,
 			selections,
-			estimateGuestsLow: estimate.guestCountLow,
-			estimateGuestsHigh: estimate.guestCountHigh,
-			estimateTotalCentsLow: estimate.totalCentsLow,
-			estimateTotalCentsHigh: estimate.totalCentsHigh
+			estimate
 		});
+		if (!sendResult.ok) {
+			return fail(502, {
+				success: false,
+				formError: 'Something went wrong sending your inquiry. Please try again.'
+			} satisfies InquireActionResult);
+		}
 
-		return { success: true, estimate } satisfies InquireActionResult;
+		redirect(303, '/inquire/sent');
 	}
 };

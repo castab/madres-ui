@@ -89,13 +89,17 @@ export type EstimateLineItem = {
 /**
  * The guest-count category picks a *band* (e.g. "25–100"), not an exact headcount, so the
  * estimate is a range: `*Low`/`*High` bracket the total at `minimumGuests` and
- * `maximumGuests` respectively. For the open-ended top band (`maximumGuests: null`) or when
- * no guest count is picked yet, low and high are equal — the UI shows a single value rather
- * than a degenerate range.
+ * `maximumGuests` respectively. For the open-ended top band (`maximumGuests: null`) there is
+ * no real ceiling to range against, so `*High` falls back to `*Low` as the best known number
+ * — `guestCountOpenEnded` is what tells callers that fallback happened, so they can render
+ * "$X+" (a floor) instead of a bare number that would misleadingly read as a hard cap. When
+ * no guest count is picked yet, low and high are also equal, but `guestCountOpenEnded` is
+ * `false` in that case — there's nothing selected to be open-ended about.
  */
 export type Estimate = {
 	guestCountLow: number;
 	guestCountHigh: number;
+	guestCountOpenEnded: boolean;
 	perEventCents: number;
 	/** Guest-count-independent rate — a range wouldn't apply here, only to totals. */
 	perGuestCents: number;
