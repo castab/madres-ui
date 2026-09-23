@@ -69,6 +69,7 @@ export const actions: Actions = {
 			email: formData.get('email'),
 			zip: formData.get('zip')
 		});
+		const additionalNotes = String(formData.get('additionalNotes') ?? '').trim();
 
 		const selections: Selections = {};
 		for (const categoryKey of Object.keys(offering.categories)) {
@@ -97,7 +98,8 @@ export const actions: Actions = {
 			customer: customerResult.data,
 			offering,
 			selections,
-			estimate
+			estimate,
+			additionalNotes
 		});
 		if (!sendResult.ok) {
 			return fail(502, {

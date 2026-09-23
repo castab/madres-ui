@@ -58,6 +58,18 @@ export type StaffQuotedExtra = {
 	label: string;
 };
 
+/** Currently the only supported kind of free-text field — a multi-line, unpriced input that
+ * lives outside `categories` entirely (no options, no selection limits, invisible to the
+ * estimator). */
+export type FreeTextInputType = 'TEXTAREA';
+
+export type AdditionalNotesField = {
+	id: string;
+	label: string;
+	inputType: FreeTextInputType;
+	placeholder?: string;
+};
+
 export type Offering = {
 	id: string;
 	version: number;
@@ -74,6 +86,7 @@ export type Offering = {
 	};
 	includedItems: IncludedItem[];
 	staffQuotedExtras: StaffQuotedExtra[];
+	additionalNotesField: AdditionalNotesField;
 };
 
 export type EstimateLineItem = {
