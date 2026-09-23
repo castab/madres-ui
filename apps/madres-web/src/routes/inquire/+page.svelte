@@ -11,7 +11,6 @@
 	import IncludedItemsNote from '$lib/components/inquire/included-items-note.svelte';
 	import StaffQuotedNote from '$lib/components/inquire/staff-quoted-note.svelte';
 	import { InquireFormState } from './inquire-form-state.svelte.js';
-	import { formatCentsRange } from '$lib/offering/money.js';
 	import type { GuestFacts, Option } from '$lib/offering/types.js';
 	import type { PageProps } from './$types.js';
 
@@ -86,25 +85,6 @@
 				We're putting the finishing touches on our inquiry form. Check back shortly, or follow along
 				on Instagram in the meantime.
 			</p>
-		</section>
-	{:else if form?.success}
-		<section
-			class="mx-auto flex max-w-(--measure) flex-col items-center gap-3 px-(--gutter) py-(--section-y) text-center"
-		>
-			<span class="text-(length:--text-heading-lg) text-(--color-sol-yellow-700)">✓</span>
-			<p class="m-0 text-(length:--text-body-lg) leading-(--leading-relaxed) text-(--text-primary)">
-				Thank you — your inquiry has been sent. We'll follow up by email with a full quote and next
-				steps.
-			</p>
-			{#if form.estimate}
-				<p class="m-0 text-(length:--text-body-md) text-(--text-secondary)">
-					Your estimated total: {formatCentsRange(
-						form.estimate.totalCentsLow,
-						form.estimate.totalCentsHigh,
-						offering.currency
-					)}
-				</p>
-			{/if}
 		</section>
 	{:else}
 		<section class="mx-auto max-w-(--container-narrow) px-(--gutter) pb-(--section-y)">

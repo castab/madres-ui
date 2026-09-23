@@ -68,7 +68,13 @@
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
 			>
 				<span>Estimated guests</span>
-				<span>{formatGuestRange(estimate.guestCountLow, estimate.guestCountHigh)}</span>
+				<span
+					>{formatGuestRange(
+						estimate.guestCountLow,
+						estimate.guestCountHigh,
+						estimate.guestCountOpenEnded
+					)}</span
+				>
 			</div>
 			<div
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
@@ -78,7 +84,8 @@
 					>{formatCentsRange(
 						estimate.perGuestTotalCentsLow,
 						estimate.perGuestTotalCentsHigh,
-						currency
+						currency,
+						estimate.guestCountOpenEnded
 					)}</span
 				>
 			</div>
@@ -89,7 +96,12 @@
 				>Estimated total</span
 			>
 			<span class="font-sans text-(length:--text-heading-lg) font-semibold text-(--text-primary)">
-				{formatCentsRange(estimate.totalCentsLow, estimate.totalCentsHigh, currency)}
+				{formatCentsRange(
+					estimate.totalCentsLow,
+					estimate.totalCentsHigh,
+					currency,
+					estimate.guestCountOpenEnded
+				)}
 			</span>
 		</div>
 

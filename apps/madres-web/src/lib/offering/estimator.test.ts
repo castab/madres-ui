@@ -24,6 +24,7 @@ describe('computeEstimate', () => {
 		// ($4,850 at 175 guests) matches the flat worked example this fixture is built from.
 		expect(estimate.guestCountLow).toBe(101);
 		expect(estimate.guestCountHigh).toBe(175);
+		expect(estimate.guestCountOpenEnded).toBe(false);
 		expect(estimate.perGuestCents).toBe(2600); // 15 + 3 + 3 + 0 + 0 + 2 + 3 = $26/guest
 		expect(estimate.perGuestTotalCentsLow).toBe(262600); // 101 * $26 = $2,626
 		expect(estimate.perGuestTotalCentsHigh).toBe(455000); // 175 * $26 = $4,550
@@ -136,7 +137,7 @@ describe('computeEstimate', () => {
 		expect(smallEvent.guestCountHigh).not.toBe(largeEvent.guestCountHigh);
 	});
 
-	test('the open-ended top guest band has no maximum, so its range collapses to a single value at minimumGuests', () => {
+	test('the open-ended top guest band has no maximum, so *High falls back to minimumGuests but is flagged open-ended', () => {
 		const estimate = computeEstimate(sampleOffering, {
 			guestCount: ['guest_251_plus'],
 			serviceDuration: ['duration_90'],
@@ -144,8 +145,12 @@ describe('computeEstimate', () => {
 			proteins: ['asada', 'pollo']
 		});
 
+		// guestCountHigh falling back to guestCountLow is only safe to render because
+		// guestCountOpenEnded tells the UI/email to format it as "251+", not a bare "251"
+		// that would misleadingly read as a hard cap on the total.
 		expect(estimate.guestCountLow).toBe(251);
 		expect(estimate.guestCountHigh).toBe(251);
+		expect(estimate.guestCountOpenEnded).toBe(true);
 	});
 
 	test('a closed guest band produces a real low/high range bracketing minimumGuests and maximumGuests', () => {
@@ -159,9 +164,22 @@ describe('computeEstimate', () => {
 		// $300 base + $15/guest base food service, no other premiums selected.
 		expect(estimate.guestCountLow).toBe(25);
 		expect(estimate.guestCountHigh).toBe(100);
+		expect(estimate.guestCountOpenEnded).toBe(false);
 		expect(estimate.totalCentsLow).toBe(30000 + 1500 * 25); // $675
 		expect(estimate.totalCentsHigh).toBe(30000 + 1500 * 100); // $1,800
 		expect(estimate.totalCentsLow).toBeLessThan(estimate.totalCentsHigh);
+	});
+
+	test('no guest count selected yet is not treated as open-ended', () => {
+		const estimate = computeEstimate(sampleOffering, {
+			serviceDuration: ['duration_90'],
+			servingStyle: ['taco_truck'],
+			proteins: ['asada', 'pollo']
+		});
+
+		expect(estimate.guestCountLow).toBe(0);
+		expect(estimate.guestCountHigh).toBe(0);
+		expect(estimate.guestCountOpenEnded).toBe(false);
 	});
 
 	test('changing a configured price (Horchata $2.00 -> $2.50) changes the estimate with no calculator code changes', () => {

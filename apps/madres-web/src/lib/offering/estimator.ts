@@ -45,6 +45,7 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 	const guestOptionId = selections.guestCount?.[0];
 	const guestOption = guestCategory.options.find((option) => option.id === guestOptionId);
 	const guestCountLow = guestOption?.facts?.minimumGuests ?? 0;
+	const guestCountOpenEnded = guestOption?.facts?.maximumGuests === null;
 	const guestCountHigh = guestOption?.facts?.maximumGuests ?? guestCountLow;
 
 	let perEventCents = 0;
@@ -113,6 +114,7 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 	return {
 		guestCountLow,
 		guestCountHigh,
+		guestCountOpenEnded,
 		perEventCents,
 		perGuestCents,
 		perGuestTotalCentsLow,
