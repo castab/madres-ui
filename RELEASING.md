@@ -12,7 +12,7 @@ The Railway `madres-ui` service exists in both environments. Production's GitHub
 ## Release procedure
 
 1. Merge the feature PR after its CI, end-to-end, and CodeQL checks pass.
-2. Wait for the merge commit's `main` CI and CodeQL runs to pass and for the same commit to reach `SUCCESS` in Railway development.
+2. Wait for the merge commit's `main` CI and CodeQL runs to pass and for the same commit to reach `SUCCESS` in Railway development. A documentation-only merge may be `SKIPPED`; preflight verifies that no app build inputs changed since the last successful development deployment before accepting that result.
 3. From the repo root, run `npm run release:preflight -- vX.Y.Z`. This command only reads GitHub, Git, and Railway state. It checks the remote `main` SHA, that the version is new and `main` is not already tagged, required GitHub release credentials, green checks, development deployment, both auto deploy settings, and the workflow on remote `main`. Install and authenticate `gh` and `railway` first (`gh auth status`, `railway whoami`). A working `git push` credential does not automatically authenticate `gh`.
 4. Fetch `main` and confirm it still matches the SHA printed by preflight. If it moved, rerun preflight. Tag that exact SHA:
 
@@ -28,4 +28,4 @@ The Railway `madres-ui` service exists in both environments. Production's GitHub
 
 The release workflow uses the repository secret `RAILWAY_TOKEN` and variable `RAILWAY_PROJECT_ID`. Railway deployment settings are external to Git; the preflight reads their live values. If the release workflow fails, inspect that run and the matching Railway deployment before retrying. Use the workflow's manual dispatch with the **existing tag** when a rerun is needed; do not move a published tag.
 
-Railway can mark a development deployment `SKIPPED` when a merge changes no watched app files. Preflight reports that status and blocks tagging so the release owner can confirm whether the skip was expected before proceeding.
+Railway can mark a development deployment `SKIPPED` when a merge changes no watched app files. Preflight accepts this only when GitHub's commit comparison shows no changes to the app, lockfile, Node configuration, or root package build configuration since the last successful development deployment. It reports other skips as failures.

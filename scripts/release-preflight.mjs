@@ -222,11 +222,50 @@ if (railwayReady && projectId) {
 				]);
 				const deployment = deployments.find((item) => item.meta?.commitHash === mainSha);
 				expect(deployment, `no development deployment found for ${mainSha.slice(0, 12)}`);
+				if (deployment.status === 'SUCCESS') return deployment.id;
 				expect(
-					deployment.status === 'SUCCESS',
+					deployment.status === 'SKIPPED' &&
+						deployment.meta?.skippedReason === 'No changes to watched files',
 					`deployment ${deployment.id} is ${deployment.status}${deployment.meta?.skippedReason ? ` (${deployment.meta.skippedReason})` : ''}`
 				);
-				return deployment.id;
+
+				const previous = deployments.find(
+					(item) => item.status === 'SUCCESS' && /^[0-9a-f]{40}$/.test(item.meta?.commitHash)
+				);
+				expect(previous, 'no prior successful development commit found');
+				const comparison = json('gh', [
+					'api',
+					`repos/${repo}/compare/${previous.meta.commitHash}...${mainSha}`
+				]);
+				expect(comparison.status === 'ahead', 'development commit is not an ancestor of main');
+				expect(
+					Array.isArray(comparison.files) && comparison.files.length < 300,
+					'commit comparison is incomplete'
+				);
+				const buildInputsChanged = comparison.files.some(
+					({ filename }) =>
+						filename.startsWith('apps/madres-web/') ||
+						['package-lock.json', '.npmrc', '.nvmrc'].includes(filename)
+				);
+				expect(
+					!buildInputsChanged,
+					'app or build inputs changed since the last successful development deployment'
+				);
+
+				if (comparison.files.some(({ filename }) => filename === 'package.json')) {
+					const packageAt = (sha) => {
+						const file = json('gh', ['api', `repos/${repo}/contents/package.json?ref=${sha}`]);
+						const data = JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
+						delete data.scripts;
+						return data;
+					};
+					expect(
+						JSON.stringify(packageAt(previous.meta.commitHash)) ===
+							JSON.stringify(packageAt(mainSha)),
+						'root package build configuration changed since the last successful development deployment'
+					);
+				}
+				return `Railway skipped ${mainSha.slice(0, 12)}; app build inputs match successful deployment ${previous.id}`;
 			});
 		}
 	}
