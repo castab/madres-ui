@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag to publish
+        description: Existing release tag to deploy
         required: true
         type: string
 
@@ -16,14 +16,36 @@ env:
 permissions:
   contents: write # for release creation
 
-# Railway's GitHub integration deploys main; tagging only publishes the GitHub Release.
+# Railway's GitHub integration deploys main to development. Tags deploy to production here.
+concurrency:
+  group: railway-production
+  cancel-in-progress: false
+
 jobs:
-  release:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.RELEASE_TAG }}
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26.9.0'
+          cache: npm
+
+      - name: Stamp version from tag
+        run: npm pkg set version="${RELEASE_TAG#v}" --workspace=madres-web
+
+      - name: Deploy to Railway production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: >
+          npx @railway/cli@5.59.0 up
+          --project ${{ vars.RAILWAY_PROJECT_ID }}
+          --service 1068d2ad-96ca-4870-a8e4-2752b458800b
+          --environment production
+          --ci
 
       - name: Create GitHub Release
         env:
