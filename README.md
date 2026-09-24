@@ -16,10 +16,13 @@ nvm use
 # 2. Install dependencies (run from the repo root — installs all workspaces)
 npm install
 
-# 3. (Optional) configure the gallery's backend integration
+# 3. (Optional) configure integrations
 cp apps/madres-web/.env.example apps/madres-web/.env
-# fill in PRESENTATION_SERVICE_*; without it, the gallery route fails
-# closed to an empty state rather than erroring
+# Every integration fails closed when unconfigured: without PRESENTATION_SERVICE_*
+# the gallery and landing photos render empty, and without a valid
+# PRIVATE_EVENT_OFFERING_JSON the /inquire form is disabled site-wide.
+# The copied sample offering and Turnstile test keys enable /inquire locally.
+# Sending the email still needs RESEND_API_KEY.
 
 # 4. Start the dev server
 npm run dev
@@ -64,4 +67,9 @@ Run `npm run release:preflight -- vX.Y.Z` before tagging a release. See [RELEASI
 - **Vitest** (unit) + **Playwright** (e2e)
 - Ships as a standalone Node server via `@sveltejs/adapter-node` — see `apps/madres-web/Dockerfile` for the deployable container build
 
-See [`apps/madres-web/README.md`](apps/madres-web/README.md) and [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md) for app-specific details, and this repo's own [`AGENTS.md`](AGENTS.md) for engineering conventions.
+## Further reading
+
+- [`AGENTS.md`](AGENTS.md): engineering rules and commands, for agents and humans.
+- [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md): app architecture (routes, `$lib` layout, integrations, tests).
+- [`apps/madres-web/.env.example`](apps/madres-web/.env.example): every env var, plus the `/inquire` offering JSON format.
+- [RELEASING.md](RELEASING.md): deployment and release procedure.

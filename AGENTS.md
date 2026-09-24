@@ -1,100 +1,49 @@
 # AGENTS.md
 
-## Role & Context
+Madres Taco Shop's public website. npm-workspaces monorepo with one app today:
+`apps/madres-web` (SvelteKit 2, Svelte 5 runes-only, Vite 8, Tailwind v4, shadcn-svelte,
+built with `adapter-node` and deployed to Railway).
 
-You are a specialist Svelte 5 + TypeScript engineer working in this npm-workspaces
-monorepo (`apps/madres-web`, a SvelteKit 2 app on Vite 8, Tailwind v4, shadcn-svelte).
-You write **runes-only Svelte 5** — this codebase has no Svelte 4 idioms, and none
-should be introduced. When in doubt, match the patterns already in `apps/madres-web/src`.
+## Where to look
 
-This file covers engineering/style conventions. For project-specific rules (brand
-palette, the gallery/presentation-service integration spec), see
-`apps/madres-web/AGENTS.md`.
+| Need                                                    | Read                                                                  |
+| ------------------------------------------------------- | --------------------------------------------------------------------- |
+| App architecture: routes, `$lib` layout, integrations   | [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md)              |
+| Env vars and the `/inquire` offering JSON schema        | [`apps/madres-web/.env.example`](apps/madres-web/.env.example)        |
+| Setup, scripts, stack                                   | [`README.md`](README.md)                                              |
+| Deploy and release (Railway, tags, preflight)           | [`RELEASING.md`](RELEASING.md)                                        |
+| Brand palette, type scale, spacing tokens               | `apps/madres-web/src/routes/layout.css` (`:root` custom props)        |
+| Shared Tailwind class recipes (buttons, headings, etc.) | `apps/madres-web/src/lib/styles.ts`                                   |
+| shadcn-svelte / email skills                            | `.claude/skills/` (mirrored in `.agents/skills/`, `skills-lock.json`) |
 
-## Critical Boundaries
+## Commands (run from the repo root)
 
-### Reactivity & state
+- Node **v26.9.0** is required (`.nvmrc`; `engine-strict` makes `npm install` refuse other versions). Use `nvm use`.
+- `npm run check` — svelte-check. Must report **0 errors and 0 warnings**.
+- `npm run lint` — Prettier check + ESLint. Fix formatting with `npm run format`.
+- `npm run test:unit -- --run` — Vitest once (bare `test:unit` starts watch mode).
+- `npm run test:e2e` — Playwright; builds the app and starts a mock presentation-service (`apps/madres-web/test/presentation-service-mock.mjs`). It runs `playwright install` first.
+- `npm run dev` — dev server on `http://localhost:5173`.
 
-- ALWAYS use Svelte 5 runes (`$state`, `$derived`, `$props`, `$effect`) for reactivity.
-  Never use legacy Svelte 4 top-level `let` reactivity (`$:`) or writable stores, unless
-  bridging to a legacy library that only exposes a store-based API.
-- For `Set`/`Map` state that must react to in-place mutation (`.add()`, `.set()`,
-  `.delete()`), use `SvelteSet`/`SvelteMap` from `svelte/reactivity` — `$state(new Set())`
-  does **not** make `.add()` reactive, only variable reassignment. This has already caused
-  one production bug in this repo; do not reintroduce it.
-- Use `untrack()` from `svelte` when a value must intentionally be read once (e.g. seeding
-  local `$state` from an initial prop, like React's `useState(initialValue)`) — don't
-  silence the `state_referenced_locally` warning any other way.
+A change is done when `check`, `lint`, and unit tests are clean. CI (`.github/workflows/ci.yml`)
+also runs `build` and the e2e suite.
 
-### Component props
+## Hard rules
 
-- ALWAYS explicitly type component props with a `Props` type/interface and destructure via
-  `$props()`: `let { prop1, prop2 }: Props = $props()`. Never leave props implicitly typed.
-- Prefer `WithElementRef<T>` / `WithoutChildren<T>` helpers from `$lib/utils.ts` for
-  components that forward a DOM element ref or accept `children`.
+**Svelte 5, runes only.** Match existing patterns in `apps/madres-web/src`.
 
-### Templates & composition
+- Reactivity via `$state` / `$derived` / `$props` / `$effect`. No `$:`, no writable stores, no `$app/stores` (use `$app/state`).
+- Reactive `Set`/`Map` must be `SvelteSet`/`SvelteMap` from `svelte/reactivity`; `$state(new Set())` does not track `.add()`. This has caused a production bug here.
+- Read a prop once to seed local state with `untrack()`; don't silence `state_referenced_locally` any other way.
+- Type props explicitly: `let { a, b }: Props = $props()`. Use `WithElementRef` / `WithoutChildren` from `$lib/utils.ts` when forwarding refs or taking `children`.
+- Snippets (`{#snippet}` / `{@render}`) only, never `<slot>` / `let:`. DOM event attributes (`onclick`), never `on:click`. No `<svelte:options accessors />`.
+- Use `{#key}` to fully remount a child when a prop change must reset its internal state.
+- File order: `<script lang="ts">`, then markup, then `<style>`. Prettier: tabs, single quotes, no trailing commas.
 
-- NEVER use `<svelte:options accessors />` — it's deprecated.
-- NEVER use old slot syntax (`<slot>`, `let:x`). Use **snippets** (`{#snippet x()}`,
-  `{@render x()}`) for all content projection, including default "children" content.
-- Use plain DOM event attributes (`onclick`, `onchange`, …), not the `on:click` directive.
-- Prefer `{#key}` to force a full remount when a child's internal state must fully reset
-  on a prop change, rather than hand-rolling a "did the identity change?" comparison.
+**App invariants.** Details are in `apps/madres-web/AGENTS.md`.
 
-## Core Commands
-
-Run from the repo root (delegates to the `madres-web` workspace):
-
-```sh
-npm run dev         # start the dev server (HMR)
-npm run build        # production build
-npm run preview      # preview the production build
-npm run check         # svelte-check (type errors/warnings)
-npm run lint          # prettier --check + eslint
-npm run format        # prettier --write
-npm run test:unit    # vitest
-npm run test:e2e     # playwright
-```
-
-Treat `npm run check` output as authoritative — 0 errors AND 0 warnings before considering
-a change done. `npm run lint` must also be clean; Prettier config uses tabs, single quotes,
-no trailing commas (see `apps/madres-web/prettier.config.js`).
-
-## Code Style
-
-```svelte
-<script lang="ts">
-	import { cn } from '$lib/utils.js';
-
-	type Props = {
-		label: string;
-		initial?: number;
-		class?: string;
-	};
-
-	let { label, initial = 0, class: className }: Props = $props();
-
-	let count = $state(initial);
-	let doubled = $derived(count * 2);
-
-	function increment() {
-		count += 1;
-	}
-</script>
-
-<div class={cn('flex items-center gap-3 rounded-lg border p-4', className)}>
-	<span class="font-medium">{label}</span>
-	<button type="button" onclick={increment}>
-		{count} (×2 = {doubled})
-	</button>
-</div>
-
-<style>
-	div {
-		background: var(--surface-card, #fff);
-	}
-</style>
-```
-
-File layout order is always: `<script lang="ts">` → template markup → scoped `<style>`.
+- Secrets and outbound calls live only in `src/lib/server/**` and read env via `$env/dynamic/*`, never `$env/static/*`, so builds succeed without an env file.
+- Every integration **fails closed**. If config is missing or a call fails, the page degrades to a safe empty or "not available" state and does not throw.
+- `/inquire` content, prices, and limits come from `PRIVATE_EVENT_OFFERING_JSON`, not source. Money is **integer cents**. The server re-validates everything the client submits.
+- Style with the CSS tokens in `layout.css` (e.g. `text-(--text-primary)`), not raw hex values.
+- Never commit real offering data, prices, or keys. `.env.example` holds fictional or test values only.
