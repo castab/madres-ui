@@ -170,6 +170,15 @@
 						onSelectSingle={(optionId) => formState.selectSingle(categoryKey, optionId)}
 						onToggleMulti={(optionId) =>
 							formState.toggleMulti(categoryKey, optionId, category.maxSelections)}
+						quantityValue={(optionId) => formState.quantityValue(categoryKey, optionId)}
+						onQuantityChange={(optionId, raw) =>
+							formState.setQuantityInput(categoryKey, optionId, raw)}
+						quantitySubtotalCents={category.inputType === 'QUANTITY_LIST'
+							? formState.quantityStatus(categoryKey).subtotalCents
+							: 0}
+						quantitySelectedOptions={category.inputType === 'QUANTITY_LIST'
+							? formState.quantityStatus(categoryKey).selectedOptions
+							: 0}
 					/>
 				{/each}
 

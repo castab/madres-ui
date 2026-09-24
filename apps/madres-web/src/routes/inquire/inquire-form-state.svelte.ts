@@ -1,7 +1,8 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { computeEstimate } from '$lib/offering/estimator.js';
 import { parseGuestCount } from '$lib/offering/guest-count.js';
-import type { Offering, Selections } from '$lib/offering/types.js';
+import { parseItemQuantity, quantityOrderStatus } from '$lib/offering/quantity-order.js';
+import type { Offering, Quantities, Selections } from '$lib/offering/types.js';
 
 /**
  * Runes-based reactive state for the `/inquire` form: customer info fields plus per-category
@@ -22,6 +23,7 @@ export class InquireFormState {
 
 	private readonly offering: Offering;
 	private readonly selectedByCategory = new SvelteMap<string, SvelteSet<string>>();
+	private readonly quantityInputs = new SvelteMap<string, SvelteMap<string, string>>();
 
 	constructor(offering: Offering) {
 		this.offering = offering;
@@ -77,12 +79,51 @@ export class InquireFormState {
 		return result;
 	}
 
+	quantityValue(categoryKey: string, optionId: string): string {
+		return this.quantityInputs.get(categoryKey)?.get(optionId) ?? '';
+	}
+
+	setQuantityInput(categoryKey: string, optionId: string, raw: string): void {
+		let inputs = this.quantityInputs.get(categoryKey);
+		if (!inputs) {
+			inputs = new SvelteMap<string, string>();
+			this.quantityInputs.set(categoryKey, inputs);
+		}
+		inputs.set(optionId, raw);
+	}
+
+	get quantities(): Quantities {
+		const result: Quantities = {};
+		for (const [categoryKey, category] of Object.entries(this.offering.categories)) {
+			if (category.inputType !== 'QUANTITY_LIST') continue;
+			result[categoryKey] = {};
+			for (const option of category.options) {
+				result[categoryKey][option.id] =
+					parseItemQuantity(
+						this.quantityValue(categoryKey, option.id),
+						category.maximumQuantityPerOption ?? 0
+					) ?? Number.NaN;
+			}
+		}
+		return result;
+	}
+
+	quantityStatus(categoryKey: string) {
+		const category = this.offering.categories[categoryKey];
+		return quantityOrderStatus(
+			category,
+			this.quantities[categoryKey] ?? {},
+			this.offering.currency
+		);
+	}
+
 	/** UX-only preview — the server recomputes authoritatively from the submitted option ids. */
 	get estimate() {
 		return computeEstimate(
 			this.offering,
 			this.selections,
-			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count ?? 0
+			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count ?? 0,
+			this.quantities
 		);
 	}
 
@@ -111,6 +152,7 @@ export class InquireFormState {
 	categoryValid(categoryKey: string): boolean {
 		const category = this.offering.categories[categoryKey];
 		if (!category) return true;
+		if (category.inputType === 'QUANTITY_LIST') return !this.quantityStatus(categoryKey).error;
 		const count = this.selectionCount(categoryKey);
 		return count >= category.minSelections && count <= category.maxSelections;
 	}
@@ -176,6 +218,7 @@ export class InquireFormState {
 		if (!this.touched) return undefined;
 		const category = this.offering.categories[categoryKey];
 		if (!category || this.categoryValid(categoryKey)) return undefined;
+		if (category.inputType === 'QUANTITY_LIST') return this.quantityStatus(categoryKey).error;
 		if (category.minSelections === category.maxSelections && category.minSelections === 1) {
 			return 'Choose one to continue';
 		}

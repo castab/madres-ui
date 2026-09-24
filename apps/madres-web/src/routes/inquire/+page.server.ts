@@ -6,7 +6,8 @@ import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.
 import { verifyTurnstileToken } from '$lib/server/turnstile/turnstile.server.js';
 import { computeEstimate } from '$lib/offering/estimator.js';
 import { parseGuestCount } from '$lib/offering/guest-count.js';
-import type { Offering, Selections } from '$lib/offering/types.js';
+import { parseQuantityFormData, quantityOrderStatus } from '$lib/offering/quantity-order.js';
+import type { Offering, Quantities, Selections } from '$lib/offering/types.js';
 import type { Actions, PageServerLoad } from './$types.js';
 
 /** One shape across every `fail()` outcome so `+page.svelte` can read `form?.field` without a
@@ -48,6 +49,7 @@ function describeSelectionLimit(minSelections: number, maxSelections: number): s
 function validateSelections(offering: Offering, selections: Selections): string[] {
 	const issues: string[] = [];
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
+		if (category.inputType === 'QUANTITY_LIST') continue;
 		const picked = [...new Set(selections[categoryKey] ?? [])];
 		const validOptionIds = new Set(category.options.map((option) => option.id));
 		if (picked.some((id) => !validOptionIds.has(id))) {
@@ -59,6 +61,16 @@ function validateSelections(offering: Offering, selections: Selections): string[
 				`${category.label}: ${describeSelectionLimit(category.minSelections, category.maxSelections)}`
 			);
 		}
+	}
+	return issues;
+}
+
+function validateQuantities(offering: Offering, quantities: Quantities): string[] {
+	const issues: string[] = [];
+	for (const [categoryKey, category] of Object.entries(offering.categories)) {
+		if (category.inputType !== 'QUANTITY_LIST') continue;
+		const status = quantityOrderStatus(category, quantities[categoryKey] ?? {}, offering.currency);
+		if (status.error) issues.push(`${category.label}: ${status.error}`);
 	}
 	return issues;
 }
@@ -106,10 +118,18 @@ export const actions: Actions = {
 		);
 
 		const selections: Selections = {};
-		for (const categoryKey of Object.keys(offering.categories)) {
+		const quantities: Quantities = {};
+		for (const [categoryKey, category] of Object.entries(offering.categories)) {
+			if (category.inputType === 'QUANTITY_LIST') {
+				quantities[categoryKey] = parseQuantityFormData(categoryKey, category, formData);
+				continue;
+			}
 			selections[categoryKey] = formData.getAll(categoryKey).map(String);
 		}
-		const selectionIssues = validateSelections(offering, selections);
+		const selectionIssues = [
+			...validateSelections(offering, selections),
+			...validateQuantities(offering, quantities)
+		];
 
 		if (!customerResult.success || guestCountResult.count === null || selectionIssues.length > 0) {
 			return fail(400, {
@@ -129,12 +149,13 @@ export const actions: Actions = {
 
 		// The browser-side estimate shown while filling out the form is UX only — this is the
 		// authoritative, server-recomputed estimate that gets recorded with the inquiry.
-		const estimate = computeEstimate(offering, selections, guestCountResult.count);
+		const estimate = computeEstimate(offering, selections, guestCountResult.count, quantities);
 
 		const sendResult = await sendInquiryNotification({
 			customer: customerResult.data,
 			offering,
 			selections,
+			quantities,
 			estimate,
 			additionalNotes
 		});

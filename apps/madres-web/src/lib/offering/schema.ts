@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import type { Offering } from './types.js';
 
-const pricingTypeSchema = z.enum(['NONE', 'PER_EVENT', 'PER_GUEST']);
-const categoryInputTypeSchema = z.enum(['SELECT', 'CHECKBOX_LIST']);
+const pricingTypeSchema = z.enum(['NONE', 'PER_EVENT', 'PER_GUEST', 'PER_ITEM']);
+const categoryInputTypeSchema = z.enum(['SELECT', 'CHECKBOX_LIST', 'QUANTITY_LIST']);
 const priceCentsSchema = z.number().int().nonnegative();
 const nonNegativeIntSchema = z.number().int().nonnegative();
 
@@ -39,6 +39,8 @@ function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
 			pricingType: pricingTypeSchema,
 			inputType: categoryInputTypeSchema,
 			selectionPricing: selectionPricingSchema.optional(),
+			minimumOrderCents: z.number().int().positive().optional(),
+			maximumQuantityPerOption: z.number().int().positive().optional(),
 			options: z.array(optionSchema).min(1)
 		})
 		.superRefine((category, ctx) => {
@@ -54,6 +56,23 @@ function makeCategorySchema<OptionSchema extends z.ZodType<MinimalOptionShape>>(
 					message:
 						'inputType "SELECT" requires maxSelections to be exactly 1 (a dropdown can only pick one option)'
 				});
+			}
+			if (category.inputType === 'QUANTITY_LIST') {
+				if (
+					category.pricingType !== 'PER_ITEM' ||
+					category.minSelections !== 0 ||
+					category.minimumOrderCents === undefined ||
+					category.maximumQuantityPerOption === undefined ||
+					category.selectionPricing !== undefined
+				) {
+					ctx.addIssue({
+						code: 'custom',
+						message:
+							'QUANTITY_LIST requires PER_ITEM pricing, zero minimum selections, minimumOrderCents, maximumQuantityPerOption, and no selectionPricing'
+					});
+				}
+			} else if (category.pricingType === 'PER_ITEM') {
+				ctx.addIssue({ code: 'custom', message: 'PER_ITEM pricing requires QUANTITY_LIST input' });
 			}
 			const seenIds = new Set<string>();
 			for (const option of category.options) {

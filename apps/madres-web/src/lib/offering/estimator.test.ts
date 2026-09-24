@@ -7,22 +7,67 @@ const selections: Selections = {
 	servingStyle: ['buffet'],
 	proteins: ['asada', 'pollo'],
 	drinks: ['horchata'],
-	appetizers: ['flautas']
+	appetizers: []
 };
 
 describe('computeEstimate', () => {
 	test('calculates one total for the entered guest count', () => {
 		const estimate = computeEstimate(sampleOffering, selections, 175);
 		expect(estimate.guestCount).toBe(175);
-		expect(estimate.perGuestCents).toBe(3200);
-		expect(estimate.perGuestTotalCents).toBe(560000);
+		expect(estimate.perGuestCents).toBe(2900);
+		expect(estimate.perGuestTotalCents).toBe(507500);
 		expect(estimate.perEventCents).toBe(0);
+		expect(estimate.itemTotalCents).toBe(0);
 		expect(estimate.minimumAdjustmentCents).toBe(0);
-		expect(estimate.totalCents).toBe(560000);
+		expect(estimate.totalCents).toBe(507500);
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:asada')).toMatchObject({
 			included: true,
 			amountCents: 0
 		});
+	});
+
+	test('prices appetizer quantities by item, independently of guest count', () => {
+		const quantities = { appetizers: { flautas: 100, fruit_cup_spread: 25 } };
+		const at15 = computeEstimate(sampleOffering, selections, 15, quantities);
+		const at50 = computeEstimate(sampleOffering, selections, 50, quantities);
+		expect(at15.itemTotalCents).toBe(50000);
+		expect(at50.itemTotalCents).toBe(50000);
+		expect(at15.perGuestCents).toBe(2900);
+		expect(at15.totalCents).toBe(153000);
+		expect(at50.totalCents).toBe(195000);
+		expect(at15.lineItems.find((item) => item.id === 'appetizers:flautas')).toMatchObject({
+			kind: 'per-item',
+			amountCents: 35000,
+			unitCents: 350,
+			quantity: 100
+		});
+	});
+
+	test('adds optional drinks and appetizer orders above the serving style floor', () => {
+		const base = computeEstimate(
+			sampleOffering,
+			{ servingStyle: ['buffet'], proteins: ['asada', 'pollo'] },
+			15
+		);
+		const withExtras = computeEstimate(sampleOffering, selections, 15, {
+			appetizers: { chorizo_avocado_toast: 125 }
+		});
+		expect(base.totalCents).toBe(100000);
+		expect(withExtras.minimumAdjustmentCents).toBe(59500);
+		expect(withExtras.itemTotalCents).toBe(50000);
+		expect(withExtras.totalCents).toBe(153000);
+	});
+
+	test('uses the four configured appetizer unit prices', () => {
+		const estimate = computeEstimate(sampleOffering, selections, 100, {
+			appetizers: {
+				flautas: 1,
+				chorizo_avocado_toast: 1,
+				elote_en_vaso: 1,
+				fruit_cup_spread: 1
+			}
+		});
+		expect(estimate.itemTotalCents).toBe(1700);
 	});
 
 	test('per-guest premiums scale with guest count while per-event charges stay fixed', () => {

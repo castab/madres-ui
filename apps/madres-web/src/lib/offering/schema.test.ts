@@ -187,6 +187,30 @@ describe('parseOffering', () => {
 		expect(result.ok).toBe(false);
 	});
 
+	test('requires quantity list pricing and a minimum order amount', () => {
+		for (const changes of [
+			{ pricingType: 'PER_GUEST' },
+			{ minimumOrderCents: undefined },
+			{ maximumQuantityPerOption: undefined },
+			{
+				selectionPricing: {
+					includedSelections: 1,
+					includedSelectionStrategy: 'HIGHEST_PRICED_SELECTED',
+					chargeRemainingSelections: true
+				}
+			}
+		]) {
+			const broken = {
+				...sampleOffering,
+				categories: {
+					...sampleOffering.categories,
+					appetizers: { ...sampleOffering.categories.appetizers, ...changes }
+				}
+			};
+			expect(parseOffering(broken).ok).toBe(false);
+		}
+	});
+
 	test('rejects a document missing the required guest count field', () => {
 		const broken: Record<string, unknown> = { ...sampleOffering };
 		delete broken.guestCountField;

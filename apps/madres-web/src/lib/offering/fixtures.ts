@@ -5,10 +5,10 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 7,
+	version: 8,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
-	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
+	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST', 'PER_ITEM'],
 	guestCountField: {
 		id: 'guest_count',
 		label: 'Guest Count',
@@ -123,35 +123,37 @@ export const sampleOffering: Offering = {
 			label: 'Appetizers',
 			minSelections: 0,
 			maxSelections: 4,
-			pricingType: 'PER_GUEST',
-			inputType: 'CHECKBOX_LIST',
+			pricingType: 'PER_ITEM',
+			inputType: 'QUANTITY_LIST',
+			minimumOrderCents: 50000,
+			maximumQuantityPerOption: 10000,
 			options: [
 				{
 					id: 'flautas',
 					label: 'Flauta en Vaso',
 					description:
 						'Crispy hand-rolled shredded-chicken flauta in a cup with salsa verde, crema, queso fresco, and lime.',
-					priceCents: 300
+					priceCents: 350
 				},
 				{
 					id: 'fruit_cup_spread',
 					label: 'Matchstick Fruit',
 					description: 'Seasonal fruit cut into matchsticks and served in a cup.',
-					priceCents: 250
+					priceCents: 600
 				},
 				{
 					id: 'elote_en_vaso',
 					label: 'Elote en Vaso',
 					description:
 						'Buttered corn in a cup with crema, queso fresco, and a light dusting of paprika.',
-					priceCents: 200
+					priceCents: 350
 				},
 				{
 					id: 'chorizo_avocado_toast',
 					label: 'Avocado Chorizo Toast',
 					description:
 						'Local artisan toast with avocado and Mexican chorizo, finished with salsa verde crema, queso fresco, and radish.',
-					priceCents: 350
+					priceCents: 400
 				}
 			]
 		}

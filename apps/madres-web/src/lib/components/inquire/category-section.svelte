@@ -2,6 +2,7 @@
 	import type { Category } from '$lib/offering/types.js';
 	import CategoryChipRadio from './category-chip-radio.svelte';
 	import CategoryChipCheckbox from './category-chip-checkbox.svelte';
+	import CategoryQuantityList from './category-quantity-list.svelte';
 
 	type Props = {
 		category: Category;
@@ -13,6 +14,10 @@
 		error?: string;
 		onSelectSingle: (optionId: string) => void;
 		onToggleMulti: (optionId: string) => void;
+		quantityValue: (optionId: string) => string;
+		onQuantityChange: (optionId: string, raw: string) => void;
+		quantitySubtotalCents: number;
+		quantitySelectedOptions: number;
 	};
 
 	let {
@@ -24,7 +29,11 @@
 		selectionCount,
 		error,
 		onSelectSingle,
-		onToggleMulti
+		onToggleMulti,
+		quantityValue,
+		onQuantityChange,
+		quantitySubtotalCents,
+		quantitySelectedOptions
 	}: Props = $props();
 </script>
 
@@ -36,6 +45,17 @@
 		value={selectedOption}
 		{error}
 		onChange={onSelectSingle}
+	/>
+{:else if category.inputType === 'QUANTITY_LIST'}
+	<CategoryQuantityList
+		{category}
+		{categoryKey}
+		{currency}
+		{quantityValue}
+		{onQuantityChange}
+		subtotalCents={quantitySubtotalCents}
+		selectedOptions={quantitySelectedOptions}
+		{error}
 	/>
 {:else}
 	<CategoryChipCheckbox

@@ -1,10 +1,10 @@
 /** A pricing document is never a "quote" — it drives a preliminary, staff-confirmed estimate. */
-export type PricingType = 'NONE' | 'PER_EVENT' | 'PER_GUEST';
+export type PricingType = 'NONE' | 'PER_EVENT' | 'PER_GUEST' | 'PER_ITEM';
 
 export type IncludedSelectionStrategy = 'HIGHEST_PRICED_SELECTED';
 
 /** How a category's options should be presented. */
-export type CategoryInputType = 'SELECT' | 'CHECKBOX_LIST';
+export type CategoryInputType = 'SELECT' | 'CHECKBOX_LIST' | 'QUANTITY_LIST';
 
 export type SelectionPricing = {
 	includedSelections: number;
@@ -31,6 +31,8 @@ export type Category<Facts = unknown> = {
 	pricingType: PricingType;
 	inputType: CategoryInputType;
 	selectionPricing?: SelectionPricing;
+	minimumOrderCents?: number;
+	maximumQuantityPerOption?: number;
 	options: Option<Facts>[];
 };
 
@@ -90,8 +92,10 @@ export type Offering = {
 export type EstimateLineItem = {
 	id: string;
 	label: string;
-	kind: 'per-event' | 'per-guest';
+	kind: 'per-event' | 'per-guest' | 'per-item';
 	amountCents: number;
+	quantity?: number;
+	unitCents?: number;
 	/** True for a highest-priced-strategy selection that's covered by an included slot —
 	 * the UI shows "Included" instead of "$0" for these. */
 	included?: boolean;
@@ -102,6 +106,7 @@ export type Estimate = {
 	perEventCents: number;
 	perGuestCents: number;
 	perGuestTotalCents: number;
+	itemTotalCents: number;
 	minimumEventCents: number;
 	minimumAdjustmentCents: number;
 	totalCents: number;
@@ -110,3 +115,6 @@ export type Estimate = {
 
 /** Selected option ids, keyed by category key (matching `Offering['categories']` keys). */
 export type Selections = Record<string, string[]>;
+
+/** Item counts keyed first by quantity category, then by option id. */
+export type Quantities = Record<string, Record<string, number>>;

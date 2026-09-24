@@ -4,6 +4,7 @@ import type {
 	EstimateLineItem,
 	Offering,
 	Option,
+	Quantities,
 	SelectionPricing,
 	Selections
 } from './types.js';
@@ -34,19 +35,39 @@ function highestPricedContributions(
  * never floating-point dollars. This function contains no offering-specific knowledge (no
  * option ids, no category names) — every dollar amount and every label comes from `offering`.
  *
- * The per-guest rate is computed once and multiplied by the entered guest count.
+ * The per-guest rate is computed once and multiplied by the entered guest count. Item
+ * quantities are independent of guest count.
  */
 export function computeEstimate(
 	offering: Offering,
 	selections: Selections,
-	guestCount: number
+	guestCount: number,
+	quantities: Quantities = {}
 ): Estimate {
 	let perEventCents = 0;
 	let perGuestCents = 0;
+	let itemTotalCents = 0;
 	const lineItems: EstimateLineItem[] = [];
 
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
 		if (category.pricingType === 'NONE') continue;
+		if (category.inputType === 'QUANTITY_LIST') {
+			for (const option of category.options) {
+				const quantity = quantities[categoryKey]?.[option.id] ?? 0;
+				if (!Number.isSafeInteger(quantity) || quantity <= 0) continue;
+				const amountCents = quantity * option.priceCents;
+				itemTotalCents += amountCents;
+				lineItems.push({
+					id: `${categoryKey}:${option.id}`,
+					label: option.label,
+					kind: 'per-item',
+					amountCents,
+					quantity,
+					unitCents: option.priceCents
+				});
+			}
+			continue;
+		}
 
 		const selectedIds = selections[categoryKey] ?? [];
 		const selectedOptions = category.options.filter((option) => selectedIds.includes(option.id));
@@ -91,19 +112,18 @@ export function computeEstimate(
 		(option) => option.id === selections.servingStyle?.[0]
 	);
 	const minimumEventCents = selectedServingStyle?.minimumEventCents ?? 0;
-	const minimumAdjustmentCents = Math.max(
-		0,
-		minimumEventCents - perEventCents - perGuestTotalCents
-	);
+	const servingStyleTotalCents = (selectedServingStyle?.priceCents ?? 0) * guestCount;
+	const minimumAdjustmentCents = Math.max(0, minimumEventCents - servingStyleTotalCents);
 
 	return {
 		guestCount,
 		perEventCents,
 		perGuestCents,
 		perGuestTotalCents,
+		itemTotalCents,
 		minimumEventCents,
 		minimumAdjustmentCents,
-		totalCents: perEventCents + perGuestTotalCents + minimumAdjustmentCents,
+		totalCents: perEventCents + perGuestTotalCents + itemTotalCents + minimumAdjustmentCents,
 		lineItems
 	};
 }
