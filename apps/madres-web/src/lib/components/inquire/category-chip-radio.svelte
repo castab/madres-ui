@@ -15,7 +15,7 @@
 
 	let { category, categoryKey, currency, value, error, onChange }: Props = $props();
 
-	function chipLabel(option: Option): string {
+	function priceLabel(option: Option): string {
 		const priceLabel =
 			option.priceCents === 0
 				? ''
@@ -28,7 +28,7 @@
 			option.minimumEventCents === undefined
 				? ''
 				: ` · ${formatCents(option.minimumEventCents, currency)} event minimum`;
-		return `${option.label}${priceLabel}${minimumLabel}`;
+		return `${priceLabel}${minimumLabel}`;
 	}
 </script>
 
@@ -39,7 +39,8 @@
 			name={categoryKey}
 			value={option.id}
 			checked={value === option.id}
-			label={chipLabel(option)}
+			label={option.label}
+			priceLabel={priceLabel(option)}
 			description={option.description}
 			onchange={() => onChange(option.id)}
 		/>

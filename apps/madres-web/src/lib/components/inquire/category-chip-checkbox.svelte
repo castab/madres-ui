@@ -17,12 +17,10 @@
 	let { category, categoryKey, currency, isSelected, selectionCount, error, onToggle }: Props =
 		$props();
 
-	function chipLabel(priceCents: number, label: string): string {
-		if (priceCents === 0) return label;
+	function priceLabel(priceCents: number): string {
+		if (priceCents === 0) return '';
 		const amount = formatCents(priceCents, currency);
-		return category.pricingType === 'PER_GUEST'
-			? `${label} · +${amount}/guest`
-			: `${label} · +${amount}`;
+		return category.pricingType === 'PER_GUEST' ? ` · +${amount}/guest` : ` · +${amount}`;
 	}
 
 	const counter = $derived.by(() => {
@@ -41,7 +39,8 @@
 			value={option.id}
 			{checked}
 			disabled={!checked && selectionCount >= category.maxSelections}
-			label={chipLabel(option.priceCents, option.label)}
+			label={option.label}
+			priceLabel={priceLabel(option.priceCents)}
 			description={option.description}
 			onchange={() => onToggle(option.id)}
 		/>

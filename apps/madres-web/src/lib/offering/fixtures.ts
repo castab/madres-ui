@@ -29,19 +29,21 @@ export const sampleOffering: Offering = {
 				{
 					id: 'taco_truck',
 					label: 'Traditional Taco Truck Style',
+					description: 'The classic from-the-window taco service you know and love.',
 					priceCents: 2300,
 					minimumEventCents: 75000
 				},
 				{
 					id: 'buffet',
 					label: 'Gourmet Taco Buffet',
+					description: 'A self-serve spread of tacos and toppings for your guests.',
 					priceCents: 2700,
 					minimumEventCents: 100000
 				},
 				{
 					id: 'just_tacos',
 					label: 'Just the Tacos!',
-					description: 'Rice and beans are not included.',
+					description: 'All about the tacos, without rice or beans.',
 					priceCents: 2000,
 					minimumEventCents: 50000
 				}
@@ -60,11 +62,31 @@ export const sampleOffering: Offering = {
 				chargeRemainingSelections: true
 			},
 			options: [
-				{ id: 'asada', label: 'Asada', description: 'Beef', priceCents: 400 },
-				{ id: 'adobada', label: 'Adobada', description: 'Pork', priceCents: 300 },
-				{ id: 'pollo', label: 'Pollo', description: 'Chicken', priceCents: 200 },
-				{ id: 'chorizo', label: 'Chorizo', description: 'Pork', priceCents: 100 },
-				{ id: 'veggie', label: 'Veggie', description: 'Vegetarian taco option', priceCents: 100 }
+				{ id: 'asada', label: 'Asada', description: 'Savory grilled beef.', priceCents: 400 },
+				{
+					id: 'adobada',
+					label: 'Adobada',
+					description: 'Marinated pork with a little spice.',
+					priceCents: 300
+				},
+				{
+					id: 'pollo',
+					label: 'Pollo',
+					description: 'Seasoned chicken for a crowd-pleasing taco.',
+					priceCents: 200
+				},
+				{
+					id: 'chorizo',
+					label: 'Chorizo',
+					description: 'Bold, spiced pork chorizo.',
+					priceCents: 100
+				},
+				{
+					id: 'veggie',
+					label: 'Veggie',
+					description: 'A flavorful meat-free taco option.',
+					priceCents: 100
+				}
 			]
 		},
 		drinks: {
@@ -75,8 +97,18 @@ export const sampleOffering: Offering = {
 			pricingType: 'PER_GUEST',
 			inputType: 'CHECKBOX_LIST',
 			options: [
-				{ id: 'fruit_infused_water', label: 'Fruit-infused water', priceCents: 150 },
-				{ id: 'horchata', label: 'Horchata', priceCents: 200 }
+				{
+					id: 'fruit_infused_water',
+					label: 'Fruit-infused water',
+					description: 'Refreshing water with a hint of fruit.',
+					priceCents: 150
+				},
+				{
+					id: 'horchata',
+					label: 'Horchata',
+					description: 'Sweet, creamy cinnamon rice drink.',
+					priceCents: 200
+				}
 			]
 		},
 		appetizers: {
@@ -90,17 +122,27 @@ export const sampleOffering: Offering = {
 				{
 					id: 'flautas',
 					label: 'Flautas',
-					description: 'Chicken in a hand-rolled tortilla that is deep fried',
+					description: 'Crispy hand-rolled tortillas filled with chicken.',
 					priceCents: 300
 				},
-				{ id: 'fruit_cup_spread', label: 'Fruit Cup Spread', priceCents: 250 },
+				{
+					id: 'fruit_cup_spread',
+					label: 'Fruit Cup Spread',
+					description: 'Fresh fruit served in individual cups.',
+					priceCents: 250
+				},
 				{
 					id: 'elote_en_vaso',
 					label: 'Elote en Vaso',
-					description: 'Also known as Esquites',
+					description: 'Esquites: Mexican street corn served in a cup.',
 					priceCents: 200
 				},
-				{ id: 'chorizo_avocado_toast', label: 'Chorizo Avocado Toast', priceCents: 350 }
+				{
+					id: 'chorizo_avocado_toast',
+					label: 'Chorizo Avocado Toast',
+					description: 'Avocado toast topped with savory chorizo.',
+					priceCents: 350
+				}
 			]
 		}
 	},
