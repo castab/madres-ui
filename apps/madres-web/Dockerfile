@@ -24,6 +24,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+# Railway's HTTP edge supplies the client address in X-Real-IP. The SvelteKit Node adapter
+# uses this for getClientAddress(), including the inquiry rate limit and Turnstile verification.
+ENV ADDRESS_HEADER=x-real-ip
 
 RUN addgroup -S madres && adduser -S madres -G madres
 COPY --from=build /repo/apps/madres-web/build ./build
