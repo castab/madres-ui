@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { env as publicEnv } from '$env/dynamic/public';
 import { getOffering } from '$lib/server/offering/offering.server.js';
 import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.js';
+import { checkInquiryRateLimit } from '$lib/server/inquiry-rate-limit.server.js';
 import { verifyTurnstileToken } from '$lib/server/turnstile/turnstile.server.js';
 import { computeEstimate } from '$lib/offering/estimator.js';
 import { parseGuestCount } from '$lib/offering/guest-count.js';
@@ -76,7 +77,7 @@ function validateQuantities(offering: Offering, quantities: Quantities): string[
 }
 
 export const actions: Actions = {
-	default: async ({ request, getClientAddress }) => {
+	default: async ({ request, getClientAddress, setHeaders }) => {
 		const offering = getOffering();
 		if (!offering) {
 			return fail(503, {
@@ -97,8 +98,18 @@ export const actions: Actions = {
 			redirect(303, '/inquire/sent');
 		}
 
+		const clientAddress = getClientAddress();
+		const rateLimit = checkInquiryRateLimit(clientAddress);
+		if (!rateLimit.allowed) {
+			setHeaders({ 'retry-after': String(rateLimit.retryAfterSeconds) });
+			return fail(429, {
+				success: false,
+				formError: 'Too many attempts. Please wait a few minutes and try again.'
+			} satisfies InquireActionResult);
+		}
+
 		const turnstileToken = String(formData.get('cf-turnstile-response') ?? '');
-		const turnstileResult = await verifyTurnstileToken(turnstileToken, getClientAddress());
+		const turnstileResult = await verifyTurnstileToken(turnstileToken, clientAddress);
 		if (!turnstileResult.ok) {
 			return fail(400, {
 				success: false,
