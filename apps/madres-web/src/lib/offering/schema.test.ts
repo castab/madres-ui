@@ -59,7 +59,7 @@ describe('parseOffering', () => {
 				drinks: {
 					...sampleOffering.categories.drinks,
 					options: sampleOffering.categories.drinks.options.map((option) =>
-						option.id === 'horchata' ? { ...option, priceCents: -200 } : option
+						option.id === 'beverage_b' ? { ...option, priceCents: -200 } : option
 					)
 				}
 			}
@@ -69,7 +69,7 @@ describe('parseOffering', () => {
 	});
 
 	test('requires a valid minimum event charge on every serving style', () => {
-		for (const minimumEventCents of [undefined, -1, 750.5]) {
+		for (const minimumEventCents of [undefined, -1, 100.5]) {
 			const broken = {
 				...sampleOffering,
 				categories: {
@@ -77,7 +77,7 @@ describe('parseOffering', () => {
 					servingStyle: {
 						...sampleOffering.categories.servingStyle,
 						options: sampleOffering.categories.servingStyle.options.map((option) =>
-							option.id === 'taco_truck' ? { ...option, minimumEventCents } : option
+							option.id === 'style_a' ? { ...option, minimumEventCents } : option
 						)
 					}
 				}
@@ -100,7 +100,7 @@ describe('parseOffering', () => {
 				servingStyle: {
 					...sampleOffering.categories.servingStyle,
 					options: sampleOffering.categories.servingStyle.options.map((option) =>
-						option.id === 'taco_truck' ? { ...option, priceCents: 2300.5 } : option
+						option.id === 'style_a' ? { ...option, priceCents: 1000.5 } : option
 					)
 				}
 			}
@@ -118,7 +118,7 @@ describe('parseOffering', () => {
 					...sampleOffering.categories.drinks,
 					options: [
 						...sampleOffering.categories.drinks.options,
-						{ id: 'horchata', label: 'Horchata (duplicate)', priceCents: 999 }
+						{ id: 'beverage_b', label: 'Duplicate beverage', priceCents: 999 }
 					]
 				}
 			}

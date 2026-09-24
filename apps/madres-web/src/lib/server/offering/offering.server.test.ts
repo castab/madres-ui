@@ -28,7 +28,7 @@ async function loadFreshModule(offeringJson: string | undefined) {
 describe('getOffering', () => {
 	test('returns the parsed offering for a valid, well-formed env var', async () => {
 		const { getOffering } = await loadFreshModule(JSON.stringify(sampleOffering));
-		expect(getOffering()?.id).toBe('madres-private-events');
+		expect(getOffering()?.id).toBe('sample-event-offering');
 	});
 
 	test('returns null and logs a warning, without throwing, when the env var is unset', async () => {
@@ -60,7 +60,7 @@ describe('getOffering', () => {
 		getOffering();
 		getOffering();
 		const first = getOffering();
-		expect(first?.version).toBe(9);
+		expect(first?.version).toBe(1);
 		// Corrupting the env var after the first read must not change subsequent results —
 		// proof the result was memoized rather than re-parsed each call.
 		mockEnv.PRIVATE_EVENT_OFFERING_JSON = 'garbage';

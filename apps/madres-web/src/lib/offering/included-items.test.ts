@@ -3,28 +3,27 @@ import { sampleOffering } from './fixtures.js';
 import { includedItemsForServingStyle } from './included-items.js';
 
 describe('includedItemsForServingStyle', () => {
-	test('includes cutlery, napkins, and plates with every serving style', () => {
+	test('includes shared supplies with every service style', () => {
 		for (const style of sampleOffering.categories.servingStyle.options) {
-			const [tablescape] = includedItemsForServingStyle(sampleOffering.includedItems, style.id);
-			const labels = tablescape.contents?.map((content) => content.label) ?? [];
-			expect(labels).toEqual(expect.arrayContaining(['Cutlery', 'Napkins', 'Plates']));
+			const [setup] = includedItemsForServingStyle(sampleOffering.includedItems, style.id);
+			const labels = setup.contents?.map((content) => content.label) ?? [];
+			expect(labels).toContain('Shared supplies');
 		}
 	});
 
-	test('keeps rice and beans for the truck and buffet', () => {
-		for (const style of ['taco_truck', 'buffet']) {
-			const [tablescape] = includedItemsForServingStyle(sampleOffering.includedItems, style);
-			expect(tablescape.contents?.map((content) => content.label)).toContain('Rice');
-			expect(tablescape.contents?.map((content) => content.label)).toContain('Beans');
+	test('includes both example components for styles A and B', () => {
+		for (const style of ['style_a', 'style_b']) {
+			const [setup] = includedItemsForServingStyle(sampleOffering.includedItems, style);
+			expect(setup.contents?.map((content) => content.label)).toContain('Component A');
+			expect(setup.contents?.map((content) => content.label)).toContain('Component B');
 		}
 	});
 
-	test('excludes rice and beans for Just the Tacos while keeping chips and toppings', () => {
-		const [tablescape] = includedItemsForServingStyle(sampleOffering.includedItems, 'just_tacos');
-		const labels = tablescape.contents?.map((content) => content.label) ?? [];
-		expect(labels).not.toContain('Rice');
-		expect(labels).not.toContain('Beans');
-		expect(labels).toContain('Chips');
-		expect(labels.some((label) => label.startsWith('Taco toppings:'))).toBe(true);
+	test('excludes selected components for style C', () => {
+		const [setup] = includedItemsForServingStyle(sampleOffering.includedItems, 'style_c');
+		const labels = setup.contents?.map((content) => content.label) ?? [];
+		expect(labels).not.toContain('Component A');
+		expect(labels).not.toContain('Component B');
+		expect(labels).toContain('Shared supplies');
 	});
 });
