@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 6,
+	version: 7,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
@@ -107,13 +107,13 @@ export const sampleOffering: Offering = {
 				{
 					id: 'fruit_infused_water',
 					label: 'Fruit-infused water',
-					description: 'Refreshing water with a hint of fruit.',
+					description: 'Water infused with fresh fruit and berries.',
 					priceCents: 150
 				},
 				{
 					id: 'horchata',
 					label: 'Horchata',
-					description: 'Sweet, creamy cinnamon rice drink.',
+					description: 'Classic sweetened rice drink with cinnamon.',
 					priceCents: 200
 				}
 			]
@@ -128,26 +128,29 @@ export const sampleOffering: Offering = {
 			options: [
 				{
 					id: 'flautas',
-					label: 'Flautas',
-					description: 'Crispy hand-rolled tortillas filled with chicken.',
+					label: 'Flauta en Vaso',
+					description:
+						'Crispy hand-rolled shredded-chicken flauta in a cup with salsa verde, crema, queso fresco, and lime.',
 					priceCents: 300
 				},
 				{
 					id: 'fruit_cup_spread',
-					label: 'Fruit Cup Spread',
-					description: 'Fresh fruit served in individual cups.',
+					label: 'Matchstick Fruit',
+					description: 'Seasonal fruit cut into matchsticks and served in a cup.',
 					priceCents: 250
 				},
 				{
 					id: 'elote_en_vaso',
 					label: 'Elote en Vaso',
-					description: 'Esquites: Mexican street corn served in a cup.',
+					description:
+						'Buttered corn in a cup with crema, queso fresco, and a light dusting of paprika.',
 					priceCents: 200
 				},
 				{
 					id: 'chorizo_avocado_toast',
-					label: 'Chorizo Avocado Toast',
-					description: 'Avocado toast topped with savory chorizo.',
+					label: 'Avocado Chorizo Toast',
+					description:
+						'Local artisan toast with avocado and Mexican chorizo, finished with salsa verde crema, queso fresco, and radish.',
 					priceCents: 350
 				}
 			]
