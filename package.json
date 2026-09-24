@@ -17,6 +17,7 @@
 		"format": "npm run format --workspace=madres-web",
 		"test:unit": "npm run test:unit --workspace=madres-web",
 		"test": "npm run test --workspace=madres-web",
-		"test:e2e": "npm run test:e2e --workspace=madres-web"
+		"test:e2e": "npm run test:e2e --workspace=madres-web",
+		"release:preflight": "node scripts/release-preflight.mjs"
 	}
 }

@@ -55,6 +55,8 @@ Run from the **repo root**:
 | `npm run test:e2e`  | Run Playwright end-to-end tests               |
 | `npm run test`      | Run unit tests, then e2e tests                |
 
+Run `npm run release:preflight -- vX.Y.Z` before tagging a release. See [RELEASING.md](RELEASING.md) for the development and production deployment paths and the full procedure.
+
 ## Tech stack
 
 - **Svelte 5** (runes-only) + **SvelteKit 2**, on **Vite 8**
