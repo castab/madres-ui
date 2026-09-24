@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import { Card } from '$lib/components/ui/card/index.js';
 	import { Tag } from '$lib/components/ui/tag/index.js';
@@ -83,15 +84,21 @@
 					</a>
 				</div>
 			</div>
-			<div
-				class="relative aspect-(--ratio-hero) w-full overflow-hidden rounded-2xl bg-(--surface-sunken) shadow-(--shadow-lg) lg:aspect-[4/5]"
+			<a
+				href={resolve('/gallery')}
+				class="group relative block aspect-(--ratio-hero) w-full overflow-hidden rounded-2xl bg-(--surface-sunken) shadow-(--shadow-lg) focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) lg:aspect-[4/5]"
 			>
 				<img
 					src="/images/photo-buffet-spread.png"
-					alt="Madres buffet spread on brass serving ware"
-					class="absolute inset-0 h-full w-full object-cover"
+					alt=""
+					class="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-(--dur-med) motion-safe:group-hover:scale-[1.02] motion-safe:group-focus-visible:scale-[1.02]"
 				/>
-			</div>
+				<span
+					class="absolute right-4 bottom-4 inline-flex min-h-11 items-center justify-center rounded-full bg-(--brand-primary) px-5 font-sans text-sm font-semibold text-(--text-on-accent) shadow-(--shadow-md) transition-colors group-hover:bg-(--brand-primary-hover)"
+				>
+					View gallery
+				</span>
+			</a>
 		</div>
 	</section>
 

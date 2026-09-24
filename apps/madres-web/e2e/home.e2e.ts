@@ -19,6 +19,21 @@ test('the Madres landing page loads and Inquire stays disabled with a coming-soo
 	await expect(page).toHaveURL('/');
 });
 
+test('the hero photo clearly links to the full gallery', async ({ page }) => {
+	await page.goto('/');
+	const heroGalleryLink = page.getByRole('link', { name: 'View gallery', exact: true });
+	await expect(heroGalleryLink).toHaveAttribute('href', '/gallery');
+	await expect(heroGalleryLink.locator('img')).toHaveAttribute(
+		'src',
+		'/images/photo-buffet-spread.png'
+	);
+	await heroGalleryLink.click();
+	await expect(page).toHaveURL('/gallery');
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+		'A Few Favorites From Recent Events'
+	);
+});
+
 test('the page fits its viewport and the mobile navigation is operable', async ({
 	page
 }, testInfo) => {
