@@ -8,6 +8,7 @@ import {
 
 const GALLERY_READ_TIMEOUT_MS = 3_000;
 const GALLERY_TRACK_TIMEOUT_MS = 3_000;
+const GALLERY_ID_CACHE_MS = 5 * 60_000;
 
 export type GalleryMediaType = 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
 
@@ -215,6 +216,32 @@ async function resolveGalleryId(
 	return stringAt(payload.gallery, 'id');
 }
 
+let cachedGalleryId: { key: string; id: string; expiresAt: number } | null = null;
+let pendingGalleryId: { key: string; promise: Promise<string | null> } | null = null;
+
+function galleryIdForTracking(
+	accountId: string,
+	galleryName: string,
+	token: string
+): Promise<string | null> {
+	const key = JSON.stringify([accountId, galleryName, token]);
+	if (cachedGalleryId?.key === key && cachedGalleryId.expiresAt > Date.now()) {
+		return Promise.resolve(cachedGalleryId.id);
+	}
+	if (pendingGalleryId?.key === key) return pendingGalleryId.promise;
+
+	const promise = resolveGalleryId(accountId, galleryName, token)
+		.then((id) => {
+			if (id) cachedGalleryId = { key, id, expiresAt: Date.now() + GALLERY_ID_CACHE_MS };
+			return id;
+		})
+		.finally(() => {
+			if (pendingGalleryId?.key === key) pendingGalleryId = null;
+		});
+	pendingGalleryId = { key, promise };
+	return promise;
+}
+
 /** Fire-and-forget analytics. Skips silently (logging once) when the gallery bearer,
  * account id, or gallery name isn't configured, or when the name can't be resolved to a
  * real gallery id, and never lets a failure reach the caller. */
@@ -232,7 +259,7 @@ export async function trackGalleryEvent(id: string, event: GalleryTrackingEvent)
 		return;
 	}
 
-	const galleryId = await resolveGalleryId(accountId, galleryName, token);
+	const galleryId = await galleryIdForTracking(accountId, galleryName, token);
 	if (!galleryId) {
 		console.warn(
 			'Skipping gallery tracking event: could not resolve the configured gallery name to an id',
@@ -243,7 +270,7 @@ export async function trackGalleryEvent(id: string, event: GalleryTrackingEvent)
 		return;
 	}
 
-	await requestPresentationService(
+	const result = await requestPresentationService(
 		`/api/v1/accounts/${encodeURIComponent(accountId)}/galleries/${encodeURIComponent(galleryId)}/track`,
 		{
 			operation: 'gallery.track',
@@ -253,4 +280,7 @@ export async function trackGalleryEvent(id: string, event: GalleryTrackingEvent)
 			bearerToken: token
 		}
 	);
+	if (result.ok && result.response.status === 404 && cachedGalleryId?.id === galleryId) {
+		cachedGalleryId = null;
+	}
 }

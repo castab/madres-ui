@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
-import { formatCentsRange, formatGuestRange } from '$lib/offering/money.js';
-import type { Estimate, Offering, Selections } from '$lib/offering/types.js';
+import { formatCents } from '$lib/offering/money.js';
+import type { Estimate, Offering, Quantities, Selections } from '$lib/offering/types.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -11,6 +11,7 @@ export type SendInquiryNotificationInput = {
 	customer: InquiryCustomer;
 	offering: Offering;
 	selections: Selections;
+	quantities: Quantities;
 	estimate: Estimate;
 	additionalNotes: string;
 };
@@ -59,6 +60,7 @@ export function formatInquiryEmailText(
 	offering: Offering,
 	customer: InquiryCustomer,
 	selections: Selections,
+	quantities: Quantities,
 	estimate: Estimate,
 	additionalNotes: string
 ): string {
@@ -68,10 +70,27 @@ export function formatInquiryEmailText(
 		`Name: ${customer.name}`,
 		`Email: ${customer.email}`,
 		`ZIP: ${customer.zip}`,
+		`Guest Count: ${estimate.guestCount}`,
 		''
 	];
 
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
+		if (category.inputType === 'QUANTITY_LIST') {
+			const ordered = category.options
+				.map((option) => ({ option, quantity: quantities[categoryKey]?.[option.id] ?? 0 }))
+				.filter(({ quantity }) => quantity > 0);
+			lines.push(
+				`${category.label}: ${ordered.length ? ordered.map(({ option, quantity }) => `${option.label} × ${quantity}`).join(', ') : 'None selected'}`
+			);
+			if (ordered.length) {
+				const subtotal = ordered.reduce(
+					(sum, { option, quantity }) => sum + option.priceCents * quantity,
+					0
+				);
+				lines.push(`${category.label} subtotal: ${formatCents(subtotal, offering.currency)}`);
+			}
+			continue;
+		}
 		const selectedIds = selections[categoryKey] ?? [];
 		const optionsById = new Map(category.options.map((option) => [option.id, option]));
 		const selectedLabels = selectedIds
@@ -86,10 +105,16 @@ export function formatInquiryEmailText(
 		lines.push('', 'Anything else:', additionalNotes.trim());
 	}
 
+	if (estimate.minimumAdjustmentCents > 0) {
+		lines.push(
+			'',
+			`Serving style minimum adjustment (to ${formatCents(estimate.minimumEventCents, offering.currency)}): ${formatCents(estimate.minimumAdjustmentCents, offering.currency)}`
+		);
+	}
+
 	lines.push(
 		'',
-		`Estimated guests: ${formatGuestRange(estimate.guestCountLow, estimate.guestCountHigh, estimate.guestCountOpenEnded)}`,
-		`Estimated total: ${formatCentsRange(estimate.totalCentsLow, estimate.totalCentsHigh, offering.currency, estimate.guestCountOpenEnded)}`,
+		`Estimated total: ${formatCents(estimate.totalCents, offering.currency)}`,
 		'',
 		`Offering: ${offering.id} v${offering.version}`
 	);
@@ -109,6 +134,7 @@ export async function sendInquiryNotification({
 	customer,
 	offering,
 	selections,
+	quantities,
 	estimate,
 	additionalNotes
 }: SendInquiryNotificationInput): Promise<SendInquiryNotificationResult> {
@@ -138,7 +164,14 @@ export async function sendInquiryNotification({
 				to: toEmail,
 				reply_to: customer.email,
 				subject: `New private-event inquiry — ${customer.name}`,
-				text: formatInquiryEmailText(offering, customer, selections, estimate, additionalNotes)
+				text: formatInquiryEmailText(
+					offering,
+					customer,
+					selections,
+					quantities,
+					estimate,
+					additionalNotes
+				)
 			}),
 			signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
 		});

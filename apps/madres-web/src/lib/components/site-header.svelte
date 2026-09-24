@@ -8,7 +8,6 @@
 	const baseNavigation = [
 		{ href: '/#experience', label: 'Experience' },
 		{ href: '/#menu', label: 'Menu' },
-		{ href: '/#how', label: 'How to Inquire' },
 		{ href: '/gallery', label: 'Gallery' }
 	] as const;
 

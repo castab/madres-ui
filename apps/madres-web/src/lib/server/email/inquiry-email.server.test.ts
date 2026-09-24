@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { computeEstimate } from '$lib/offering/estimator.js';
 import { sampleOffering } from '$lib/offering/fixtures.js';
-import type { Selections } from '$lib/offering/types.js';
+import type { Quantities, Selections } from '$lib/offering/types.js';
 
 // `inquiry-email.server.ts` reads secrets through `$env/dynamic/private` (not `process.env`
 // directly — see `offering.server.ts` for why), so that's what tests must mock. Unlike
@@ -17,14 +17,13 @@ const { formatInquiryEmailText, sendInquiryNotification } =
 const customer = { name: 'Jane Diaz', email: 'jane@example.com', zip: '90210' };
 const additionalNotes = '';
 const selections: Selections = {
-	guestCount: ['guest_101_175'],
-	serviceDuration: ['duration_120'],
-	servingStyle: ['buffet'],
-	proteins: ['asada', 'pollo'],
-	drinks: ['horchata'],
+	servingStyle: ['style_b'],
+	proteins: ['filling_a', 'filling_c'],
+	drinks: ['beverage_b'],
 	appetizers: []
 };
-const estimate = computeEstimate(sampleOffering, selections);
+const quantities: Quantities = {};
+const estimate = computeEstimate(sampleOffering, selections, 175);
 
 describe('formatInquiryEmailText', () => {
 	test('includes the customer info and every category, selected or not', () => {
@@ -32,6 +31,7 @@ describe('formatInquiryEmailText', () => {
 			sampleOffering,
 			customer,
 			selections,
+			quantities,
 			estimate,
 			additionalNotes
 		);
@@ -39,28 +39,50 @@ describe('formatInquiryEmailText', () => {
 		expect(text).toContain('Name: Jane Diaz');
 		expect(text).toContain('Email: jane@example.com');
 		expect(text).toContain('ZIP: 90210');
-		expect(text).toContain('Guest Count: 100–175');
-		expect(text).toContain('Service Duration: 2 hours');
-		expect(text).toContain('Serving Style: Buffet Service');
-		expect(text).toContain('Proteins: Asada, Pollo');
-		expect(text).toContain('Drinks: Horchata');
-		expect(text).toContain('Appetizers: None selected');
+		expect(text).toContain('Guest Count: 175');
+		expect(text).toContain('Service Style: Service B');
+		expect(text).toContain('Fillings: Filling A, Filling C');
+		expect(text).toContain('Beverages: Beverage B');
+		expect(text).toContain('Items: None selected');
 	});
 
-	test('formats an open-ended guest band as a floor ("251+"), not a bare number', () => {
-		const openEndedSelections: Selections = { ...selections, guestCount: ['guest_251_plus'] };
-		const openEndedEstimate = computeEstimate(sampleOffering, openEndedSelections);
+	test('reports one total for the entered guest count', () => {
+		const largerEstimate = computeEstimate(sampleOffering, selections, 275);
 
 		const text = formatInquiryEmailText(
 			sampleOffering,
 			customer,
-			openEndedSelections,
-			openEndedEstimate,
+			selections,
+			quantities,
+			largerEstimate,
 			additionalNotes
 		);
 
-		expect(text).toContain('Estimated guests: 251+');
-		expect(text).toMatch(/Estimated total: \$[\d,]+\+/);
+		expect(text).toContain('Guest Count: 275');
+		expect(text).toContain('Estimated total: $3,643.75');
+	});
+
+	test('includes appetizer counts and their item subtotal', () => {
+		const ordered = { appetizers: { item_a: 20, item_b: 20 } };
+		const priced = computeEstimate(sampleOffering, selections, 175, ordered);
+		const text = formatInquiryEmailText(sampleOffering, customer, selections, ordered, priced, '');
+		expect(text).toContain('Items: Item A × 20, Item B × 20');
+		expect(text).toContain('Items subtotal: $100');
+		expect(text).toContain('Estimated total: $2,418.75');
+	});
+
+	test('explains an event minimum adjustment in the staff notification', () => {
+		const smallEstimate = computeEstimate(sampleOffering, selections, 15);
+		const text = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			selections,
+			quantities,
+			smallEstimate,
+			''
+		);
+		expect(text).toContain('Serving style minimum adjustment (to $200): $20');
+		expect(text).toContain('Estimated total: $218.75');
 	});
 
 	test('includes an "Anything else" section when notes are present', () => {
@@ -68,6 +90,7 @@ describe('formatInquiryEmailText', () => {
 			sampleOffering,
 			customer,
 			selections,
+			quantities,
 			estimate,
 			'Please set up near the pavilion, and one guest has a peanut allergy.'
 		);
@@ -77,11 +100,19 @@ describe('formatInquiryEmailText', () => {
 	});
 
 	test('omits the "Anything else" section when notes are empty or whitespace-only', () => {
-		const empty = formatInquiryEmailText(sampleOffering, customer, selections, estimate, '');
+		const empty = formatInquiryEmailText(
+			sampleOffering,
+			customer,
+			selections,
+			quantities,
+			estimate,
+			''
+		);
 		const whitespace = formatInquiryEmailText(
 			sampleOffering,
 			customer,
 			selections,
+			quantities,
 			estimate,
 			'   '
 		);
@@ -116,6 +147,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -147,6 +179,7 @@ describe('sendInquiryNotification', () => {
 			customer,
 			offering: sampleOffering,
 			selections,
+			quantities,
 			estimate,
 			additionalNotes: 'Please set up near the pavilion.'
 		});
@@ -170,6 +203,7 @@ describe('sendInquiryNotification', () => {
 					customer,
 					offering: sampleOffering,
 					selections,
+					quantities,
 					estimate,
 					additionalNotes
 				})
@@ -188,6 +222,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -204,6 +239,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -221,6 +257,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -236,6 +273,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -254,6 +292,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})
@@ -271,6 +310,7 @@ describe('sendInquiryNotification', () => {
 				customer,
 				offering: sampleOffering,
 				selections,
+				quantities,
 				estimate,
 				additionalNotes
 			})

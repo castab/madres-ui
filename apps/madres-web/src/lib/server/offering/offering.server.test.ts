@@ -28,7 +28,7 @@ async function loadFreshModule(offeringJson: string | undefined) {
 describe('getOffering', () => {
 	test('returns the parsed offering for a valid, well-formed env var', async () => {
 		const { getOffering } = await loadFreshModule(JSON.stringify(sampleOffering));
-		expect(getOffering()?.id).toBe('madres-private-events');
+		expect(getOffering()?.id).toBe('sample-event-offering');
 	});
 
 	test('returns null and logs a warning, without throwing, when the env var is unset', async () => {

@@ -4,6 +4,7 @@ import type {
 	EstimateLineItem,
 	Offering,
 	Option,
+	Quantities,
 	SelectionPricing,
 	Selections
 } from './types.js';
@@ -34,41 +35,39 @@ function highestPricedContributions(
  * never floating-point dollars. This function contains no offering-specific knowledge (no
  * option ids, no category names) — every dollar amount and every label comes from `offering`.
  *
- * The guest-count category picks a band, not an exact headcount, so `perGuestCents` (the
- * per-guest rate — duration/serving-style/protein/etc. premiums are all guest-count-
- * independent) is computed once and then applied at both `minimumGuests` and `maximumGuests`
- * to produce a low/high range. An open-ended top band (`maximumGuests: null`) has no high end
- * to range against, so low and high both fall back to `minimumGuests`.
+ * The per-guest rate is computed once and multiplied by the entered guest count. Item
+ * quantities are independent of guest count.
  */
-export function computeEstimate(offering: Offering, selections: Selections): Estimate {
-	const guestCategory = offering.categories.guestCount;
-	const guestOptionId = selections.guestCount?.[0];
-	const guestOption = guestCategory.options.find((option) => option.id === guestOptionId);
-	const guestCountLow = guestOption?.facts?.minimumGuests ?? 0;
-	const guestCountOpenEnded = guestOption?.facts?.maximumGuests === null;
-	const guestCountHigh = guestOption?.facts?.maximumGuests ?? guestCountLow;
-
+export function computeEstimate(
+	offering: Offering,
+	selections: Selections,
+	guestCount: number,
+	quantities: Quantities = {}
+): Estimate {
 	let perEventCents = 0;
 	let perGuestCents = 0;
+	let itemTotalCents = 0;
 	const lineItems: EstimateLineItem[] = [];
 
-	for (const charge of offering.baseCharges) {
-		if (charge.pricingType === 'NONE') continue;
-		if (charge.pricingType === 'PER_EVENT') {
-			perEventCents += charge.priceCents;
-		} else {
-			perGuestCents += charge.priceCents;
-		}
-		lineItems.push({
-			id: `base:${charge.id}`,
-			label: charge.label,
-			kind: charge.pricingType === 'PER_EVENT' ? 'per-event' : 'per-guest',
-			amountCents: charge.priceCents
-		});
-	}
-
 	for (const [categoryKey, category] of Object.entries(offering.categories)) {
-		if (categoryKey === 'guestCount' || category.pricingType === 'NONE') continue;
+		if (category.pricingType === 'NONE') continue;
+		if (category.inputType === 'QUANTITY_LIST') {
+			for (const option of category.options) {
+				const quantity = quantities[categoryKey]?.[option.id] ?? 0;
+				if (!Number.isSafeInteger(quantity) || quantity <= 0) continue;
+				const amountCents = quantity * option.priceCents;
+				itemTotalCents += amountCents;
+				lineItems.push({
+					id: `${categoryKey}:${option.id}`,
+					label: option.label,
+					kind: 'per-item',
+					amountCents,
+					quantity,
+					unitCents: option.priceCents
+				});
+			}
+			continue;
+		}
 
 		const selectedIds = selections[categoryKey] ?? [];
 		const selectedOptions = category.options.filter((option) => selectedIds.includes(option.id));
@@ -91,7 +90,7 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 				perGuestCents += amountCents;
 			}
 
-			// A non-included, zero-cost pick (e.g. the free duration tier) adds nothing worth
+			// A non-included, zero-cost pick adds nothing worth
 			// showing. Included picks are always shown so the UI can render "Included".
 			if (!included && amountCents === 0) continue;
 
@@ -108,19 +107,23 @@ export function computeEstimate(offering: Offering, selections: Selections): Est
 		}
 	}
 
-	const perGuestTotalCentsLow = perGuestCents * guestCountLow;
-	const perGuestTotalCentsHigh = perGuestCents * guestCountHigh;
+	const perGuestTotalCents = perGuestCents * guestCount;
+	const selectedServingStyle = offering.categories.servingStyle.options.find(
+		(option) => option.id === selections.servingStyle?.[0]
+	);
+	const minimumEventCents = selectedServingStyle?.minimumEventCents ?? 0;
+	const servingStyleTotalCents = (selectedServingStyle?.priceCents ?? 0) * guestCount;
+	const minimumAdjustmentCents = Math.max(0, minimumEventCents - servingStyleTotalCents);
 
 	return {
-		guestCountLow,
-		guestCountHigh,
-		guestCountOpenEnded,
+		guestCount,
 		perEventCents,
 		perGuestCents,
-		perGuestTotalCentsLow,
-		perGuestTotalCentsHigh,
-		totalCentsLow: perEventCents + perGuestTotalCentsLow,
-		totalCentsHigh: perEventCents + perGuestTotalCentsHigh,
+		perGuestTotalCents,
+		itemTotalCents,
+		minimumEventCents,
+		minimumAdjustmentCents,
+		totalCents: perEventCents + perGuestTotalCents + itemTotalCents + minimumAdjustmentCents,
 		lineItems
 	};
 }

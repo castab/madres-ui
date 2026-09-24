@@ -1,6 +1,8 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { computeEstimate } from '$lib/offering/estimator.js';
-import type { Offering, Selections } from '$lib/offering/types.js';
+import { parseGuestCount } from '$lib/offering/guest-count.js';
+import { parseItemQuantity, quantityOrderStatus } from '$lib/offering/quantity-order.js';
+import type { Offering, Quantities, Selections } from '$lib/offering/types.js';
 
 /**
  * Runes-based reactive state for the `/inquire` form: customer info fields plus per-category
@@ -12,6 +14,7 @@ export class InquireFormState {
 	name = $state('');
 	email = $state('');
 	zip = $state('');
+	guestCount = $state<number | undefined>(undefined);
 	/** Optional free text ("Anything else?") — no validity getter: unvalidated, never affects
 	 * `isValid`. */
 	additionalNotes = $state('');
@@ -20,6 +23,7 @@ export class InquireFormState {
 
 	private readonly offering: Offering;
 	private readonly selectedByCategory = new SvelteMap<string, SvelteSet<string>>();
+	private readonly quantityInputs = new SvelteMap<string, SvelteMap<string, string>>();
 
 	constructor(offering: Offering) {
 		this.offering = offering;
@@ -75,9 +79,58 @@ export class InquireFormState {
 		return result;
 	}
 
+	quantityValue(categoryKey: string, optionId: string): string {
+		return this.quantityInputs.get(categoryKey)?.get(optionId) ?? '';
+	}
+
+	setQuantityInput(categoryKey: string, optionId: string, raw: string): void {
+		let inputs = this.quantityInputs.get(categoryKey);
+		if (!inputs) {
+			inputs = new SvelteMap<string, string>();
+			this.quantityInputs.set(categoryKey, inputs);
+		}
+		inputs.set(optionId, raw);
+	}
+
+	get quantities(): Quantities {
+		const result: Quantities = {};
+		for (const [categoryKey, category] of Object.entries(this.offering.categories)) {
+			if (category.inputType !== 'QUANTITY_LIST') continue;
+			result[categoryKey] = {};
+			for (const option of category.options) {
+				result[categoryKey][option.id] =
+					parseItemQuantity(
+						this.quantityValue(categoryKey, option.id),
+						category.maximumQuantityPerOption ?? 0
+					) ?? Number.NaN;
+			}
+		}
+		return result;
+	}
+
+	quantityStatus(categoryKey: string) {
+		const category = this.offering.categories[categoryKey];
+		return quantityOrderStatus(
+			category,
+			this.quantities[categoryKey] ?? {},
+			this.offering.currency
+		);
+	}
+
 	/** UX-only preview — the server recomputes authoritatively from the submitted option ids. */
 	get estimate() {
-		return computeEstimate(this.offering, this.selections);
+		return computeEstimate(
+			this.offering,
+			this.selections,
+			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count ?? 0,
+			this.quantities
+		);
+	}
+
+	get guestCountValid(): boolean {
+		return (
+			parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).count !== null
+		);
 	}
 
 	get nameValid(): boolean {
@@ -99,6 +152,7 @@ export class InquireFormState {
 	categoryValid(categoryKey: string): boolean {
 		const category = this.offering.categories[categoryKey];
 		if (!category) return true;
+		if (category.inputType === 'QUANTITY_LIST') return !this.quantityStatus(categoryKey).error;
 		const count = this.selectionCount(categoryKey);
 		return count >= category.minSelections && count <= category.maxSelections;
 	}
@@ -113,7 +167,13 @@ export class InquireFormState {
 	 * tell "you still have fields to fix" apart from "everything else is done, just complete the
 	 * challenge below" and prompt accordingly. */
 	get fieldsValid(): boolean {
-		return this.nameValid && this.emailValid && this.zipValid && this.selectionsComplete;
+		return (
+			this.nameValid &&
+			this.emailValid &&
+			this.zipValid &&
+			this.guestCountValid &&
+			this.selectionsComplete
+		);
 	}
 
 	/** The widget reporting success is a hard requirement — this form never submits without it,
@@ -137,6 +197,12 @@ export class InquireFormState {
 		return this.touched && !this.zipValid ? 'ZIP code is required' : undefined;
 	}
 
+	get guestCountError(): string | undefined {
+		return this.touched
+			? parseGuestCount(String(this.guestCount ?? ''), this.offering.guestCountField).error
+			: undefined;
+	}
+
 	/** Shown next to the submit button, not the widget itself — only once every other field is
 	 * already satisfied, so it reads as "you're almost done, just this last step below" rather
 	 * than piling on top of the general "fix the highlighted fields" message. */
@@ -152,6 +218,7 @@ export class InquireFormState {
 		if (!this.touched) return undefined;
 		const category = this.offering.categories[categoryKey];
 		if (!category || this.categoryValid(categoryKey)) return undefined;
+		if (category.inputType === 'QUANTITY_LIST') return this.quantityStatus(categoryKey).error;
 		if (category.minSelections === category.maxSelections && category.minSelections === 1) {
 			return 'Choose one to continue';
 		}

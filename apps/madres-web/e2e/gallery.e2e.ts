@@ -28,6 +28,27 @@ test('the gallery grid renders real posts, paginates with Load more, and opens a
 	await expect(page.getByRole('button', { name: 'Close' })).toHaveCount(0);
 });
 
+test('a failed load more request shows an error and can be retried', async ({ page }) => {
+	await page.goto('/gallery');
+	await page.route(
+		'**/gallery/load-more?page=2',
+		async (route) => {
+			await route.fulfill({ status: 503, body: 'Unavailable' });
+		},
+		{ times: 1 }
+	);
+
+	await page.getByRole('button', { name: 'Load more' }).click();
+	await expect(page.getByRole('alert')).toHaveText("Couldn't load more photos. Please try again.");
+	await expect(page.getByRole('button', { name: 'Load more' })).toBeEnabled();
+
+	await page.getByRole('button', { name: 'Load more' }).click();
+	await expect(page.getByRole('button', { name: /View (photo|video|album) \d of 3/ })).toHaveCount(
+		3
+	);
+	await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 test('grid and lightbox loading spinners clear once each image settles, even on a failed load', async ({
 	page
 }) => {

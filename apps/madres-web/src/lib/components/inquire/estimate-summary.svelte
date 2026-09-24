@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { formatCents, formatCentsRange, formatGuestRange } from '$lib/offering/money.js';
+	import { formatCents } from '$lib/offering/money.js';
 	import type { Estimate, EstimateLineItem } from '$lib/offering/types.js';
 
 	type Props = { estimate: Estimate; currency: string; isComplete: boolean };
@@ -8,6 +8,7 @@
 
 	const perEventItems = $derived(estimate.lineItems.filter((item) => item.kind === 'per-event'));
 	const perGuestItems = $derived(estimate.lineItems.filter((item) => item.kind === 'per-guest'));
+	const perItemItems = $derived(estimate.lineItems.filter((item) => item.kind === 'per-item'));
 
 	function amountLabel(item: EstimateLineItem): string {
 		return item.included ? 'Included' : formatCents(item.amountCents, currency);
@@ -68,40 +69,61 @@
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
 			>
 				<span>Estimated guests</span>
-				<span
-					>{formatGuestRange(
-						estimate.guestCountLow,
-						estimate.guestCountHigh,
-						estimate.guestCountOpenEnded
-					)}</span
-				>
+				<span>{estimate.guestCount}</span>
 			</div>
 			<div
 				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
 			>
 				<span>Guest subtotal</span>
-				<span
-					>{formatCentsRange(
-						estimate.perGuestTotalCentsLow,
-						estimate.perGuestTotalCentsHigh,
-						currency,
-						estimate.guestCountOpenEnded
-					)}</span
-				>
+				<span>{formatCents(estimate.perGuestTotalCents, currency)}</span>
 			</div>
 		</div>
+
+		{#if perItemItems.length > 0}
+			<div class="flex flex-col gap-1.5 border-t border-(--border-subtle) pt-3">
+				<span
+					class="text-(length:--text-caption) font-medium tracking-(--track-wide) text-(--text-secondary) uppercase"
+					>Appetizers</span
+				>
+				{#each perItemItems as item (item.id)}
+					<div class="flex items-baseline justify-between gap-3 text-(length:--text-body-md)">
+						<span class="text-(--text-primary)"
+							>{item.quantity} × {item.label} ({formatCents(item.unitCents ?? 0, currency)} each)</span
+						>
+						<span class="font-medium text-(--text-primary)"
+							>{formatCents(item.amountCents, currency)}</span
+						>
+					</div>
+				{/each}
+				<div
+					class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
+				>
+					<span>Appetizer subtotal</span>
+					<span>{formatCents(estimate.itemTotalCents, currency)}</span>
+				</div>
+			</div>
+		{/if}
+
+		{#if estimate.minimumAdjustmentCents > 0}
+			<div
+				class="flex items-baseline justify-between gap-3 text-(length:--text-body-sm) text-(--text-secondary)"
+			>
+				<span
+					>Serving style minimum adjustment (to {formatCents(
+						estimate.minimumEventCents,
+						currency
+					)})</span
+				>
+				<span>{formatCents(estimate.minimumAdjustmentCents, currency)}</span>
+			</div>
+		{/if}
 
 		<div class="flex items-baseline justify-between gap-3 border-t border-(--border-strong) pt-3">
 			<span class="font-sans text-(length:--text-body-lg) font-semibold text-(--text-primary)"
 				>Estimated total</span
 			>
 			<span class="font-sans text-(length:--text-heading-lg) font-semibold text-(--text-primary)">
-				{formatCentsRange(
-					estimate.totalCentsLow,
-					estimate.totalCentsHigh,
-					currency,
-					estimate.guestCountOpenEnded
-				)}
+				{formatCents(estimate.totalCents, currency)}
 			</span>
 		</div>
 

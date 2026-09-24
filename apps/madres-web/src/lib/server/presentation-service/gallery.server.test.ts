@@ -323,12 +323,14 @@ describe('presentation-service gallery client', () => {
 					pagination: pagination()
 				})
 			)
+			.mockResolvedValueOnce(Response.json({ status: 'ok' }))
 			.mockResolvedValueOnce(Response.json({ status: 'ok' }));
 		vi.stubGlobal('fetch', fetch);
 
 		await trackGalleryEvent('post-1', 'click');
+		await trackGalleryEvent('post-2', 'view');
 
-		expect(fetch).toHaveBeenCalledTimes(2);
+		expect(fetch).toHaveBeenCalledTimes(3);
 
 		const [resolveUrl] = fetch.mock.calls[0] as [URL, RequestInit];
 		expect(resolveUrl.pathname).toBe(
@@ -340,10 +342,13 @@ describe('presentation-service gallery client', () => {
 		expect(trackUrl.pathname).toBe('/api/v1/accounts/acct-1/galleries/resolved-gallery-id/track');
 		expect(trackInit.headers).toMatchObject({ authorization: 'Bearer a-sufficiently-long-token' });
 		expect(trackInit.body).toBe(JSON.stringify({ id: 'post-1', event: 'click' }));
+		const [secondTrackUrl] = fetch.mock.calls[2] as [URL, RequestInit];
+		expect(secondTrackUrl.pathname).toBe(trackUrl.pathname);
 	});
 
 	test("skips tracking when the configured gallery name can't be resolved to an id", async () => {
 		process.env.PRESENTATION_SERVICE_TRACKING_TOKEN = 'a-sufficiently-long-token';
+		process.env.PRESENTATION_SERVICE_GALLERY_NAME = 'Unknown gallery';
 		const fetch = vi.fn().mockResolvedValue(Response.json({ unexpected: true }));
 		vi.stubGlobal('fetch', fetch);
 
@@ -354,6 +359,7 @@ describe('presentation-service gallery client', () => {
 
 	test('never throws when the resolve or tracking call fails', async () => {
 		process.env.PRESENTATION_SERVICE_TRACKING_TOKEN = 'a-sufficiently-long-token';
+		process.env.PRESENTATION_SERVICE_GALLERY_NAME = 'Unreachable gallery';
 		vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('network down')));
 
 		await expect(trackGalleryEvent('post-1', 'view')).resolves.toBeUndefined();

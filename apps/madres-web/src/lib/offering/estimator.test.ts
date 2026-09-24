@@ -3,196 +3,136 @@ import { computeEstimate } from './estimator.js';
 import { sampleOffering } from './fixtures.js';
 import type { Offering, Selections } from './types.js';
 
-function lineItem(estimate: ReturnType<typeof computeEstimate>, id: string) {
-	return estimate.lineItems.find((item) => item.id === id);
-}
+const selections: Selections = {
+	servingStyle: ['style_b'],
+	proteins: ['filling_a', 'filling_c'],
+	drinks: ['beverage_b'],
+	appetizers: []
+};
 
 describe('computeEstimate', () => {
-	test('basic estimate: 175 guests, 3-hour buffet, two included proteins, one drink, one appetizer', () => {
-		const selections: Selections = {
-			guestCount: ['guest_101_175'],
-			serviceDuration: ['duration_180'],
-			servingStyle: ['buffet'],
-			proteins: ['asada', 'pollo'],
-			drinks: ['horchata'],
-			appetizers: ['flautas']
-		};
-
-		const estimate = computeEstimate(sampleOffering, selections);
-
-		// guest_101_175 bands 101–175 guests, so the estimate is a range: the high end
-		// ($4,850 at 175 guests) matches the flat worked example this fixture is built from.
-		expect(estimate.guestCountLow).toBe(101);
-		expect(estimate.guestCountHigh).toBe(175);
-		expect(estimate.guestCountOpenEnded).toBe(false);
-		expect(estimate.perGuestCents).toBe(2600); // 15 + 3 + 3 + 0 + 0 + 2 + 3 = $26/guest
-		expect(estimate.perGuestTotalCentsLow).toBe(262600); // 101 * $26 = $2,626
-		expect(estimate.perGuestTotalCentsHigh).toBe(455000); // 175 * $26 = $4,550
-		expect(estimate.perEventCents).toBe(30000);
-		expect(estimate.totalCentsLow).toBe(292600); // $300 + $2,626 = $2,926
-		expect(estimate.totalCentsHigh).toBe(485000); // $300 + $4,550 = $4,850
-
-		expect(lineItem(estimate, 'proteins:asada')).toMatchObject({ included: true, amountCents: 0 });
-		expect(lineItem(estimate, 'proteins:pollo')).toMatchObject({ included: true, amountCents: 0 });
-	});
-
-	test('extra protein beyond the included two is charged at its own configured price', () => {
-		const selections: Selections = {
-			guestCount: ['guest_101_175'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo', 'chorizo']
-		};
-
-		const estimate = computeEstimate(sampleOffering, selections);
-
-		// Asada ($4) and Pollo ($2) are the two highest-priced -> included. Chorizo ($1) is
-		// the remainder -> charged its own price. Premium is +$1/guest, not the sum of the
-		// two cheapest and not a flat "extra protein" fee.
-		expect(lineItem(estimate, 'proteins:chorizo')).toMatchObject({ amountCents: 100 });
-		expect(lineItem(estimate, 'proteins:asada')).toMatchObject({ included: true });
-		expect(lineItem(estimate, 'proteins:pollo')).toMatchObject({ included: true });
-		expect(estimate.perGuestCents).toBe(1500 + 100); // base food service + $1 protein premium
-	});
-
-	test('highest-priced-selected inclusion: the two highest-priced picks are free, the rest are charged', () => {
-		const selections: Selections = {
-			guestCount: ['guest_101_175'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'adobada', 'pollo', 'chorizo']
-		};
-
-		const estimate = computeEstimate(sampleOffering, selections);
-
-		expect(lineItem(estimate, 'proteins:asada')).toMatchObject({ included: true });
-		expect(lineItem(estimate, 'proteins:adobada')).toMatchObject({ included: true });
-		expect(lineItem(estimate, 'proteins:pollo')).toMatchObject({ amountCents: 200 });
-		expect(lineItem(estimate, 'proteins:pollo')?.included).toBeUndefined();
-		expect(lineItem(estimate, 'proteins:chorizo')).toMatchObject({ amountCents: 100 });
-		expect(lineItem(estimate, 'proteins:chorizo')?.included).toBeUndefined();
-
-		const proteinPremiumCents = estimate.perGuestCents - 1500; // subtract base food service
-		expect(proteinPremiumCents).toBe(300); // $2 (Pollo) + $1 (Chorizo) = $3/guest
-	});
-
-	test('a per-guest premium (service duration) scales with guest count instead of behaving as a flat event fee', () => {
-		const base: Omit<Selections, 'guestCount'> = {
-			serviceDuration: ['duration_180'], // +$3/guest
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
-		};
-
-		const at100 = computeEstimate(sampleOffering, { ...base, guestCount: ['guest_25_100'] });
-		const at175 = computeEstimate(sampleOffering, { ...base, guestCount: ['guest_101_175'] });
-
-		const durationDeltaAt100 =
-			at100.totalCentsHigh -
-			computeEstimate(sampleOffering, {
-				...base,
-				serviceDuration: ['duration_90'],
-				guestCount: ['guest_25_100']
-			}).totalCentsHigh;
-		const durationDeltaAt175 =
-			at175.totalCentsHigh -
-			computeEstimate(sampleOffering, {
-				...base,
-				serviceDuration: ['duration_90'],
-				guestCount: ['guest_101_175']
-			}).totalCentsHigh;
-
-		expect(durationDeltaAt100).toBe(300 * 100); // $3/guest * 100 guests
-		expect(durationDeltaAt175).toBe(300 * 175); // $3/guest * 175 guests
-		expect(durationDeltaAt175).toBeGreaterThan(durationDeltaAt100);
-	});
-
-	test('zero selected drinks and zero selected appetizers add no charge', () => {
-		const selections: Selections = {
-			guestCount: ['guest_25_100'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
-			// drinks / appetizers omitted entirely
-		};
-
-		const estimate = computeEstimate(sampleOffering, selections);
-
-		expect(estimate.lineItems.some((item) => item.id.startsWith('drinks:'))).toBe(false);
-		expect(estimate.lineItems.some((item) => item.id.startsWith('appetizers:'))).toBe(false);
-		expect(estimate.perGuestCents).toBe(1500); // base food service only
-	});
-
-	test('PER_EVENT base charges do not scale with guest count', () => {
-		const base: Omit<Selections, 'guestCount'> = {
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
-		};
-
-		const smallEvent = computeEstimate(sampleOffering, { ...base, guestCount: ['guest_25_100'] });
-		const largeEvent = computeEstimate(sampleOffering, { ...base, guestCount: ['guest_251_plus'] });
-
-		expect(smallEvent.perEventCents).toBe(30000);
-		expect(largeEvent.perEventCents).toBe(30000);
-		expect(smallEvent.guestCountHigh).not.toBe(largeEvent.guestCountHigh);
-	});
-
-	test('the open-ended top guest band has no maximum, so *High falls back to minimumGuests but is flagged open-ended', () => {
-		const estimate = computeEstimate(sampleOffering, {
-			guestCount: ['guest_251_plus'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
+	test('calculates one total for the entered guest count', () => {
+		const estimate = computeEstimate(sampleOffering, selections, 175);
+		expect(estimate.guestCount).toBe(175);
+		expect(estimate.perGuestCents).toBe(1325);
+		expect(estimate.perGuestTotalCents).toBe(231875);
+		expect(estimate.perEventCents).toBe(0);
+		expect(estimate.itemTotalCents).toBe(0);
+		expect(estimate.minimumAdjustmentCents).toBe(0);
+		expect(estimate.totalCents).toBe(231875);
+		expect(estimate.lineItems.find((item) => item.id === 'proteins:filling_a')).toMatchObject({
+			included: true,
+			amountCents: 0
 		});
-
-		// guestCountHigh falling back to guestCountLow is only safe to render because
-		// guestCountOpenEnded tells the UI/email to format it as "251+", not a bare "251"
-		// that would misleadingly read as a hard cap on the total.
-		expect(estimate.guestCountLow).toBe(251);
-		expect(estimate.guestCountHigh).toBe(251);
-		expect(estimate.guestCountOpenEnded).toBe(true);
 	});
 
-	test('a closed guest band produces a real low/high range bracketing minimumGuests and maximumGuests', () => {
-		const estimate = computeEstimate(sampleOffering, {
-			guestCount: ['guest_25_100'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
+	test('prices appetizer quantities by item, independently of guest count', () => {
+		const quantities = { appetizers: { item_a: 20, item_b: 20 } };
+		const at15 = computeEstimate(sampleOffering, selections, 15, quantities);
+		const at50 = computeEstimate(sampleOffering, selections, 50, quantities);
+		expect(at15.itemTotalCents).toBe(10000);
+		expect(at50.itemTotalCents).toBe(10000);
+		expect(at15.perGuestCents).toBe(1325);
+		expect(at15.totalCents).toBe(31875);
+		expect(at50.totalCents).toBe(76250);
+		expect(at15.lineItems.find((item) => item.id === 'appetizers:item_a')).toMatchObject({
+			kind: 'per-item',
+			amountCents: 4000,
+			unitCents: 200,
+			quantity: 20
 		});
-
-		// $300 base + $15/guest base food service, no other premiums selected.
-		expect(estimate.guestCountLow).toBe(25);
-		expect(estimate.guestCountHigh).toBe(100);
-		expect(estimate.guestCountOpenEnded).toBe(false);
-		expect(estimate.totalCentsLow).toBe(30000 + 1500 * 25); // $675
-		expect(estimate.totalCentsHigh).toBe(30000 + 1500 * 100); // $1,800
-		expect(estimate.totalCentsLow).toBeLessThan(estimate.totalCentsHigh);
 	});
 
-	test('no guest count selected yet is not treated as open-ended', () => {
-		const estimate = computeEstimate(sampleOffering, {
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo']
+	test('adds optional drinks and appetizer orders above the serving style floor', () => {
+		const base = computeEstimate(
+			sampleOffering,
+			{ servingStyle: ['style_b'], proteins: ['filling_a', 'filling_c'] },
+			15
+		);
+		const withExtras = computeEstimate(sampleOffering, selections, 15, {
+			appetizers: { item_d: 20 }
 		});
-
-		expect(estimate.guestCountLow).toBe(0);
-		expect(estimate.guestCountHigh).toBe(0);
-		expect(estimate.guestCountOpenEnded).toBe(false);
+		expect(base.totalCents).toBe(20000);
+		expect(withExtras.minimumAdjustmentCents).toBe(2000);
+		expect(withExtras.itemTotalCents).toBe(10000);
+		expect(withExtras.totalCents).toBe(31875);
 	});
 
-	test('changing a configured price (Horchata $2.00 -> $2.50) changes the estimate with no calculator code changes', () => {
-		const selections: Selections = {
-			guestCount: ['guest_25_100'],
-			serviceDuration: ['duration_90'],
-			servingStyle: ['taco_truck'],
-			proteins: ['asada', 'pollo'],
-			drinks: ['horchata']
-		};
+	test('prices both drinks per guest above the serving style floor', () => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{
+				servingStyle: ['style_c'],
+				proteins: ['filling_a', 'filling_c'],
+				drinks: ['beverage_a', 'beverage_b']
+			},
+			1
+		);
+		expect(estimate.perGuestCents).toBe(1000);
+		expect(estimate.minimumAdjustmentCents).toBe(7200);
+		expect(estimate.totalCents).toBe(8200);
+	});
 
-		const before = computeEstimate(sampleOffering, selections);
+	test('uses the four configured appetizer unit prices', () => {
+		const estimate = computeEstimate(sampleOffering, selections, 100, {
+			appetizers: {
+				item_a: 1,
+				item_d: 1,
+				item_c: 1,
+				item_b: 1
+			}
+		});
+		expect(estimate.itemTotalCents).toBe(1400);
+	});
 
+	test('per-guest premiums scale with guest count while per-event charges stay fixed', () => {
+		const at50 = computeEstimate(sampleOffering, selections, 50);
+		const at150 = computeEstimate(sampleOffering, selections, 150);
+		expect(at150.perEventCents).toBe(at50.perEventCents);
+		expect(at150.totalCents - at50.totalCents).toBe(at50.perGuestCents * 100);
+	});
+
+	test('charges additional proteins after including the two highest priced choices', () => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{
+				servingStyle: ['style_a'],
+				proteins: ['filling_a', 'filling_c', 'filling_d']
+			},
+			50
+		);
+		expect(estimate.perGuestCents).toBe(1050);
+		expect(estimate.lineItems.find((item) => item.id === 'proteins:filling_d')).toMatchObject({
+			amountCents: 50
+		});
+	});
+
+	test.each([
+		['style_a', 10000, 9000],
+		['style_b', 20000, 18800],
+		['style_c', 8000, 7200]
+	])('applies the %s serving style minimum to a one guest event', (style, minimum, adjustment) => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{ servingStyle: [style], proteins: ['filling_a', 'filling_c'] },
+			1
+		);
+		expect(estimate.minimumEventCents).toBe(minimum);
+		expect(estimate.minimumAdjustmentCents).toBe(adjustment);
+		expect(estimate.totalCents).toBe(minimum);
+	});
+
+	test('does not add an adjustment when the itemized total exceeds the style minimum', () => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{ servingStyle: ['style_c'], proteins: ['filling_a', 'filling_c'] },
+			30
+		);
+		expect(estimate.minimumAdjustmentCents).toBe(0);
+		expect(estimate.totalCents).toBe(24000);
+	});
+
+	test('uses a changed configured price without calculator changes', () => {
 		const repriced: Offering = {
 			...sampleOffering,
 			categories: {
@@ -200,15 +140,13 @@ describe('computeEstimate', () => {
 				drinks: {
 					...sampleOffering.categories.drinks,
 					options: sampleOffering.categories.drinks.options.map((option) =>
-						option.id === 'horchata' ? { ...option, priceCents: 250 } : option
+						option.id === 'beverage_b' ? { ...option, priceCents: 175 } : option
 					)
 				}
 			}
 		};
-		const after = computeEstimate(repriced, selections);
-
-		expect(lineItem(before, 'drinks:horchata')).toMatchObject({ amountCents: 200 });
-		expect(lineItem(after, 'drinks:horchata')).toMatchObject({ amountCents: 250 });
-		expect(after.totalCentsHigh - before.totalCentsHigh).toBe((250 - 200) * before.guestCountHigh);
+		const before = computeEstimate(sampleOffering, selections, 50);
+		const after = computeEstimate(repriced, selections, 50);
+		expect(after.totalCents - before.totalCents).toBe(50 * 50);
 	});
 });

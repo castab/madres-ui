@@ -44,29 +44,6 @@
 	];
 
 	const sideTags = ['Elote en Vaso', 'Chips', 'Guacamole Salsa', 'Horchata', 'Infused Water'];
-
-	const steps = [
-		{
-			number: '01',
-			title: 'Send your details',
-			copy: "Tell us about your event — guest count, service style and more — and we'll follow up with a proper quote."
-		},
-		{
-			number: '02',
-			title: 'Build the menu',
-			copy: 'We propose a service style, taco lineup and sides scaled to your headcount.'
-		},
-		{
-			number: '03',
-			title: 'Contract & deposit',
-			copy: 'A completed contract and deposit is required to secure your booking.'
-		},
-		{
-			number: '04',
-			title: 'We arrive and set up',
-			copy: 'Truck, table and crew arrive ahead of service. You host; we handle the rest.'
-		}
-	];
 </script>
 
 <MarigoldWatermark />
@@ -197,39 +174,6 @@
 		>
 			Wedding reception · 140 guests
 		</span>
-	</section>
-
-	<section
-		id="how"
-		class="mx-auto flex max-w-(--container-max) flex-col gap-(--stack-gap) px-(--gutter) py-(--section-y)"
-	>
-		<div class="flex flex-col gap-2">
-			<span class={eyebrow}>How to Inquire</span>
-			<h2 class={headingSection}>Four steps to a booked date</h2>
-		</div>
-		<div class="grid grid-cols-1 gap-(--stack-gap) md:grid-cols-2">
-			{#each steps as step (step.number)}
-				<div class="grid grid-cols-[auto_1fr] items-start gap-4">
-					<span
-						class="min-w-[1.6em] font-sans text-(length:--text-heading-lg) font-semibold text-(--color-sol-yellow-700)"
-					>
-						{step.number}
-					</span>
-					<div class="flex flex-col gap-1">
-						<h3
-							class="m-0 font-sans text-(length:--text-heading-md) font-semibold text-(--text-primary)"
-						>
-							{step.title}
-						</h3>
-						<p
-							class="m-0 text-(length:--text-body-md) leading-(--leading-relaxed) text-(--text-secondary)"
-						>
-							{step.copy}
-						</p>
-					</div>
-				</div>
-			{/each}
-		</div>
 	</section>
 
 	<section class="bg-(--surface-sunken)">

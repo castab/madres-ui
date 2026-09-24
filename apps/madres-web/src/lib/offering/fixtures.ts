@@ -1,99 +1,54 @@
 import type { Offering } from './types.js';
 
-/** The initial private-event offering document — the same shape published to
- * `PRIVATE_EVENT_OFFERING_JSON` (see `.env.example`). Shared by the schema/estimator test
- * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
+/** Fictional data for tests and `.env.example`. Real offerings belong only in private env vars. */
 export const sampleOffering: Offering = {
-	id: 'madres-private-events',
+	id: 'sample-event-offering',
 	version: 1,
 	currency: 'USD',
-	pricingStatus: 'DEVELOPMENT',
-	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
-	baseCharges: [
-		{ id: 'base_event_fee', label: 'Base event fee', pricingType: 'PER_EVENT', priceCents: 30000 },
-		{
-			id: 'base_food_service',
-			label: 'Base food and service',
-			pricingType: 'PER_GUEST',
-			priceCents: 1500
-		}
-	],
+	pricingStatus: 'EXAMPLE',
+	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST', 'PER_ITEM'],
+	guestCountField: {
+		id: 'attendee_count',
+		label: 'Attendees',
+		inputType: 'NUMBER',
+		maximumGuests: 999,
+		placeholder: 'Enter an attendee count'
+	},
 	categories: {
-		guestCount: {
-			id: 'guest_count',
-			label: 'Guest Count',
+		servingStyle: {
+			id: 'service_style',
+			label: 'Service Style',
 			minSelections: 1,
 			maxSelections: 1,
-			pricingType: 'NONE',
+			pricingType: 'PER_GUEST',
 			inputType: 'SELECT',
 			options: [
 				{
-					id: 'guest_25_100',
-					label: '25–100',
-					priceCents: 0,
-					facts: { minimumGuests: 25, maximumGuests: 100, isMinimum: false }
+					id: 'style_a',
+					label: 'Service A',
+					description: 'Example service style A.',
+					priceCents: 1000,
+					minimumEventCents: 10000
 				},
 				{
-					id: 'guest_101_175',
-					label: '100–175',
-					priceCents: 0,
-					facts: { minimumGuests: 101, maximumGuests: 175, isMinimum: false }
+					id: 'style_b',
+					label: 'Service B',
+					description: 'Example service style B.',
+					priceCents: 1200,
+					minimumEventCents: 20000
 				},
 				{
-					id: 'guest_176_250',
-					label: '175–250',
-					priceCents: 0,
-					facts: { minimumGuests: 176, maximumGuests: 250, isMinimum: false }
-				},
-				{
-					id: 'guest_251_plus',
-					label: '250+',
-					priceCents: 0,
-					facts: { minimumGuests: 251, maximumGuests: null, isMinimum: true }
+					id: 'style_c',
+					label: 'Service C',
+					description: 'Example service style C.',
+					priceCents: 800,
+					minimumEventCents: 8000
 				}
 			]
 		},
-		serviceDuration: {
-			id: 'service_duration',
-			label: 'Service Duration',
-			minSelections: 1,
-			maxSelections: 1,
-			pricingType: 'PER_GUEST',
-			inputType: 'SELECT',
-			options: [
-				{ id: 'duration_90', label: '1.5 hours', priceCents: 0, facts: { durationMinutes: 90 } },
-				{ id: 'duration_120', label: '2 hours', priceCents: 100, facts: { durationMinutes: 120 } },
-				{
-					id: 'duration_150',
-					label: '2.5 hours',
-					priceCents: 200,
-					facts: { durationMinutes: 150 }
-				},
-				{ id: 'duration_180', label: '3 hours', priceCents: 300, facts: { durationMinutes: 180 } },
-				{
-					id: 'duration_210',
-					label: '3.5 hours',
-					priceCents: 400,
-					facts: { durationMinutes: 210 }
-				},
-				{ id: 'duration_240', label: '4 hours', priceCents: 500, facts: { durationMinutes: 240 } }
-			]
-		},
-		servingStyle: {
-			id: 'serving_style',
-			label: 'Serving Style',
-			minSelections: 1,
-			maxSelections: 1,
-			pricingType: 'PER_GUEST',
-			inputType: 'SELECT',
-			options: [
-				{ id: 'taco_truck', label: 'Taco Truck Service', priceCents: 0 },
-				{ id: 'buffet', label: 'Buffet Service', priceCents: 300 }
-			]
-		},
 		proteins: {
-			id: 'proteins',
-			label: 'Proteins',
+			id: 'fillings',
+			label: 'Fillings',
 			minSelections: 2,
 			maxSelections: 5,
 			pricingType: 'PER_GUEST',
@@ -104,63 +59,69 @@ export const sampleOffering: Offering = {
 				chargeRemainingSelections: true
 			},
 			options: [
-				{ id: 'asada', label: 'Asada', description: 'Beef', priceCents: 400 },
-				{ id: 'adobada', label: 'Adobada', description: 'Pork', priceCents: 300 },
-				{ id: 'pollo', label: 'Pollo', description: 'Chicken', priceCents: 200 },
-				{ id: 'chorizo', label: 'Chorizo', description: 'Pork', priceCents: 100 },
-				{ id: 'veggie', label: 'Veggie', description: 'Vegetarian taco option', priceCents: 100 }
+				{ id: 'filling_a', label: 'Filling A', description: 'Example filling A.', priceCents: 200 },
+				{ id: 'filling_b', label: 'Filling B', description: 'Example filling B.', priceCents: 150 },
+				{ id: 'filling_c', label: 'Filling C', description: 'Example filling C.', priceCents: 100 },
+				{ id: 'filling_d', label: 'Filling D', description: 'Example filling D.', priceCents: 50 },
+				{ id: 'filling_e', label: 'Filling E', description: 'Example filling E.', priceCents: 25 }
 			]
 		},
 		drinks: {
-			id: 'drinks',
-			label: 'Drinks',
+			id: 'beverages',
+			label: 'Beverages',
 			minSelections: 0,
 			maxSelections: 2,
 			pricingType: 'PER_GUEST',
 			inputType: 'CHECKBOX_LIST',
 			options: [
-				{ id: 'fruit_infused_water', label: 'Fruit-infused water', priceCents: 150 },
-				{ id: 'horchata', label: 'Horchata', priceCents: 200 }
+				{
+					id: 'beverage_a',
+					label: 'Beverage A',
+					description: 'Example beverage A.',
+					priceCents: 75
+				},
+				{
+					id: 'beverage_b',
+					label: 'Beverage B',
+					description: 'Example beverage B.',
+					priceCents: 125
+				}
 			]
 		},
 		appetizers: {
-			id: 'appetizers',
-			label: 'Appetizers',
+			id: 'items',
+			label: 'Items',
 			minSelections: 0,
 			maxSelections: 4,
-			pricingType: 'PER_GUEST',
-			inputType: 'CHECKBOX_LIST',
+			pricingType: 'PER_ITEM',
+			inputType: 'QUANTITY_LIST',
+			minimumOrderCents: 10000,
+			maximumQuantityPerOption: 1000,
 			options: [
-				{
-					id: 'flautas',
-					label: 'Flautas',
-					description: 'Chicken in a hand-rolled tortilla that is deep fried',
-					priceCents: 300
-				},
-				{ id: 'fruit_cup_spread', label: 'Fruit Cup Spread', priceCents: 250 },
-				{
-					id: 'elote_en_vaso',
-					label: 'Elote en Vaso',
-					description: 'Also known as Esquites',
-					priceCents: 200
-				},
-				{ id: 'chorizo_avocado_toast', label: 'Chorizo Avocado Toast', priceCents: 350 }
+				{ id: 'item_a', label: 'Item A', description: 'Example item A.', priceCents: 200 },
+				{ id: 'item_b', label: 'Item B', description: 'Example item B.', priceCents: 300 },
+				{ id: 'item_c', label: 'Item C', description: 'Example item C.', priceCents: 400 },
+				{ id: 'item_d', label: 'Item D', description: 'Example item D.', priceCents: 500 }
 			]
 		}
 	},
 	includedItems: [
-		{ id: 'rice', label: 'Rice' },
-		{ id: 'peruvian_beans', label: 'Peruvian beans / habichuela' }
+		{
+			id: 'included_setup',
+			label: 'Included Setup',
+			description: 'Example included setup.',
+			contents: [
+				{ label: 'Component A', excludedServingStyleIds: ['style_c'] },
+				{ label: 'Component B', excludedServingStyleIds: ['style_c'] },
+				{ label: 'Shared supplies' }
+			]
+		}
 	],
-	staffQuotedExtras: [
-		{ id: 'travel_surcharge', label: 'Travel surcharge' },
-		{ id: 'special_protein', label: 'Special-request protein' },
-		{ id: 'special_request', label: 'Other special request' }
-	],
+	staffQuotedExtras: [{ id: 'custom_extra', label: 'Custom extra' }],
 	additionalNotesField: {
 		id: 'additional_notes',
-		label: 'Anything else?',
+		label: 'Other details',
 		inputType: 'TEXTAREA',
-		placeholder: 'Allergies, theme, timing constraints, anything else we should know…'
+		placeholder: 'Add any extra details'
 	}
 };

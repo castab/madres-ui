@@ -7,13 +7,11 @@
 	import TextField from '$lib/components/inquire/text-field.svelte';
 	import TextareaField from '$lib/components/inquire/textarea-field.svelte';
 	import CategorySection from '$lib/components/inquire/category-section.svelte';
-	import GuestCountNote from '$lib/components/inquire/guest-count-note.svelte';
 	import EstimateSummary from '$lib/components/inquire/estimate-summary.svelte';
 	import IncludedItemsNote from '$lib/components/inquire/included-items-note.svelte';
 	import StaffQuotedNote from '$lib/components/inquire/staff-quoted-note.svelte';
 	import TurnstileWidget from '$lib/components/inquire/turnstile-widget.svelte';
 	import { InquireFormState } from './inquire-form-state.svelte.js';
-	import type { GuestFacts, Option } from '$lib/offering/types.js';
 	import type { PageProps } from './$types.js';
 
 	let { data, form }: PageProps = $props();
@@ -22,13 +20,6 @@
 	const formState = $derived(offering ? new InquireFormState(offering) : null);
 
 	let submitting = $state(false);
-
-	const selectedGuestOption = $derived.by<Option<GuestFacts> | undefined>(() => {
-		if (!offering || !formState) return undefined;
-		return offering.categories.guestCount.options.find((option) =>
-			formState.isSelected('guestCount', option.id)
-		);
-	});
 
 	async function handleSubmit({ cancel }: { cancel: () => void }) {
 		if (!formState) {
@@ -151,6 +142,21 @@
 					</h2>
 					<span class="h-px flex-1 bg-(--border-subtle)"></span>
 				</div>
+				<TextField
+					id={offering.guestCountField.id}
+					name="guestCount"
+					label={offering.guestCountField.label}
+					type="number"
+					inputmode="numeric"
+					min="1"
+					max={offering.guestCountField.maximumGuests}
+					step="1"
+					placeholder={offering.guestCountField.placeholder}
+					required
+					bind:value={formState.guestCount}
+					error={form?.fieldErrors?.guestCount?.[0] ?? formState.guestCountError}
+					helperText="Serving style minimums apply to every event."
+				/>
 
 				{#each Object.entries(offering.categories) as [categoryKey, category] (categoryKey)}
 					<CategorySection
@@ -164,13 +170,24 @@
 						onSelectSingle={(optionId) => formState.selectSingle(categoryKey, optionId)}
 						onToggleMulti={(optionId) =>
 							formState.toggleMulti(categoryKey, optionId, category.maxSelections)}
+						quantityValue={(optionId) => formState.quantityValue(categoryKey, optionId)}
+						onQuantityChange={(optionId, raw) =>
+							formState.setQuantityInput(categoryKey, optionId, raw)}
+						quantitySubtotalCents={category.inputType === 'QUANTITY_LIST'
+							? formState.quantityStatus(categoryKey).subtotalCents
+							: 0}
+						quantitySelectedOptions={category.inputType === 'QUANTITY_LIST'
+							? formState.quantityStatus(categoryKey).selectedOptions
+							: 0}
 					/>
-					{#if categoryKey === 'guestCount'}
-						<GuestCountNote option={selectedGuestOption} />
-					{/if}
 				{/each}
 
-				<IncludedItemsNote items={offering.includedItems} />
+				{#if formState.selectedOption('servingStyle')}
+					<IncludedItemsNote
+						items={offering.includedItems}
+						servingStyleId={formState.selectedOption('servingStyle')}
+					/>
+				{/if}
 
 				<TextareaField
 					id="additionalNotes"
@@ -183,7 +200,7 @@
 				<EstimateSummary
 					estimate={formState.estimate}
 					currency={offering.currency}
-					isComplete={formState.selectionsComplete}
+					isComplete={formState.selectionsComplete && formState.guestCountValid}
 				/>
 
 				<StaffQuotedNote items={offering.staffQuotedExtras} />
