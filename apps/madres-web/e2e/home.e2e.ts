@@ -100,6 +100,20 @@ test('curated landing photos use small images, warm large covers, and open the p
 
 	await photos.getByRole('button', { name: /^View photo 1/ }).click();
 	const dialog = page.getByRole('dialog');
+	await expect(dialog).toBeVisible();
+	expect(await dialog.evaluate((node) => node.matches(':modal'))).toBe(true);
+	expect(
+		await page.evaluate(() => {
+			const header = document.querySelector('header');
+			if (!header) return false;
+			const bounds = header.getBoundingClientRect();
+			return (
+				document
+					.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
+					?.closest('dialog') !== null
+			);
+		})
+	).toBe(true);
 	await expect(dialog.locator('img[src*="post-1/large.webp"]')).toBeVisible();
 	await page.keyboard.press('ArrowRight');
 	await expect(dialog.locator('img[src*="post-carousel/0/large.webp"]')).toBeVisible();
@@ -110,5 +124,8 @@ test('curated landing photos use small images, warm large covers, and open the p
 		.poll(() => trackingRequests.map((request) => request.id))
 		.toEqual(['e2e-post-1', 'e2e-post-carousel']);
 	await page.keyboard.press('Escape');
+	await expect(dialog).toHaveCount(0);
+	await photos.getByRole('button', { name: /^View photo 1/ }).click();
+	await dialog.getByRole('button', { name: 'Close' }).click();
 	await expect(dialog).toHaveCount(0);
 });

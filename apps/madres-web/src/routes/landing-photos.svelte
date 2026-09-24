@@ -20,6 +20,15 @@
 		activeIndex = -1;
 	}
 
+	function showModal(node: HTMLDialogElement) {
+		node.showModal();
+		return {
+			destroy() {
+				if (node.open) node.close();
+			}
+		};
+	}
+
 	function prev() {
 		activeIndex = (activeIndex - 1 + tiles.length) % tiles.length;
 	}
@@ -95,14 +104,17 @@
 
 {#if active}
 	{#key active.id}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_interactive_supports_focus -->
-		<div
-			role="dialog"
-			aria-modal="true"
+		<dialog
+			use:showModal
 			aria-label={tileAlt(active, instagramHandle)}
-			class="fixed inset-0 z-[1000] flex items-center justify-center bg-(--ink-900)/65 p-(--gutter)"
-			onclick={close}
+			class="fixed inset-0 m-0 flex h-dvh max-h-none w-dvw max-w-none items-center justify-center overflow-hidden border-0 bg-(--ink-900)/65 p-(--gutter) backdrop:bg-transparent"
+			onclick={(event) => {
+				if (event.target === event.currentTarget) close();
+			}}
+			oncancel={(event) => {
+				event.preventDefault();
+				close();
+			}}
 		>
 			<LightboxCarousel
 				tile={active}
@@ -116,6 +128,6 @@
 				onNext={next}
 				onLinkClick={() => track(active.id, 'click')}
 			/>
-		</div>
+		</dialog>
 	{/key}
 {/if}
