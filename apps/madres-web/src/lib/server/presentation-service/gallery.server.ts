@@ -170,13 +170,16 @@ export function parseGalleryPage(payload: unknown): GalleryPage | null {
  * malformed — the gallery page treats that identically to "no posts yet", and a failed
  * "load more" simply stops offering further pages rather than surfacing an error.
  *
- * `page` is 1-based, matching knurl's own convention. `limit` is deliberately omitted:
+ * `page` is 1-based, matching knurl's own convention. `galleryName` defaults to the
+ * configured main gallery; the landing page passes its own curated name. `limit` is omitted:
  * knurl defaults it to 12 and clamps it into 1..50, and that per-page size is knurl's
  * call to make, not this app's — see `AGENTS.md`.
  */
-export async function getGalleryPage(page: number = 1): Promise<GalleryPage> {
+export async function getGalleryPage(
+	page: number = 1,
+	galleryName: string | null = presentationServiceGalleryName()
+): Promise<GalleryPage> {
 	const accountId = presentationServiceAccountId();
-	const galleryName = presentationServiceGalleryName();
 	const token = presentationServiceTrackingToken();
 	if (!accountId || !galleryName || !token) return EMPTY_PAGE;
 
@@ -242,12 +245,15 @@ function galleryIdForTracking(
 	return promise;
 }
 
-/** Fire-and-forget analytics. Skips silently (logging once) when the gallery bearer,
- * account id, or gallery name isn't configured, or when the name can't be resolved to a
+/** Fire-and-forget analytics. Skips silently when the gallery bearer, account id, or
+ * gallery name isn't configured, or when the name can't be resolved to a
  * real gallery id, and never lets a failure reach the caller. */
-export async function trackGalleryEvent(id: string, event: GalleryTrackingEvent): Promise<void> {
+export async function trackGalleryEvent(
+	id: string,
+	event: GalleryTrackingEvent,
+	galleryName: string | null = presentationServiceGalleryName()
+): Promise<void> {
 	const accountId = presentationServiceAccountId();
-	const galleryName = presentationServiceGalleryName();
 	const token = presentationServiceTrackingToken();
 	if (!accountId || !galleryName || !token) {
 		console.warn(

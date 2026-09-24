@@ -38,3 +38,62 @@ test('the page fits its viewport and the mobile navigation is operable', async (
 		).toHaveAttribute('href', '/gallery');
 	}
 });
+
+test('curated landing photos use small images, warm large covers, and open the photo lightbox', async ({
+	page
+}) => {
+	const largeRequests: string[] = [];
+	const trackingRequests: Array<{ id: string; event: string }> = [];
+	page.on('request', (request) => {
+		if (request.url().endsWith('/large.webp')) largeRequests.push(request.url());
+		if (request.url().endsWith('/landing/track')) {
+			trackingRequests.push(request.postDataJSON());
+		}
+	});
+	await page.route('**/e2e/**', (route) =>
+		route.fulfill({
+			contentType: 'image/png',
+			body: Buffer.from(
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y3UO6sAAAAASUVORK5CYII=',
+				'base64'
+			)
+		})
+	);
+
+	await page.goto('/');
+	const photos = page.locator('section').filter({
+		has: page.getByRole('heading', { name: 'Moments worth sharing' })
+	});
+	await expect(photos.getByRole('button', { name: /^View photo/ })).toHaveCount(2);
+	await expect(photos.locator('img').first()).toHaveAttribute('src', /small\.webp/);
+	await expect.poll(() => largeRequests.length).toBe(2);
+	const testimonial = page.locator('section').filter({ hasText: 'Our guests are still talking' });
+	await expect(testimonial).toBeVisible();
+	expect(await photos.evaluate((node) => getComputedStyle(node).backgroundColor)).toBe(
+		await testimonial.evaluate((node) => getComputedStyle(node).backgroundColor)
+	);
+	await expect(photos.getByRole('link', { name: 'View full gallery' })).toHaveAttribute(
+		'href',
+		'/gallery'
+	);
+	expect(
+		await testimonial.evaluate(
+			(node) =>
+				node.nextElementSibling?.querySelector('h2')?.textContent === 'Moments worth sharing'
+		)
+	).toBe(true);
+
+	await photos.getByRole('button', { name: /^View photo 1/ }).click();
+	const dialog = page.getByRole('dialog');
+	await expect(dialog.locator('img[src*="post-1/large.webp"]')).toBeVisible();
+	await page.keyboard.press('ArrowRight');
+	await expect(dialog.locator('img[src*="post-carousel/0/large.webp"]')).toBeVisible();
+	await page.keyboard.press('ArrowRight');
+	await expect(dialog.locator('img[src*="post-carousel/2/large.webp"]')).toBeVisible();
+	await expect(dialog.locator('video')).toHaveCount(0);
+	await expect
+		.poll(() => trackingRequests.map((request) => request.id))
+		.toEqual(['e2e-post-1', 'e2e-post-carousel']);
+	await page.keyboard.press('Escape');
+	await expect(dialog).toHaveCount(0);
+});

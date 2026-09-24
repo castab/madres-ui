@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+vi.mock('$env/dynamic/private', () => ({ env: process.env }));
+
 import { getGalleryPage, parseGalleryPage, trackGalleryEvent } from './gallery.server.js';
 
 const rawItem = {
@@ -255,6 +257,35 @@ describe('presentation-service gallery client', () => {
 		expect(init.headers).toMatchObject({ authorization: 'Bearer a-sufficiently-long-token' });
 	});
 
+	test('requests the named landing gallery without changing the configured gallery', async () => {
+		const fetch = vi
+			.fn()
+			.mockResolvedValue(Response.json({ data: [rawItem], pagination: pagination() }));
+		vi.stubGlobal('fetch', fetch);
+
+		await getGalleryPage(1, 'landing');
+		await getGalleryPage();
+
+		expect((fetch.mock.calls[0][0] as URL).pathname).toBe(
+			'/api/v1/accounts/acct-1/galleries/by-name/landing'
+		);
+		expect((fetch.mock.calls[1][0] as URL).pathname).toBe(
+			'/api/v1/accounts/acct-1/galleries/by-name/Madres%20Taco%20Shop'
+		);
+	});
+
+	test('returns no landing photos when the named gallery is unavailable', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(Response.json({ error: 'not_found' }, { status: 404 }))
+		);
+		await expect(getGalleryPage(1, 'landing')).resolves.toEqual({
+			tiles: [],
+			currentPage: 1,
+			hasNextPage: false
+		});
+	});
+
 	test('requests a later page by number when asked', async () => {
 		const fetch = vi.fn().mockResolvedValue(
 			Response.json({
@@ -344,6 +375,26 @@ describe('presentation-service gallery client', () => {
 		expect(trackInit.body).toBe(JSON.stringify({ id: 'post-1', event: 'click' }));
 		const [secondTrackUrl] = fetch.mock.calls[2] as [URL, RequestInit];
 		expect(secondTrackUrl.pathname).toBe(trackUrl.pathname);
+	});
+
+	test('resolves and tracks the landing gallery independently', async () => {
+		const fetch = vi
+			.fn()
+			.mockResolvedValueOnce(Response.json({ gallery: { id: 'landing-id' } }))
+			.mockResolvedValueOnce(Response.json({ status: 'ok' }));
+		vi.stubGlobal('fetch', fetch);
+
+		await trackGalleryEvent('landing-post', 'view', 'landing');
+
+		expect((fetch.mock.calls[0][0] as URL).pathname).toBe(
+			'/api/v1/accounts/acct-1/galleries/by-name/landing'
+		);
+		expect((fetch.mock.calls[1][0] as URL).pathname).toBe(
+			'/api/v1/accounts/acct-1/galleries/landing-id/track'
+		);
+		expect((fetch.mock.calls[1][1] as RequestInit).body).toBe(
+			JSON.stringify({ id: 'landing-post', event: 'view' })
+		);
 	});
 
 	test("skips tracking when the configured gallery name can't be resolved to an id", async () => {

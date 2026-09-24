@@ -106,6 +106,23 @@ const galleryPages = [
 
 const galleryName = 'Madres Taco Shop';
 const galleryId = 'e2e-gallery-uuid';
+const landingGalleryName = 'landing';
+const landingGalleryId = 'e2e-landing-gallery-uuid';
+const landingPosts = [
+	galleryPages[0][0],
+	{
+		...galleryPages[0][1],
+		mediaItems: [
+			galleryPages[0][1].mediaItems[0],
+			galleryPages[0][1].mediaItems[1],
+			{
+				...galleryPages[0][1].mediaItems[0],
+				largeUrl: 'https://example-bucket.s3.amazonaws.com/e2e/post-carousel/2/large.webp'
+			}
+		]
+	},
+	galleryPages[1][0]
+];
 
 function paginationFor(page) {
 	const totalPages = galleryPages.length;
@@ -150,25 +167,29 @@ const server = createServer(async (request, response) => {
 			json(response, 401, { error: 'unauthorized' });
 			return;
 		}
-		if (decodeURIComponent(byNameMatch[1]) !== galleryName) {
+		const requestedName = decodeURIComponent(byNameMatch[1]);
+		if (requestedName !== galleryName && requestedName !== landingGalleryName) {
 			json(response, 404, { error: 'not_found' });
 			return;
 		}
+		const isLanding = requestedName === landingGalleryName;
 		const page = Math.min(
 			Math.max(Number(url.searchParams.get('page') ?? '1') || 1, 1),
-			galleryPages.length
+			isLanding ? 1 : galleryPages.length
 		);
 		json(response, 200, {
 			gallery: {
-				id: galleryId,
-				name: galleryName,
-				itemCount: galleryPages.flat().length,
-				publishedCount: galleryPages.flat().length,
+				id: isLanding ? landingGalleryId : galleryId,
+				name: requestedName,
+				itemCount: isLanding ? landingPosts.length : galleryPages.flat().length,
+				publishedCount: isLanding ? landingPosts.length : galleryPages.flat().length,
 				createdAt: '2026-08-01T00:00:00Z',
 				updatedAt: '2026-08-02T00:00:00Z'
 			},
-			data: galleryPages[page - 1],
-			pagination: paginationFor(page)
+			data: isLanding ? landingPosts : galleryPages[page - 1],
+			pagination: isLanding
+				? { ...paginationFor(1), totalRecords: landingPosts.length, totalPages: 1 }
+				: paginationFor(page)
 		});
 		return;
 	}
@@ -182,7 +203,7 @@ const server = createServer(async (request, response) => {
 		// Only the id resolved from the by-name lookup is a valid track target — a caller that
 		// posted the gallery *name* here (skipping resolution) would get a 404, same as knurl
 		// would for an id that doesn't exist.
-		if (trackMatch[1] !== galleryId) {
+		if (trackMatch[1] !== galleryId && trackMatch[1] !== landingGalleryId) {
 			json(response, 404, { error: 'not_found' });
 			return;
 		}
