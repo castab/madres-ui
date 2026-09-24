@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 5,
+	version: 6,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST'],
@@ -62,29 +62,36 @@ export const sampleOffering: Offering = {
 				chargeRemainingSelections: true
 			},
 			options: [
-				{ id: 'asada', label: 'Asada', description: 'Savory grilled beef.', priceCents: 400 },
+				{
+					id: 'asada',
+					label: 'Asada',
+					description:
+						'Classic steak, seasoned and marinated with freshly squeezed lime, then seared on the plancha.',
+					priceCents: 400
+				},
 				{
 					id: 'adobada',
 					label: 'Adobada',
-					description: 'Marinated pork with a little spice.',
+					description:
+						'Pork marinated in a smoky guajillo and pineapple adobo, then caramelized on the plancha.',
 					priceCents: 300
 				},
 				{
 					id: 'pollo',
 					label: 'Pollo',
-					description: 'Seasoned chicken for a crowd-pleasing taco.',
+					description: 'Seasoned chicken prepared for a tender, crowd-pleasing taco.',
 					priceCents: 200
 				},
 				{
 					id: 'chorizo',
 					label: 'Chorizo',
-					description: 'Bold, spiced pork chorizo.',
+					description: 'Seasoned pork chorizo, cooked on the plancha until the edges crisp.',
 					priceCents: 100
 				},
 				{
 					id: 'veggie',
 					label: 'Veggie',
-					description: 'A flavorful meat-free taco option.',
+					description: 'A flavorful meat-free filling for a vegetarian taco.',
 					priceCents: 100
 				}
 			]
