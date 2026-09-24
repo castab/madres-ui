@@ -42,7 +42,6 @@ export type GuestCountField = {
 	id: string;
 	label: string;
 	inputType: 'NUMBER';
-	minimumGuests: number;
 	maximumGuests: number;
 	placeholder?: string;
 };

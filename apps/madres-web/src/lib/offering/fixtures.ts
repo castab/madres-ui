@@ -5,7 +5,7 @@ import type { Offering } from './types.js';
  * suites so a config change (e.g. Horchata's price) only needs updating in one place. */
 export const sampleOffering: Offering = {
 	id: 'madres-private-events',
-	version: 8,
+	version: 9,
 	currency: 'USD',
 	pricingStatus: 'DEVELOPMENT',
 	pricingTypes: ['NONE', 'PER_EVENT', 'PER_GUEST', 'PER_ITEM'],
@@ -13,7 +13,6 @@ export const sampleOffering: Offering = {
 		id: 'guest_count',
 		label: 'Guest Count',
 		inputType: 'NUMBER',
-		minimumGuests: 15,
 		maximumGuests: 10000,
 		placeholder: 'Enter your estimated guest count'
 	},
@@ -108,13 +107,13 @@ export const sampleOffering: Offering = {
 					id: 'fruit_infused_water',
 					label: 'Fruit-infused water',
 					description: 'Water infused with fresh fruit and berries.',
-					priceCents: 150
+					priceCents: 100
 				},
 				{
 					id: 'horchata',
 					label: 'Horchata',
 					description: 'Classic sweetened rice drink with cinnamon.',
-					priceCents: 200
+					priceCents: 150
 				}
 			]
 		},

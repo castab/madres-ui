@@ -30,10 +30,10 @@ describe('parseOffering', () => {
 		if (!result.ok) expect(result.issues.length).toBeGreaterThan(0);
 	});
 
-	test('rejects guest limits in the wrong order', () => {
+	test('rejects an invalid guest maximum', () => {
 		const broken = {
 			...sampleOffering,
-			guestCountField: { ...sampleOffering.guestCountField, maximumGuests: 14 }
+			guestCountField: { ...sampleOffering.guestCountField, maximumGuests: 0 }
 		};
 		const result = parseOffering(broken);
 		expect(result.ok).toBe(false);

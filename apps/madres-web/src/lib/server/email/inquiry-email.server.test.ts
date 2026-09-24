@@ -59,7 +59,7 @@ describe('formatInquiryEmailText', () => {
 		);
 
 		expect(text).toContain('Guest Count: 275');
-		expect(text).toContain('Estimated total: $7,975');
+		expect(text).toContain('Estimated total: $7,837.50');
 	});
 
 	test('includes appetizer counts and their item subtotal', () => {
@@ -68,7 +68,7 @@ describe('formatInquiryEmailText', () => {
 		const text = formatInquiryEmailText(sampleOffering, customer, selections, ordered, priced, '');
 		expect(text).toContain('Appetizers: Flauta en Vaso × 100, Matchstick Fruit × 25');
 		expect(text).toContain('Appetizers subtotal: $500');
-		expect(text).toContain('Estimated total: $5,575');
+		expect(text).toContain('Estimated total: $5,487.50');
 	});
 
 	test('explains an event minimum adjustment in the staff notification', () => {
@@ -82,7 +82,7 @@ describe('formatInquiryEmailText', () => {
 			''
 		);
 		expect(text).toContain('Serving style minimum adjustment (to $1,000): $595');
-		expect(text).toContain('Estimated total: $1,030');
+		expect(text).toContain('Estimated total: $1,022.50');
 	});
 
 	test('includes an "Anything else" section when notes are present', () => {

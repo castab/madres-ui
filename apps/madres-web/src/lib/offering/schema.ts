@@ -99,18 +99,13 @@ const servingStyleCategorySchema = makeCategorySchema(
 ).refine((category) => category.pricingType === 'PER_GUEST' && category.minSelections === 1, {
 	message: 'Serving style must require one selection priced per guest'
 });
-const guestCountFieldSchema = z
-	.object({
-		id: z.string().min(1),
-		label: z.string().min(1),
-		inputType: z.literal('NUMBER'),
-		minimumGuests: z.number().int().positive(),
-		maximumGuests: z.number().int().positive(),
-		placeholder: z.string().min(1).optional()
-	})
-	.refine((field) => field.maximumGuests >= field.minimumGuests, {
-		message: 'maximumGuests must be >= minimumGuests'
-	});
+const guestCountFieldSchema = z.object({
+	id: z.string().min(1),
+	label: z.string().min(1),
+	inputType: z.literal('NUMBER'),
+	maximumGuests: z.number().int().positive(),
+	placeholder: z.string().min(1).optional()
+});
 
 const includedItemSchema = z.object({
 	id: z.string().min(1),

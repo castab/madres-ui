@@ -14,12 +14,12 @@ describe('computeEstimate', () => {
 	test('calculates one total for the entered guest count', () => {
 		const estimate = computeEstimate(sampleOffering, selections, 175);
 		expect(estimate.guestCount).toBe(175);
-		expect(estimate.perGuestCents).toBe(2900);
-		expect(estimate.perGuestTotalCents).toBe(507500);
+		expect(estimate.perGuestCents).toBe(2850);
+		expect(estimate.perGuestTotalCents).toBe(498750);
 		expect(estimate.perEventCents).toBe(0);
 		expect(estimate.itemTotalCents).toBe(0);
 		expect(estimate.minimumAdjustmentCents).toBe(0);
-		expect(estimate.totalCents).toBe(507500);
+		expect(estimate.totalCents).toBe(498750);
 		expect(estimate.lineItems.find((item) => item.id === 'proteins:asada')).toMatchObject({
 			included: true,
 			amountCents: 0
@@ -32,9 +32,9 @@ describe('computeEstimate', () => {
 		const at50 = computeEstimate(sampleOffering, selections, 50, quantities);
 		expect(at15.itemTotalCents).toBe(50000);
 		expect(at50.itemTotalCents).toBe(50000);
-		expect(at15.perGuestCents).toBe(2900);
-		expect(at15.totalCents).toBe(153000);
-		expect(at50.totalCents).toBe(195000);
+		expect(at15.perGuestCents).toBe(2850);
+		expect(at15.totalCents).toBe(152250);
+		expect(at50.totalCents).toBe(192500);
 		expect(at15.lineItems.find((item) => item.id === 'appetizers:flautas')).toMatchObject({
 			kind: 'per-item',
 			amountCents: 35000,
@@ -55,7 +55,22 @@ describe('computeEstimate', () => {
 		expect(base.totalCents).toBe(100000);
 		expect(withExtras.minimumAdjustmentCents).toBe(59500);
 		expect(withExtras.itemTotalCents).toBe(50000);
-		expect(withExtras.totalCents).toBe(153000);
+		expect(withExtras.totalCents).toBe(152250);
+	});
+
+	test('prices both drinks per guest above the serving style floor', () => {
+		const estimate = computeEstimate(
+			sampleOffering,
+			{
+				servingStyle: ['just_tacos'],
+				proteins: ['asada', 'pollo'],
+				drinks: ['fruit_infused_water', 'horchata']
+			},
+			1
+		);
+		expect(estimate.perGuestCents).toBe(2250);
+		expect(estimate.minimumAdjustmentCents).toBe(48000);
+		expect(estimate.totalCents).toBe(50250);
 	});
 
 	test('uses the four configured appetizer unit prices', () => {
@@ -125,7 +140,7 @@ describe('computeEstimate', () => {
 				drinks: {
 					...sampleOffering.categories.drinks,
 					options: sampleOffering.categories.drinks.options.map((option) =>
-						option.id === 'horchata' ? { ...option, priceCents: 250 } : option
+						option.id === 'horchata' ? { ...option, priceCents: 200 } : option
 					)
 				}
 			}

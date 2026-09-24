@@ -148,14 +148,14 @@
 					label={offering.guestCountField.label}
 					type="number"
 					inputmode="numeric"
-					min={offering.guestCountField.minimumGuests}
+					min="1"
 					max={offering.guestCountField.maximumGuests}
 					step="1"
 					placeholder={offering.guestCountField.placeholder}
 					required
 					bind:value={formState.guestCount}
 					error={form?.fieldErrors?.guestCount?.[0] ?? formState.guestCountError}
-					helperText={`Minimum ${offering.guestCountField.minimumGuests} guests`}
+					helperText="Serving style minimums apply to every event."
 				/>
 
 				{#each Object.entries(offering.categories) as [categoryKey, category] (categoryKey)}

@@ -11,8 +11,8 @@ export function parseGuestCount(raw: string, field: GuestCountField): GuestCount
 	if (!Number.isSafeInteger(count)) {
 		return { count: null, error: 'Enter a whole number of guests' };
 	}
-	if (count < field.minimumGuests) {
-		return { count: null, error: `Enter at least ${field.minimumGuests} guests` };
+	if (count < 1) {
+		return { count: null, error: 'Enter at least 1 guest' };
 	}
 	if (count > field.maximumGuests) {
 		return { count: null, error: `Enter no more than ${field.maximumGuests} guests` };
