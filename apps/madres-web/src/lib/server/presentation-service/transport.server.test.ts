@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+vi.mock('$env/dynamic/private', () => ({ env: process.env }));
+
 import {
 	presentationServiceAccountId,
 	presentationServiceGalleryName,

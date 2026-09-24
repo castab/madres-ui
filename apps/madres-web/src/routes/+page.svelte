@@ -4,8 +4,12 @@
 	import { Tag } from '$lib/components/ui/tag/index.js';
 	import InquireCta from '$lib/components/inquire-cta.svelte';
 	import MarigoldWatermark from '$lib/components/marigold-watermark.svelte';
+	import LandingPhotos from './landing-photos.svelte';
 	import { eyebrow, headingDisplay, headingSection } from '$lib/styles.js';
 	import { cn } from '$lib/utils.js';
+	import type { PageProps } from './$types.js';
+
+	let { data }: PageProps = $props();
 
 	const experience = [
 		{
@@ -175,6 +179,10 @@
 			Wedding reception · 140 guests
 		</span>
 	</section>
+
+	{#if data.landingPhotos.length > 0}
+		<LandingPhotos tiles={data.landingPhotos} />
+	{/if}
 
 	<section class="bg-(--surface-sunken)">
 		<div
