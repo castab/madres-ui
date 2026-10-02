@@ -1,6 +1,6 @@
 # madres-ui
 
-Public-facing web app for Madres Taco Shop — built with **Svelte 5** (runes) on **Vite 8**, via SvelteKit 2.
+Public-facing web app for Madres Taco Shop — built with **Svelte 5** (runes) on **Vite 8**, via SvelteKit 3.
 
 ## Prerequisites
 
@@ -62,7 +62,7 @@ Run `npm run release:preflight -- vX.Y.Z` before tagging a release. See [RELEASI
 
 ## Tech stack
 
-- **Svelte 5** (runes-only) + **SvelteKit 2**, on **Vite 8**
+- **Svelte 5** (runes-only) + **SvelteKit 3**, on **Vite 8**
 - **Tailwind CSS v4** (CSS-first config) + **shadcn-svelte** components
 - **Vitest** (unit) + **Playwright** (e2e)
 - Ships as a standalone Node server via `@sveltejs/adapter-node` — see `apps/madres-web/Dockerfile` for the deployable container build

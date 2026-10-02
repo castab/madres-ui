@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Madres Taco Shop's public website. npm-workspaces monorepo with one app today:
-`apps/madres-web` (SvelteKit 2, Svelte 5 runes-only, Vite 8, Tailwind v4, shadcn-svelte,
+`apps/madres-web` (SvelteKit 3, Svelte 5 runes-only, Vite 8, Tailwind v4, shadcn-svelte,
 built with `adapter-node` and deployed to Railway).
 
 ## Where to look
