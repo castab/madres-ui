@@ -58,7 +58,7 @@ The client-side min/max enforcement exists for UX only, so keep the server check
 
 The Svelte MCP server comes from the `sveltejs/ai-tools` plugin, enabled in `.claude/settings.json` and
 `.opencode/`. The same plugin provides a `svelte-file-editor` subagent for editing `.svelte` / `.svelte.ts` files.
-When the server is available, follow the official usage guidance below.
+When the server is available, follow the official usage guidance below. One deviation for this repo is under `svelte-autofixer`.
 
 You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
 
@@ -75,7 +75,12 @@ After calling the list-sections tool, you MUST analyze the returned documentatio
 ### 3. svelte-autofixer
 
 Analyzes Svelte code and returns issues and suggestions.
-You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues or suggestions are returned.
+You MUST use this tool whenever writing Svelte code before sending it to the user. Keep calling it until no issues are returned.
+
+**Repo deviation:** suggestions are advisory, not required. Mention any you see in your summary, but only
+apply them when they concern code you're already changing for the task. Don't refactor existing code
+just to clear them. Several components already trigger suggestions (`$effect` usage, `bind:this`,
+attachments instead of actions).
 
 ### 4. playground-link
 
