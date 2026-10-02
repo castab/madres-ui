@@ -8,7 +8,7 @@ built with `adapter-node` and deployed to Railway).
 
 | Need                                                    | Read                                                                  |
 | ------------------------------------------------------- | --------------------------------------------------------------------- |
-| App architecture: routes, `$lib` layout, integrations   | [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md)              |
+| App architecture: routes, `#lib` layout, integrations   | [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md)              |
 | Env vars and the `/inquire` offering JSON schema        | [`apps/madres-web/.env.example`](apps/madres-web/.env.example)        |
 | Setup, scripts, stack                                   | [`README.md`](README.md)                                              |
 | Deploy and release (Railway, tags, preflight)           | [`RELEASING.md`](RELEASING.md)                                        |
@@ -35,14 +35,14 @@ also runs `build` and the e2e suite.
 - Reactivity via `$state` / `$derived` / `$props` / `$effect`. No `$:`, no writable stores, no `$app/stores` (use `$app/state`).
 - Reactive `Set`/`Map` must be `SvelteSet`/`SvelteMap` from `svelte/reactivity`; `$state(new Set())` does not track `.add()`. This has caused a production bug here.
 - Read a prop once to seed local state with `untrack()`; don't silence `state_referenced_locally` any other way.
-- Type props explicitly: `let { a, b }: Props = $props()`. Use `WithElementRef` / `WithoutChildren` from `$lib/utils.ts` when forwarding refs or taking `children`.
+- Type props explicitly: `let { a, b }: Props = $props()`. Use `WithElementRef` / `WithoutChildren` from `#lib/utils.js` when forwarding refs or taking `children`.
 - Snippets (`{#snippet}` / `{@render}`) only, never `<slot>` / `let:`. DOM event attributes (`onclick`), never `on:click`. No `<svelte:options accessors />`.
 - Use `{#key}` to fully remount a child when a prop change must reset its internal state.
 - File order: `<script lang="ts">`, then markup, then `<style>`. Prettier: tabs, single quotes, no trailing commas.
 
 **App invariants.** Details are in `apps/madres-web/AGENTS.md`.
 
-- Secrets and outbound calls live only in `src/lib/server/**` and read env via `$env/dynamic/*`, never `$env/static/*`, so builds succeed without an env file.
+- Secrets and outbound calls live only in `src/lib/server/**` and read env via `$app/env/private` / `$app/env/public`. Every variable is declared in `src/env.ts` as dynamic (never `static: true`) and optional, so builds succeed without an env file.
 - Every integration **fails closed**. If config is missing or a call fails, the page degrades to a safe empty or "not available" state and does not throw.
 - `/inquire` content, prices, and limits come from `PRIVATE_EVENT_OFFERING_JSON`, not source. Money is **integer cents**. The server re-validates everything the client submits.
 - Style with the CSS tokens in `layout.css` (e.g. `text-(--text-primary)`), not raw hex values.

@@ -2,7 +2,7 @@ import type {
 	GalleryMediaItem,
 	GalleryMediaType,
 	GalleryTile
-} from '$lib/server/presentation-service/gallery.server.js';
+} from '#lib/server/presentation-service/gallery.server.js';
 
 export function tileAlt(tile: GalleryTile, instagramHandle: string): string {
 	return tile.caption ?? `Photo from @${instagramHandle}`;

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import InfoIcon from '@lucide/svelte/icons/info';
-	import * as Popover from '$lib/components/ui/popover/index.js';
-	import { formatCents } from '$lib/offering/money.js';
-	import type { Category } from '$lib/offering/types.js';
-	import { focusRing } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
+	import * as Popover from '#lib/components/ui/popover/index.js';
+	import { formatCents } from '#lib/offering/money.js';
+	import type { Category } from '#lib/offering/types.js';
+	import { focusRing } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
 
 	type Props = {
 		category: Category;

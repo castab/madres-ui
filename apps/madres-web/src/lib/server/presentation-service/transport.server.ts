@@ -1,4 +1,9 @@
-import { env } from '$env/dynamic/private';
+import {
+	PRESENTATION_SERVICE_BASE_URL,
+	PRESENTATION_SERVICE_ACCOUNT_ID,
+	PRESENTATION_SERVICE_GALLERY_NAME,
+	PRESENTATION_SERVICE_TRACKING_TOKEN
+} from '$app/env/private';
 
 const DEFAULT_RESPONSE_LIMIT_BYTES = 1_048_576;
 const TRACKING_TOKEN_MIN_LENGTH = 16;
@@ -20,7 +25,7 @@ type PresentationServiceRequestOptions = {
 };
 
 function presentationServiceBaseUrl(): URL | null {
-	const configured = env.PRESENTATION_SERVICE_BASE_URL?.trim();
+	const configured = PRESENTATION_SERVICE_BASE_URL?.trim();
 	if (!configured) return null;
 	try {
 		const url = new URL(configured);
@@ -41,17 +46,17 @@ function presentationServiceBaseUrl(): URL | null {
 }
 
 export function presentationServiceAccountId(): string | null {
-	const value = env.PRESENTATION_SERVICE_ACCOUNT_ID?.trim();
+	const value = PRESENTATION_SERVICE_ACCOUNT_ID?.trim();
 	return value ? value : null;
 }
 
 export function presentationServiceGalleryName(): string | null {
-	const value = env.PRESENTATION_SERVICE_GALLERY_NAME?.trim();
+	const value = PRESENTATION_SERVICE_GALLERY_NAME?.trim();
 	return value ? value : null;
 }
 
 export function presentationServiceTrackingToken(): string | null {
-	const value = env.PRESENTATION_SERVICE_TRACKING_TOKEN?.trim();
+	const value = PRESENTATION_SERVICE_TRACKING_TOKEN?.trim();
 	return value && value.length >= TRACKING_TOKEN_MIN_LENGTH ? value : null;
 }
 

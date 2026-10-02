@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { sampleOffering } from '$lib/offering/fixtures.js';
+import { sampleOffering } from '#lib/offering/fixtures.js';
 
 beforeEach(() => {
 	vi.resetModules();
@@ -9,19 +9,17 @@ beforeEach(() => {
 
 afterEach(() => {
 	vi.restoreAllMocks();
-	vi.doUnmock('$env/dynamic/private');
+	vi.doUnmock('$app/env/private');
 });
 
 /** `getOffering` memoizes at module scope, so each case gets its own fresh module instance
  * via `resetModules` + a dynamic re-import — otherwise the first test's result would stick
- * for the rest of the file. `$env/dynamic/private` (not `process.env`) is mocked directly
- * since that's what `offering.server.ts` now reads — see its comment for why (a `.env` file
+ * for the rest of the file. `$app/env/private` (not `process.env`) is mocked directly
+ * since that's what `offering.server.ts` reads — see its comment for why (a `.env` file
  * alone is enough for local dev that way, which `process.env` mutation in a test doesn't
  * reflect once the real module reads through the SvelteKit env virtual module instead). */
 async function loadFreshModule(offeringJson: string | undefined) {
-	vi.doMock('$env/dynamic/private', () => ({
-		env: offeringJson === undefined ? {} : { PRIVATE_EVENT_OFFERING_JSON: offeringJson }
-	}));
+	vi.doMock('$app/env/private', () => ({ PRIVATE_EVENT_OFFERING_JSON: offeringJson }));
 	return await import('./offering.server.js');
 }
 
@@ -54,7 +52,7 @@ describe('getOffering', () => {
 		const mockEnv: Record<string, string> = {
 			PRIVATE_EVENT_OFFERING_JSON: JSON.stringify(sampleOffering)
 		};
-		vi.doMock('$env/dynamic/private', () => ({ env: mockEnv }));
+		vi.doMock('$app/env/private', () => new Proxy(mockEnv, { has: () => true }));
 		const { getOffering } = await import('./offering.server.js');
 
 		getOffering();

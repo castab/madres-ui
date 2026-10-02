@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CheckIcon from '@lucide/svelte/icons/check';
-	import { includedItemsForServingStyle } from '$lib/offering/included-items.js';
-	import type { IncludedItem } from '$lib/offering/types.js';
+	import { includedItemsForServingStyle } from '#lib/offering/included-items.js';
+	import type { IncludedItem } from '#lib/offering/types.js';
 
 	type Props = { items: IncludedItem[]; servingStyleId: string | undefined };
 	let { items, servingStyleId }: Props = $props();

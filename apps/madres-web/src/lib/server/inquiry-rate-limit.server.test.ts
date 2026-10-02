@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 const mockEnv: Record<string, string | undefined> = {};
-vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+vi.mock('$app/env/private', () => new Proxy(mockEnv, { has: () => true }));
 
 const { checkInquiryRateLimit } = await import('./inquiry-rate-limit.server.js');
 

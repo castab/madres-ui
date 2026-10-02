@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { StaffQuotedExtra } from '$lib/offering/types.js';
+	import type { StaffQuotedExtra } from '#lib/offering/types.js';
 
 	type Props = { items: StaffQuotedExtra[] };
 	let { items }: Props = $props();

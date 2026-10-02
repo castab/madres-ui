@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn, type WithoutChildren } from '$lib/utils.js';
-	import { showComingSoonToast } from '$lib/toast/coming-soon-toast-state.svelte.js';
+	import { cn, type WithoutChildren } from '#lib/utils.js';
+	import { showComingSoonToast } from '#lib/toast/coming-soon-toast-state.svelte.js';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import type { Snippet } from 'svelte';
 

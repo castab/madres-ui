@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { computeEstimate } from '$lib/offering/estimator.js';
-import { sampleOffering } from '$lib/offering/fixtures.js';
-import type { Quantities, Selections } from '$lib/offering/types.js';
+import { computeEstimate } from '#lib/offering/estimator.js';
+import { sampleOffering } from '#lib/offering/fixtures.js';
+import type { Quantities, Selections } from '#lib/offering/types.js';
 
-// `inquiry-email.server.ts` reads secrets through `$env/dynamic/private` (not `process.env`
+// `inquiry-email.server.ts` reads secrets through `$app/env/private` (not `process.env`
 // directly — see `offering.server.ts` for why), so that's what tests must mock. Unlike
 // `getOffering`, `sendInquiryNotification` reads it fresh on every call rather than caching,
 // so a single mutable mock object (no per-test module reset) is enough.
 const mockEnv: Record<string, string | undefined> = {};
-vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+vi.mock('$app/env/private', () => new Proxy(mockEnv, { has: () => true }));
 
 const { formatInquiryEmailText, sendInquiryNotification } =
 	await import('./inquiry-email.server.js');

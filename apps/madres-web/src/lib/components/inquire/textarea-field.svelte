@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn, type WithElementRef } from '$lib/utils.js';
-	import { focusRing } from '$lib/styles.js';
+	import { cn, type WithElementRef } from '#lib/utils.js';
+	import { focusRing } from '#lib/styles.js';
 	import type { HTMLTextareaAttributes } from 'svelte/elements';
 
 	type Props = WithElementRef<Omit<HTMLTextareaAttributes, 'id' | 'value'>> & {

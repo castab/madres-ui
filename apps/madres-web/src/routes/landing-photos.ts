@@ -1,4 +1,4 @@
-import type { GalleryTile } from '$lib/server/presentation-service/gallery.server.js';
+import type { GalleryTile } from '#lib/server/presentation-service/gallery.server.js';
 
 /** Keep one tile per post and retain only photo slides in its lightbox. */
 export function landingPhotoTiles(tiles: GalleryTile[]): GalleryTile[] {

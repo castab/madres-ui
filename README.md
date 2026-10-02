@@ -70,6 +70,6 @@ Run `npm run release:preflight -- vX.Y.Z` before tagging a release. See [RELEASI
 ## Further reading
 
 - [`AGENTS.md`](AGENTS.md): engineering rules and commands, for agents and humans.
-- [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md): app architecture (routes, `$lib` layout, integrations, tests).
+- [`apps/madres-web/AGENTS.md`](apps/madres-web/AGENTS.md): app architecture (routes, `#lib` layout, integrations, tests).
 - [`apps/madres-web/.env.example`](apps/madres-web/.env.example): every env var, plus the `/inquire` offering JSON format.
 - [RELEASING.md](RELEASING.md): deployment and release procedure.

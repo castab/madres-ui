@@ -21,12 +21,12 @@
 			aria-label="Footer navigation"
 			class="flex flex-wrap justify-center gap-x-5 gap-y-2 font-sans text-sm opacity-85 md:justify-end"
 		>
-			<a href={resolve('/#experience')}>Catering</a>
+			<a href={resolve('#experience')}>Catering</a>
 			<ComingSoonButton>Contact</ComingSoonButton>
 			{#if isExternal}
 				<a href={instagramProfileUrl} target="_blank" rel="noopener">Instagram</a>
 			{:else}
-				<a href={resolve('/gallery')}>Instagram</a>
+				<a href={resolve('gallery')}>Instagram</a>
 			{/if}
 		</nav>
 	</div>

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { Card } from '$lib/components/ui/card/index.js';
-	import { Tag } from '$lib/components/ui/tag/index.js';
-	import InquireCta from '$lib/components/inquire-cta.svelte';
-	import MarigoldWatermark from '$lib/components/marigold-watermark.svelte';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { Card } from '#lib/components/ui/card/index.js';
+	import { Tag } from '#lib/components/ui/tag/index.js';
+	import InquireCta from '#lib/components/inquire-cta.svelte';
+	import MarigoldWatermark from '#lib/components/marigold-watermark.svelte';
 	import LandingPhotos from './landing-photos.svelte';
-	import { eyebrow, headingDisplay, headingSection } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
+	import { eyebrow, headingDisplay, headingSection } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
 	import type { PageProps } from './$types.js';
 
 	let { data }: PageProps = $props();
@@ -85,7 +85,7 @@
 				</div>
 			</div>
 			<a
-				href={resolve('/gallery')}
+				href={resolve('gallery')}
 				class="group relative block aspect-(--ratio-hero) w-full overflow-hidden rounded-2xl bg-(--surface-sunken) shadow-(--shadow-lg) focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring) lg:aspect-[4/5]"
 			>
 				<img

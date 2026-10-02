@@ -1,4 +1,4 @@
-import { getGalleryPage } from '$lib/server/presentation-service/gallery.server.js';
+import { getGalleryPage } from '#lib/server/presentation-service/gallery.server.js';
 import { landingPhotoTiles } from './landing-photos.js';
 import type { PageServerLoad } from './$types.js';
 

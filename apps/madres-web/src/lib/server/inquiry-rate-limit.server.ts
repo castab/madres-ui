@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/private';
+import { INQUIRY_RATE_LIMIT_PER_15_MINUTES } from '$app/env/private';
 
 const WINDOW_MS = 15 * 60 * 1000;
 const DEFAULT_LIMIT = 5;
@@ -8,7 +8,7 @@ type AttemptWindow = { count: number; expiresAt: number };
 const attempts = new Map<string, AttemptWindow>();
 
 function configuredLimit(): number {
-	const value = env.INQUIRY_RATE_LIMIT_PER_15_MINUTES?.trim();
+	const value = INQUIRY_RATE_LIMIT_PER_15_MINUTES?.trim();
 	if (!value || !/^[1-9]\d*$/.test(value)) return DEFAULT_LIMIT;
 	const parsed = Number(value);
 	return Number.isSafeInteger(parsed) ? parsed : DEFAULT_LIMIT;

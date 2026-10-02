@@ -1,8 +1,8 @@
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import { computeEstimate } from '$lib/offering/estimator.js';
-import { parseGuestCount } from '$lib/offering/guest-count.js';
-import { parseItemQuantity, quantityOrderStatus } from '$lib/offering/quantity-order.js';
-import type { Offering, Quantities, Selections } from '$lib/offering/types.js';
+import { computeEstimate } from '#lib/offering/estimator.js';
+import { parseGuestCount } from '#lib/offering/guest-count.js';
+import { parseItemQuantity, quantityOrderStatus } from '#lib/offering/quantity-order.js';
+import type { Offering, Quantities, Selections } from '#lib/offering/types.js';
 
 /**
  * Runes-based reactive state for the `/inquire` form: customer info fields plus per-category

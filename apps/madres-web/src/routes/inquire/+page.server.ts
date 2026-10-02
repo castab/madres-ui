@@ -1,14 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
-import { env as publicEnv } from '$env/dynamic/public';
-import { getOffering } from '$lib/server/offering/offering.server.js';
-import { sendInquiryNotification } from '$lib/server/email/inquiry-email.server.js';
-import { checkInquiryRateLimit } from '$lib/server/inquiry-rate-limit.server.js';
-import { verifyTurnstileToken } from '$lib/server/turnstile/turnstile.server.js';
-import { computeEstimate } from '$lib/offering/estimator.js';
-import { parseGuestCount } from '$lib/offering/guest-count.js';
-import { parseQuantityFormData, quantityOrderStatus } from '$lib/offering/quantity-order.js';
-import type { Offering, Quantities, Selections } from '$lib/offering/types.js';
+import { PUBLIC_TURNSTILE_SITE_KEY } from '$app/env/public';
+import { getOffering } from '#lib/server/offering/offering.server.js';
+import { sendInquiryNotification } from '#lib/server/email/inquiry-email.server.js';
+import { checkInquiryRateLimit } from '#lib/server/inquiry-rate-limit.server.js';
+import { verifyTurnstileToken } from '#lib/server/turnstile/turnstile.server.js';
+import { computeEstimate } from '#lib/offering/estimator.js';
+import { parseGuestCount } from '#lib/offering/guest-count.js';
+import { parseQuantityFormData, quantityOrderStatus } from '#lib/offering/quantity-order.js';
+import type { Offering, Quantities, Selections } from '#lib/offering/types.js';
 import type { Actions, PageServerLoad } from './$types.js';
 
 /** One shape across every `fail()` outcome so `+page.svelte` can read `form?.field` without a
@@ -25,11 +25,11 @@ type InquireActionResult = {
 export const load: PageServerLoad = async () => {
 	return {
 		offering: getOffering(),
-		// `$env/dynamic/public` (not `static/public`) so the build doesn't hard-fail when this
+		// `$app/env/public` (dynamic, not `static: true`) so the build doesn't hard-fail when this
 		// isn't set — e.g. in CI, which has no env file at all. An empty site key means the
 		// widget itself fails to render/resolve, so the (already-required) client and server
 		// Turnstile checks fail closed the same way a missing `TURNSTILE_SECRET_KEY` does.
-		turnstileSiteKey: publicEnv.PUBLIC_TURNSTILE_SITE_KEY ?? ''
+		turnstileSiteKey: PUBLIC_TURNSTILE_SITE_KEY ?? ''
 	};
 };
 

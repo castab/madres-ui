@@ -15,6 +15,13 @@ This file maps the app.
 
 Gallery and landing pages set `prerender = false` because media URLs expire and must be fetched on each request.
 
+## `src/env.ts`
+
+Declares every env var the app reads (SvelteKit 3 `defineEnvVars`). Server code imports them from
+`$app/env/private`, public ones from `$app/env/public`. A new var must be added here first. Keep
+each one dynamic (no `static: true`) and optional (`input ?? ''`), so builds and startup work
+without an env file and integrations fail closed.
+
 ## `src/lib`
 
 - `server/`: server-only code.

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-// `turnstile.server.ts` reads its secret through `$env/dynamic/private` (matching
+// `turnstile.server.ts` reads its secret through `$app/env/private` (matching
 // `inquiry-email.server.ts` — see that file for why), so that's what tests must mock.
 const mockEnv: Record<string, string | undefined> = {};
-vi.mock('$env/dynamic/private', () => ({ env: mockEnv }));
+vi.mock('$app/env/private', () => new Proxy(mockEnv, { has: () => true }));
 
 const { verifyTurnstileToken } = await import('./turnstile.server.js');
 
