@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
-	import { eyebrow, headingDisplay } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import TextField from '$lib/components/inquire/text-field.svelte';
-	import TextareaField from '$lib/components/inquire/textarea-field.svelte';
-	import CategorySection from '$lib/components/inquire/category-section.svelte';
-	import EstimateSummary from '$lib/components/inquire/estimate-summary.svelte';
-	import IncludedItemsNote from '$lib/components/inquire/included-items-note.svelte';
-	import StaffQuotedNote from '$lib/components/inquire/staff-quoted-note.svelte';
-	import TurnstileWidget from '$lib/components/inquire/turnstile-widget.svelte';
+	import { eyebrow, headingDisplay } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import TextField from '#lib/components/inquire/text-field.svelte';
+	import TextareaField from '#lib/components/inquire/textarea-field.svelte';
+	import CategorySection from '#lib/components/inquire/category-section.svelte';
+	import EstimateSummary from '#lib/components/inquire/estimate-summary.svelte';
+	import IncludedItemsNote from '#lib/components/inquire/included-items-note.svelte';
+	import StaffQuotedNote from '#lib/components/inquire/staff-quoted-note.svelte';
+	import TurnstileWidget from '#lib/components/inquire/turnstile-widget.svelte';
 	import { InquireFormState } from './inquire-form-state.svelte.js';
 	import type { PageProps } from './$types.js';
 

@@ -2,8 +2,8 @@
 	import { fly } from 'svelte/transition';
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import XIcon from '@lucide/svelte/icons/x';
-	import { buttonBase, focusRing } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
+	import { buttonBase, focusRing } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
 	import {
 		comingSoonToastState,
 		dismissComingSoonToast,

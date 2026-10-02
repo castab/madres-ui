@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { eyebrow, headingDisplay } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
+	import { eyebrow, headingDisplay } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
 </script>
 
 <svelte:head>

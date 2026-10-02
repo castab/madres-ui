@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Category } from '$lib/offering/types.js';
+	import type { Category } from '#lib/offering/types.js';
 	import CategoryChipRadio from './category-chip-radio.svelte';
 	import CategoryChipCheckbox from './category-chip-checkbox.svelte';
 	import CategoryQuantityList from './category-quantity-list.svelte';

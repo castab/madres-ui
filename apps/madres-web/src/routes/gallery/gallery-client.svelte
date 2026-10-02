@@ -3,9 +3,9 @@
 	import type {
 		GalleryPage,
 		GalleryTile
-	} from '$lib/server/presentation-service/gallery.server.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { PlayIcon, StackedLayersIcon } from '$lib/components/icons/index.js';
+	} from '#lib/server/presentation-service/gallery.server.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { PlayIcon, StackedLayersIcon } from '#lib/components/icons/index.js';
 	import LightboxCarousel from './lightbox-carousel.svelte';
 	import { tileAlt, mediaTypeWord, truncateCaption } from './gallery-helpers.js';
 	import { SvelteSet } from 'svelte/reactivity';

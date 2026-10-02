@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { GalleryTile } from '$lib/server/presentation-service/gallery.server.js';
-	import { Badge } from '$lib/components/ui/badge/index.js';
+	import type { GalleryTile } from '#lib/server/presentation-service/gallery.server.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
 	import {
 		CloseIcon,
 		ChevronLeftIcon,
@@ -9,8 +9,8 @@
 		PauseIcon,
 		MutedIcon,
 		UnmutedIcon
-	} from '$lib/components/icons/index.js';
-	import { cn } from '$lib/utils.js';
+	} from '#lib/components/icons/index.js';
+	import { cn } from '#lib/utils.js';
 	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		tileAlt,

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
-	import SiteHeader from '$lib/components/site-header.svelte';
-	import SiteFooter from '$lib/components/site-footer.svelte';
-	import ComingSoonToast from '$lib/toast/coming-soon-toast.svelte';
+	import favicon from '#lib/assets/favicon.svg';
+	import SiteHeader from '#lib/components/site-header.svelte';
+	import SiteFooter from '#lib/components/site-footer.svelte';
+	import ComingSoonToast from '#lib/toast/coming-soon-toast.svelte';
 
 	let { children } = $props();
 </script>

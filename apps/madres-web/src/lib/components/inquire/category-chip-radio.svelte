@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { formatCents } from '$lib/offering/money.js';
-	import type { Category, Option } from '$lib/offering/types.js';
+	import { formatCents } from '#lib/offering/money.js';
+	import type { Category, Option } from '#lib/offering/types.js';
 	import Chip from './chip.svelte';
 	import ChipGroupShell from './chip-group-shell.svelte';
 

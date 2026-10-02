@@ -1,4 +1,4 @@
-import { getOffering } from '$lib/server/offering/offering.server.js';
+import { getOffering } from '#lib/server/offering/offering.server.js';
 import type { LayoutServerLoad } from './$types.js';
 
 /** Runs for every page. `offeringAvailable` doubles as a pseudo feature flag: every

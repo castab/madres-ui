@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { SvelteSet } from 'svelte/reactivity';
-	import type { GalleryTile } from '$lib/server/presentation-service/gallery.server.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { eyebrow, headingSection } from '$lib/styles.js';
+	import type { GalleryTile } from '#lib/server/presentation-service/gallery.server.js';
+	import { Button } from '#lib/components/ui/button/index.js';
+	import { eyebrow, headingSection } from '#lib/styles.js';
 	import LightboxCarousel from './gallery/lightbox-carousel.svelte';
 	import { tileAlt } from './gallery/gallery-helpers.js';
 
@@ -96,9 +96,10 @@
 				</button>
 			{/each}
 		</div>
-		<Button href={resolve('/gallery')} variant="secondary" class="self-center">
-			View full gallery
-		</Button>
+
+		<Button href={resolve('gallery')} variant="secondary" class="self-center"
+			>View full gallery</Button
+		>
 	</div>
 </section>
 

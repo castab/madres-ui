@@ -157,7 +157,7 @@ Design-system options (style, theme, icons, fonts, etc.) can be captured as an e
 | -------------------- | ---------------------------------------------------------------- |
 | `tailwind.css`       | Global CSS file path (Tailwind entry / theme variables)          |
 | `tailwind.baseColor` | Base palette (cannot change after init)                          |
-| `aliases.*`          | Import aliases; must match `svelte.config.js` / `tsconfig` paths |
+| `aliases.*`          | Import aliases; must match the `imports` field (`#lib/*`) in `package.json` |
 | `registry`           | Base registry URL (default `https://shadcn-svelte.com/registry`) |
 | `style`              | Registered style name (e.g. `nova`, `vega`, …)                   |
 | `iconLibrary`        | Icon set key (`lucide`, `tabler`, …) — drives generated imports  |

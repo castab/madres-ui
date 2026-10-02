@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import BrandMark from './brand-mark.svelte';
 	import ComingSoonButton from './coming-soon-button.svelte';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '#lib/utils.js';
 
 	const baseNavigation = [
 		{ href: '/#experience', label: 'Experience' },

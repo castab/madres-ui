@@ -1,7 +1,7 @@
 <script lang="ts">
 	import GalleryClient from './gallery-client.svelte';
-	import { eyebrow, headingDisplay } from '$lib/styles.js';
-	import { cn } from '$lib/utils.js';
+	import { eyebrow, headingDisplay } from '#lib/styles.js';
+	import { cn } from '#lib/utils.js';
 	import type { PageProps } from './$types.js';
 
 	let { data }: PageProps = $props();

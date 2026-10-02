@@ -1,14 +1,17 @@
-import { env } from '$env/dynamic/private';
+import { TURNSTILE_SECRET_KEY } from '$app/env/private';
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const REQUEST_TIMEOUT_MS = 10_000;
 
 export type VerifyTurnstileResult =
 	| { ok: true }
-	| { ok: false; kind: 'misconfigured' | 'missing-token' | 'timeout' | 'network' | 'rejected' };
+	| {
+			ok: false;
+			kind: 'misconfigured' | 'missing-token' | 'timeout' | 'network' | 'rejected';
+	  };
 
 function turnstileSecretKey(): string | null {
-	const value = env.TURNSTILE_SECRET_KEY?.trim();
+	const value = TURNSTILE_SECRET_KEY?.trim();
 	return value ? value : null;
 }
 

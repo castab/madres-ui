@@ -1,15 +1,15 @@
-import { env } from '$env/dynamic/private';
-import { parseOffering } from '$lib/offering/schema.js';
-import type { Offering } from '$lib/offering/types.js';
+import { PRIVATE_EVENT_OFFERING_JSON } from '$app/env/private';
+import { parseOffering } from '#lib/offering/schema.js';
+import type { Offering } from '#lib/offering/types.js';
 
 let cached: Offering | null | undefined;
 
 function loadOffering(): Offering | null {
-	// `$env/dynamic/private` (not `process.env` directly): during `vite dev` it's populated
+	// `$app/env/private` (not `process.env` directly): during `vite dev` it's populated
 	// from `.env` files too, not only real shell/OS env vars, so a `.env` file alone is
 	// enough for local dev. In production it still reads the real runtime `process.env` at
 	// server start (adapter-node wires this up), so Railway env vars work exactly as before.
-	const raw = env.PRIVATE_EVENT_OFFERING_JSON?.trim();
+	const raw = PRIVATE_EVENT_OFFERING_JSON?.trim();
 	if (!raw) {
 		console.warn(
 			'PRIVATE_EVENT_OFFERING_JSON is not set — the private-event inquiry form is disabled'

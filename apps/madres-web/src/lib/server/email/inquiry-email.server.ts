@@ -1,6 +1,12 @@
-import { env } from '$env/dynamic/private';
-import { formatCents } from '$lib/offering/money.js';
-import type { Estimate, Offering, Quantities, Selections } from '$lib/offering/types.js';
+import {
+	RESEND_API_KEY,
+	RESEND_FROM_EMAIL,
+	RESEND_TO_EMAIL,
+	INQUIRY_DEV_ALLOWED_EMAIL
+} from '$app/env/private';
+
+import { formatCents } from '#lib/offering/money.js';
+import type { Estimate, Offering, Quantities, Selections } from '#lib/offering/types.js';
 
 const RESEND_API_URL = 'https://api.resend.com/emails';
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -18,20 +24,23 @@ export type SendInquiryNotificationInput = {
 
 export type SendInquiryNotificationResult =
 	| { ok: true }
-	| { ok: false; kind: 'misconfigured' | 'blocked' | 'timeout' | 'network' | 'rejected' };
+	| {
+			ok: false;
+			kind: 'misconfigured' | 'blocked' | 'timeout' | 'network' | 'rejected';
+	  };
 
 function resendApiKey(): string | null {
-	const value = env.RESEND_API_KEY?.trim();
+	const value = RESEND_API_KEY?.trim();
 	return value ? value : null;
 }
 
 function resendFromEmail(): string | null {
-	const value = env.RESEND_FROM_EMAIL?.trim();
+	const value = RESEND_FROM_EMAIL?.trim();
 	return value ? value : null;
 }
 
 function resendToEmail(): string | null {
-	const value = env.RESEND_TO_EMAIL?.trim();
+	const value = RESEND_TO_EMAIL?.trim();
 	return value ? value : null;
 }
 
@@ -40,7 +49,7 @@ function resendToEmail(): string | null {
  * attempted. Unset (the default, and how production must be configured) disables the gate
  * entirely — every submission is allowed through, unrestricted. */
 function devAllowedEmail(): string | null {
-	const value = env.INQUIRY_DEV_ALLOWED_EMAIL?.trim();
+	const value = INQUIRY_DEV_ALLOWED_EMAIL?.trim();
 	return value ? value : null;
 }
 

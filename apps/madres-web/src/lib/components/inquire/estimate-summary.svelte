@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge/index.js';
-	import { formatCents } from '$lib/offering/money.js';
-	import type { Estimate, EstimateLineItem } from '$lib/offering/types.js';
+	import { Badge } from '#lib/components/ui/badge/index.js';
+	import { formatCents } from '#lib/offering/money.js';
+	import type { Estimate, EstimateLineItem } from '#lib/offering/types.js';
 
 	type Props = { estimate: Estimate; currency: string; isComplete: boolean };
 	let { estimate, currency, isComplete }: Props = $props();
