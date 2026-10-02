@@ -16,6 +16,11 @@ built with `adapter-node` and deployed to Railway).
 | Shared Tailwind class recipes (buttons, headings, etc.) | `apps/madres-web/src/lib/styles.ts`                                   |
 | shadcn-svelte / email skills                            | `.claude/skills/` (mirrored in `.agents/skills/`, `skills-lock.json`) |
 
+Both copies of the shadcn-svelte skill have been **patched locally** for SvelteKit 3: their `$lib/...` examples
+were rewritten to `#lib/.../index.js`. Upstream hasn't caught up yet, so `npx skills update` will revert
+the patch and `skills-lock.json`'s hash no longer matches these files. If you update the skill, reapply
+the patch to both copies, or drop it once upstream uses `#lib`.
+
 ## Commands (run from the repo root)
 
 - Node **v26.9.0** is required (`.nvmrc`; `engine-strict` makes `npm install` refuse other versions). Use `nvm use`.
